@@ -93,6 +93,14 @@ automatic.smokingguns=TRUE
     data(GSE32062.GPL6480_eset)
     data(GSE32063_eset)
     data(GSE12470_eset)
-    testesets <- list(JapaneseA=GSE32062.GPL6480_eset, JapaneseB=GSE32063_eset, Yoshihara2010=GSE12470_eset)
-    doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE, method="pearson"))
+    data(GSE17260_eset)
+
+    testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
+                      JapaneseB=GSE32063_eset, 
+                      Yoshihara2009=GSE12470_eset, 
+                      Yoshihara2010=GSE17260_eset)
+    testesets <- lapply(testesets, function(X) { sampleNames(X) <-
+     X$alt_sample_name; X })
+
+    doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
 })

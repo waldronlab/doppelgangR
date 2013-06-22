@@ -19,14 +19,20 @@ smokingGunFinder.args=list(transFun=I),
 manual.smokingguns=NULL,
 ### a character vector of phenoData columns that, if identical, will
 ### be considered evidence of duplication
-automatic.smokingguns=TRUE
+automatic.smokingguns=TRUE,
 ### automatically look for "smoking guns."  If TRUE, look for
 ### phenotype variables that are unique to each patient in dataset 1,
 ### also unique to each patient in dataset 2, but contain exact
 ### matches between datasets 1 and 2.
+verbose=TRUE
+### print progress information.
 ){
+    if (is.null(names(esets))) names(esets) <- make.names(1:length(esets))
+
     output <- lapply(1:length(esets), function(i){
         output2 <- lapply(i:length(esets), function(j){
+            if (verbose) print(paste("Working on datasets", names(esets)[i],
+            "and",names(esets)[j])) 
             ## calculate correlation matrix
             corFinder.args$eset.pair <- esets[c(i, j)]
             cor.sim <- do.call(corFinder, corFinder.args)

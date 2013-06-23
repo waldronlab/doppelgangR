@@ -1,4 +1,8 @@
-vectorHammingDist <- function ###Calculate Hamming Distance between two vectors, using pairwise complete observations.
+vectorHammingDist <- function #Calculate Hamming Distance between two vectors, using pairwise complete observations.
+### Simple function to count the fraction of different elements (in
+### the same position) between two vectors of the same length, after
+### removing elements from both vectors corresponding to positions
+### that are NA in either vector.
 (x,
 ### a vector (normally character)
 y

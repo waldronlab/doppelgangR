@@ -1,4 +1,7 @@
-corFinder <- function  ### Calculate pair-wise correlations between samples using the expr() slots of a list of two ExpressionSets.
+corFinder <- function  # Calculate pair-wise correlations between samples using the expr() slots of a list of two ExpressionSets.
+### This function acts as a wrapper around ComBat (sva package) and
+### cor(), to calculate pairwise correlations within one or between
+### two ExpressionSets.
 (eset.pair,
 ### a list of ExpressionSets, with two elements.  If the two
 ### elements are identical, return the correlation matrix for pairs

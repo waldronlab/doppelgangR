@@ -6,5 +6,5 @@ library(inlinedocs);
 package.skeleton.dx("doppelgangR")
 RSCRIPT
 
-R CMD INSTALL --build doppelgangR
-cd doppelgangR
+R CMD build doppelgangR
+

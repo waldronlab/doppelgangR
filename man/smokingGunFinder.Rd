@@ -1,7 +1,8 @@
 \name{smokingGunFinder}
 \alias{smokingGunFinder}
-\title{#Find doppelgangers based on "smoking gun" phenotypes - those that should be unique to each patient.}
-
+\title{Find doppelgangers based on "smoking gun" phenotypes - those that should be unique to each patient.}
+\description{Checks all pairwise combinations of samples for values of the
+"smoking" gun phenotypes that are identical.}
 \usage{smokingGunFinder(eset.pair, smokingguns, transFun = I, separator = ":")}
 \arguments{
   \item{eset.pair}{a list of ExpressionSets, with two elements.  If the two elements

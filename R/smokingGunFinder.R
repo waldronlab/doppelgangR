@@ -1,4 +1,6 @@
-smokingGunFinder <- function  ##Find doppelgangers based on "smoking gun" phenotypes - those that should be unique to each patient.
+smokingGunFinder <- function  #Find doppelgangers based on "smoking gun" phenotypes - those that should be unique to each patient.
+### Checks all pairwise combinations of samples for values of the
+### "smoking" gun phenotypes that are identical.
 (eset.pair,
 ### a list of ExpressionSets, with two elements.  If the two elements
 ### are identical, the function will check for duplicate IDs within

@@ -1,7 +1,8 @@
 \name{phenoDist}
 \alias{phenoDist}
-\title{##Calculate distance between two vectors, rows of one matrix/dataframe, or rows of two matrices/dataframes.}
-
+\title{Calculate distance between two vectors, rows of one matrix/dataframe, or rows of two matrices/dataframes.}
+\description{This function does some simple looping to allow x and y to be
+various combinations of vectors and matrices/dataframes.}
 \usage{phenoDist(x, y = NULL, vectorDistFun = vectorHammingDist, ...)}
 \arguments{
   \item{x}{A vector, matrix or dataframe}

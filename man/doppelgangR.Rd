@@ -5,10 +5,11 @@
 \usage{doppelgangR(esets, separator = ":", corFinder.args = list(separator = separator, 
     use.ComBat = TRUE, method = "pearson"), phenoFinder.args = list(separator = separator), 
     phenoDist.args = list(vectorDistFun = vectorHammingDist), 
-    outlierFinder.expr.args = list(bonf.pvalue = 0.05, transFun = atanh), 
-    outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, 
-        bonf.pvalue = NULL), smokingGunFinder.args = list(transFun = I), 
-    manual.smokingguns = NULL, automatic.smokingguns = TRUE)}
+    outlierFinder.expr.args = list(bonf.pvalue = 0.01, transFun = atanh, 
+        tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, 
+        bonf.pvalue = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I), 
+    manual.smokingguns = NULL, automatic.smokingguns = TRUE, 
+    verbose = TRUE)}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}
   \item{separator}{a delimitor to use between dataset names and sample names}
@@ -24,6 +25,7 @@ be considered evidence of duplication}
 phenotype variables that are unique to each patient in dataset 1,
 also unique to each patient in dataset 2, but contain exact
 matches between datasets 1 and 2.}
+  \item{verbose}{print progress information.}
 }
 
 \value{Returns a dataframe with columns: sample1, sample2, correlation,
@@ -40,6 +42,12 @@ library(curatedOvarianData)
 data(GSE32062.GPL6480_eset)
 data(GSE32063_eset)
 data(GSE12470_eset)
-testesets <- list(JapaneseA=GSE32062.GPL6480_eset, JapaneseB=GSE32063_eset, Yoshihara2010=GSE12470_eset)
-doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE, method="pearson"))
+data(GSE17260_eset)
+testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
+                  JapaneseB=GSE32063_eset, 
+                  Yoshihara2009=GSE12470_eset, 
+                  Yoshihara2010=GSE17260_eset)
+testesets <- lapply(testesets, function(X) { sampleNames(X) <-
+                                                 X$alt_sample_name; X })
+doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
 }

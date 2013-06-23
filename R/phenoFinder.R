@@ -1,4 +1,7 @@
-phenoFinder <- function ### Calculate pairwise similarities of phenoData between samples for a list containing two ExpressionSets
+phenoFinder <- function # Calculate pairwise similarities of phenoData between samples for a list containing two ExpressionSets
+### This function acts as a wrapper to phenoDist to handle cases of
+### one ExpressionSet, a list of two identical ExpressionSets, or a
+### list of two different ExpressionSets.
 (eset.pair,
 ### input: a list of ExpressionSets with two elements, or an
 ### ExpressionSet.  If the two elements are identical, return the
@@ -15,12 +18,9 @@ separator=":",
        & (class(eset.pair) != "list" || length(eset.pair) > 2))
         stop("eset.pair should be a list of two esets")
     if( identical(class(eset.pair), "list") & !identical(eset.pair[[1]], eset.pair[[2]]) ){
-<<<<<<< HEAD
         if(!identical(colnames(pData(eset.pair[[1]])), colnames(pData(eset.pair[[2]]))))
-=======
         if(!identical(colnames(pData(eset.pair[[1]])),
         colnames(pData(eset.pair[[2]]))))
->>>>>>> 465ec702103c55da487d63f5f4b203e55ce3ba43
             stop("Both ExpressionSets should have the same columnames in their phenoData slots.")
         matrix.one <- as.matrix(pData(eset.pair[[1]]))
         matrix.two <- as.matrix(pData(eset.pair[[2]]))

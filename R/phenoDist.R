@@ -1,5 +1,7 @@
 
-phenoDist <- function ###Calculate distance between two vectors, rows of one matrix/dataframe, or rows of two matrices/dataframes.
+phenoDist <- function #Calculate distance between two vectors, rows of one matrix/dataframe, or rows of two matrices/dataframes.
+### This function does some simple looping to allow x and y to be
+### various combinations of vectors and matrices/dataframes.
 (x,
 ### A vector, matrix or dataframe
 y=NULL,

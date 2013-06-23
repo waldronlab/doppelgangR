@@ -20,6 +20,9 @@ normal.upper.thresh=NULL,
 ### Instead of specifying bonf.pvalue and transFun, an upper
 ### similarity threshold can be set, and values above this will be
 ### considered likely duplicates.
+tail="upper",
+### "upper" to look for samples with very high similarity values,
+### "lower" to look for very low values, or "both" to look for both.
 prune.output=TRUE
 ### If prune.output=TRUE, only return likely doppelgangers.
 ){
@@ -28,17 +31,22 @@ prune.output=TRUE
     if(is.null(normal.upper.thresh) & !is.null(bonf.pvalue) & !is.null(transFun)){
         zmat <- transFun(similarity.mat)
         raw.pvalue <- bonf.pvalue / sum(!is.na(zmat))
-        z.cutoff <- qnorm(1-raw.pvalue, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
-        outlier.mat <- zmat > z.cutoff
+        if(identical(tail, "upper")){
+            z.cutoff <- qnorm(1-raw.pvalue, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            outlier.mat <- zmat > z.cutoff
+        }else if(identical(tail, "lower")){
+            z.cutoff <- qnorm(raw.pvalue, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            outlier.mat <- zmat < z.cutoff
+        }else if(identical(tail, "both")){
+            z.cutoff <- qnorm(c(raw.pvalue, 1-raw.pvalue), mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            outlier.mat <- (zmat < z.cutoff[1]) | (zmat > z.cutoff[2])
+        }else{ error("tail argument should be upper, lower, or both.") }
     }else if(!is.null(normal.upper.thresh)){
         outlier.mat <- similarity.mat > normal.upper.thresh
     }else{
         return(NULL)
     }
     outlier.mat[is.na(outlier.mat)] <- FALSE
-##    output <- data.frame(sample1=rownames(outlier.mat)[row(outlier.mat)[which(outlier.mat)]],
-##                         sample2=colnames(outlier.mat)[col(outlier.mat)[which(outlier.mat)]],
-##                         similarity=similarity.mat[which(outlier.mat)])
     output <- .outer2df(rownames(outlier.mat), colnames(outlier.mat), bidirectional=TRUE, diag=TRUE)
     output$similarity <- .outer2df(similarity.mat, bidirectional=TRUE, diag=TRUE)
     output$doppel <- .outer2df(outlier.mat, bidirectional=TRUE, diag=TRUE)

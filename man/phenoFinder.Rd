@@ -1,7 +1,9 @@
 \name{phenoFinder}
 \alias{phenoFinder}
-\title{## Calculate pairwise similarities of phenoData between samples for a list containing two ExpressionSets}
-
+\title{Calculate pairwise similarities of phenoData between samples for a list containing two ExpressionSets}
+\description{This function acts as a wrapper to phenoDist to handle cases of
+one ExpressionSet, a list of two identical ExpressionSets, or a
+list of two different ExpressionSets.}
 \usage{phenoFinder(eset.pair, separator = ":", ...)}
 \arguments{
   \item{eset.pair}{input: a list of ExpressionSets with two elements, or an

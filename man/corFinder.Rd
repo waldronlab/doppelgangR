@@ -1,7 +1,9 @@
 \name{corFinder}
 \alias{corFinder}
-\title{## Calculate pair-wise correlations between samples using the expr() slots of a list of two ExpressionSets.}
-
+\title{Calculate pair-wise correlations between samples using the expr() slots of a list of two ExpressionSets.}
+\description{This function acts as a wrapper around ComBat (sva package) and
+cor(), to calculate pairwise correlations within one or between
+two ExpressionSets.}
 \usage{corFinder(eset.pair, separator = ":", use.ComBat = TRUE, ...)}
 \arguments{
   \item{eset.pair}{a list of ExpressionSets, with two elements.  If the two

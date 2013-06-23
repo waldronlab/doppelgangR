@@ -19,14 +19,24 @@ smokingGunFinder.args=list(transFun=I),
 manual.smokingguns=NULL,
 ### a character vector of phenoData columns that, if identical, will
 ### be considered evidence of duplication
-automatic.smokingguns=TRUE
+automatic.smokingguns=TRUE,
 ### automatically look for "smoking guns."  If TRUE, look for
 ### phenotype variables that are unique to each patient in dataset 1,
 ### also unique to each patient in dataset 2, but contain exact
 ### matches between datasets 1 and 2.
+verbose=TRUE
+### print progress information.
 ){
+    if (is.null(names(esets))) names(esets) <- make.names(1:length(esets))
+
     output <- lapply(1:length(esets), function(i){
+<<<<<<< HEAD
         output2 <- lapply(i:length(esets), function(j, i){
+=======
+        output2 <- lapply(i:length(esets), function(j){
+            if (verbose) print(paste("Working on datasets", names(esets)[i],
+            "and",names(esets)[j])) 
+>>>>>>> 465ec702103c55da487d63f5f4b203e55ce3ba43
             ## calculate correlation matrix
             corFinder.args$eset.pair <- esets[c(i, j)]
             cor.sim <- do.call(corFinder, corFinder.args)
@@ -99,7 +109,15 @@ automatic.smokingguns=TRUE
     data(GSE32062.GPL6480_eset)
     data(GSE32063_eset)
     data(GSE12470_eset)
-    testesets <- list(JapaneseA=GSE32062.GPL6480_eset, JapaneseB=GSE32063_eset, Yoshihara2010=GSE12470_eset)
-    doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE, method="pearson"))
+    data(GSE17260_eset)
+
+    testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
+                      JapaneseB=GSE32063_eset, 
+                      Yoshihara2009=GSE12470_eset, 
+                      Yoshihara2010=GSE17260_eset)
+    testesets <- lapply(testesets, function(X) { sampleNames(X) <-
+     X$alt_sample_name; X })
+
+    doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
 })
 

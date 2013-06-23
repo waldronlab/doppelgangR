@@ -1,6 +1,5 @@
 \name{doppelgangR-package}
 \alias{doppelgangR-package}
-\alias{doppelgangR}
 \docType{package}
 \title{Identify likely duplicate samples from genomic or meta-data.}
 \description{The main function is doppelgangR(), which takes as minimal

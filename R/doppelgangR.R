@@ -101,19 +101,21 @@ verbose=TRUE
         do.call(rbind, output2)
     })
     results <- do.call(rbind, output)
-    output <- new("doppelgangR", results=results, correlations=correlations.list, smokingguns=smokingguns.list)
-### Returns an object of S4-class "doppelgangR".  See ?doppelgangR-class.
+    output <- new("DoppelGang", results=results, correlations=correlations.list, smokingguns=smokingguns.list)
+### Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.
 }, ex=function(){
-    library(curatedOvarianData)
-    data(GSE32062.GPL6480_eset)
-    data(GSE32063_eset)
-    data(GSE12470_eset)
-    data(GSE17260_eset)
-    testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
-                      JapaneseB=GSE32063_eset, 
-                      Yoshihara2009=GSE12470_eset, 
-                      Yoshihara2010=GSE17260_eset)
-    testesets <- lapply(testesets, function(X) { sampleNames(X) <-
-                                                     X$alt_sample_name; X })
-    doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
+    if(require(curatedOvarianData)){
+        data(GSE32062.GPL6480_eset)
+        data(GSE32063_eset)
+        data(GSE12470_eset)
+        data(GSE17260_eset)
+        testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
+                          JapaneseB=GSE32063_eset, 
+                          Yoshihara2009=GSE12470_eset, 
+                          Yoshihara2010=GSE17260_eset)
+        testesets <- lapply(testesets, function(X) { sampleNames(X) <-
+                                                         X$alt_sample_name; X })
+        library(doppelgangR)
+        doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
+    }
 })

@@ -29,6 +29,7 @@
  \itemize{
    \item{print}{Use \code{print(DoppelGang-object)} for brief information.}
    \item{summary}{Use \code{summary(DoppelGang-object)} for brief information.}
+   \item{show}{Use \code{DoppelGang-object} for brief information.}
  }
 }
 

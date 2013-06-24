@@ -40,7 +40,7 @@ prune.output=TRUE
         }else if(identical(tail, "both")){
             z.cutoff <- qnorm(c(raw.pvalue, 1-raw.pvalue), mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
             outlier.mat <- (zmat < z.cutoff[1]) | (zmat > z.cutoff[2])
-        }else{ error("tail argument should be upper, lower, or both.") }
+        }else{ stop("tail argument should be upper, lower, or both.") }
     }else if(!is.null(normal.upper.thresh)){
         outlier.mat <- similarity.mat > normal.upper.thresh
     }else{

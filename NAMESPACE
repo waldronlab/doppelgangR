@@ -1,2 +1,8 @@
-exportPattern("^[[:alpha:]]+")
 importFrom(sva, ComBat)
+
+exportPattern("corFinder, doppelgangR, outer2df, outlierFinder, phenoDist, phenoFinder, smokingGunFinder, vectorHammingDist")
+
+exportClasses("DoppelGang")
+
+exportMethods("print", "summary")
+

@@ -27,6 +27,8 @@ automatic.smokingguns=TRUE,
 verbose=TRUE
 ### print progress information.
 ){
+    correlations.list <- list()
+    smokingguns.list <- list()
     if (is.null(names(esets)))
         names(esets) <- make.names(1:length(esets))
     output <- lapply(1:length(esets), function(i){
@@ -36,6 +38,7 @@ verbose=TRUE
             ## calculate correlation matrix
             corFinder.args$eset.pair <- esets[c(i, j)]
             cor.sim <- do.call(corFinder, corFinder.args)
+            correlations.list[[paste(names(esets)[c(i, j)], collapse=separator)]] <- cor.sim
             ## find numeric (expression) doppelgangers
             outlierFinder.expr.args$similarity.mat <- cor.sim
             outlierFinder.expr.args$prune.output <- FALSE
@@ -52,6 +55,7 @@ verbose=TRUE
             if(automatic.smokingguns){
                 manual.smokingguns <- unique(c(manual.smokingguns, new.smokinggun.phenotypes))
             }
+            smokingguns.list[[paste(names(esets)[c(i, j)], collapse=separator)]] <- manual.smokingguns
             if(!is.null(manual.smokingguns)){
                 smokingGunFinder.args$eset.pair <- esets[c(i, j)]
                 smokingGunFinder.args$smokingguns <- manual.smokingguns
@@ -96,10 +100,9 @@ verbose=TRUE
         }, i=i)
         do.call(rbind, output2)
     })
-    do.call(rbind, output)
-### Returns a dataframe with columns: sample1, sample2, correlation,
-### phenotype.similarity, numeric.doppel, pheno.doppel, smokinggun,
-### sample1.keep, sample2.keep.
+    results <- do.call(rbind, output)
+    output <- new("doppelgangR", results=results, correlations=correlations.list, smokingguns=smokingguns.list)
+### Returns an object of S4-class "doppelgangR".  See ?doppelgangR-class.
 }, ex=function(){
     library(curatedOvarianData)
     data(GSE32062.GPL6480_eset)

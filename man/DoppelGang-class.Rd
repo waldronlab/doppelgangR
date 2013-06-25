@@ -12,17 +12,24 @@
   datasets.}
 \section{Slots}{
 	 \describe{
-    \item{\code{results}:}{ A dataframe of doppelganger search results.
-    It may contain columns: sample1 (label), sample2 (label),
-    expr.similarity (numeric), expr.doppel (TRUE for expression-evidence
-  duplicates), pheno.similarity (numeric), pheno.doppel (TRUE for
-  phenotype-evidence duplicates), smokinggun.similarity (numeric),
-  smokinggun.doppel (TRUE for duplicates based on "smoking gun" evidence.)}
-    \item{\code{correlations}:}{Pairwise expression similarity matrix (by
-      default correlations) for each pair of datasets and within each dataset.}
-    \item{\code{smokingguns}:}{Column names of pData that were specified
-      or inferred to be "smoking gun" phenotypes: where an identical
-      value implies duplicated samples.}
+	   \item{\code{summaryresults}:}{ A dataframe of doppelganger search results.
+	     It may contain columns: sample1 (label), sample2 (label),
+	     expr.similarity (numeric), expr.doppel (TRUE for expression-evidence
+	     duplicates), pheno.similarity (numeric), pheno.doppel (TRUE for
+	     phenotype-evidence duplicates), smokinggun.similarity (numeric),
+	     smokinggun.doppel (TRUE for duplicates based on "smoking
+	     gun" evidence.)}
+	     \item{\code{fullresults}:}{ A nested list with doppelganger search
+	       results for each pair of datasets. List elements
+	       corresponding to a pair of datasets each have the
+	       following elements:  \code{correlations}: Pairwise expression similarity matrix (by
+	     default correlations) for each pair of datasets and within each dataset, \code{expr.doppels}: a
+	       data.frame of candidate expression doppelgangers,
+	       \code{pheno.doppels}: a data.frame of candidate phenotype
+	       doppelgangers, and \code{smokingguns} a character vector
+	       of column names of pData that were specified
+	       or inferred to be "smoking gun" phenotypes: where an identical
+	     value implies duplicated samples.}
   }
 }
 \section{Methods}{

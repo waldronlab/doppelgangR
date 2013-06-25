@@ -34,9 +34,13 @@
 }
 \section{Methods}{
  \itemize{
-   \item{print}{Use \code{print(DoppelGang-object)} for brief information.}
-   \item{summary}{Use \code{summary(DoppelGang-object)} for brief information.}
+   \item{print}{Use \code{print(DoppelGang-object)} to show the
+     object@summaryresults slot.}
+   \item{summary}{Use \code{summary(DoppelGang-object)} to summarize the
+     object@summaryresults slot.}
    \item{show}{Use \code{DoppelGang-object} for brief information.}
+   \item{plot}{Use \code{plot(DoppelGang-object)}.  "..." arguments are
+     passed onto hist.}
  }
 }
 

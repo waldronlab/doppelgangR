@@ -4,6 +4,7 @@ setClass(Class = "DoppelGang", representation(fullresults = "list", summaryresul
 
 setGeneric("print")
 setGeneric("summary")
+setGeneric("plot")
 
 setMethod("print", signature(x="DoppelGang"),
           function(x) print(x@summaryresults))
@@ -23,3 +24,16 @@ setMethod("show", signature="DoppelGang",
               cat (" \n ")
           })
 
+setMethod("plot", signature(x="DoppelGang"),
+          function(x){
+              for (i in 1:length(x@fullresults)){
+                  for (j in 1:length(x@fullresults[[i]])){
+                      cors <- x@fullresults[[i]][[j]]$correlations
+                      cors <- cors[upper.tri(cors)]
+                      hist(cors, main = paste(names(x@fullresults)[i],
+                                              names(x@fullresults[[i]])[j], sep = " / "),
+                           xlab = "Pairwise Correlations", breaks="FD")
+                      expr.doppels <- x@fullresults[[i]][[j]]$expr.doppels
+                      abline(v=expr.doppels$similarity, col="red")
+                      par(ask=TRUE)
+                  }}})

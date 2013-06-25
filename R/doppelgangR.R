@@ -143,5 +143,10 @@ verbose=TRUE
     testesets <- lapply(testesets, function(X) { sampleNames(X) <-
                                                      X$alt_sample_name; X })
     library(doppelgangR)
-    tmp <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
+    results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
+    summary(results1)
+    plot(results1)
+    ## Set phenoFinder.args to ignore similar phenotypes:
+    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL)
+    summary(results2)
 })

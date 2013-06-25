@@ -11,7 +11,7 @@ phenoFinder.args=list(separator=separator),
 ### NULL, samples with similar phenotypes will not be searched for.
 phenoDist.args=list(vectorDistFun=vectorHammingDist),
 ### a list of arguments to be passed to the phenoDist function
-outlierFinder.expr.args=list(bonf.pvalue=0.01, transFun=atanh, tail="upper"),
+outlierFinder.expr.args=list(bonf.pvalue=0.001, transFun=atanh, tail="upper"),
 ### a list of arguments to be passed to outlierFinder when called for expression data
 outlierFinder.pheno.args=list(normal.upper.thresh=0.99, bonf.pvalue=NULL, tail="upper"),
 ### a list of arguments to be passed to outlierFinder when called for phenotype data

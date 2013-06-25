@@ -25,17 +25,19 @@ setMethod("show", signature="DoppelGang",
           })
 
 setMethod("plot", signature(x="DoppelGang"),
-          function(x){
+          function(x, skip.no.doppels=FALSE, ...){
               results <- x@fullresults
               for (i in 1:length(results)){
                   for (j in 1:length(results[[i]])){
                       cors <- results[[i]][[j]]$correlations
                       cors <- na.omit(as.numeric(cors))
-                      hist(cors, main = paste(names(results)[i],
-                                              names(results[[i]])[j], sep = " / "),
-                           xlab = "Pairwise Correlations", breaks="FD")
                       expr.doppels <- results[[i]][[j]]$expr.doppels
                       expr.doppels <- expr.doppels[expr.doppels$doppel, ]
+                      if(skip.no.doppels & (nrow(expr.doppels) == 0 | is.null(expr.doppels)))
+                          next
+                      hist(cors, main = paste(names(results)[i],
+                                              names(results[[i]])[j], sep = " / "),
+                           xlab = "Pairwise Correlations", breaks="FD", ...)
                       abline(v=expr.doppels$similarity, col="red", lw=0.5)
                       par(ask=TRUE)
                   }}})

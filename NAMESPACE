@@ -4,4 +4,4 @@ export(doppelgangR, corFinder, outlierFinder, phenoDist, phenoFinder, smokingGun
 
 exportClasses("DoppelGang")
 
-exportMethods("print", "summary", "show")
+exportMethods("print", "summary", "show", "plot")

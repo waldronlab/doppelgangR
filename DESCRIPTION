@@ -4,7 +4,7 @@ Depends: R (>= 2.10), affy, methods, Biobase
 Suggests: curatedOvarianData
 Imports: sva
 Author: Levi Waldron and Markus Riester
-Version: 0.4.1
+Version: 0.4.2
 Date: 2013-06-25
 License: GPL (>=2.0)
 Title: Identify likely duplicate samples from genomic or meta-data.

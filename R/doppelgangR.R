@@ -30,6 +30,8 @@ verbose=TRUE
 ){
     if (is.null(names(esets)))
         names(esets) <- make.names(1:length(esets))
+    if(length(esets) > length(unique(names(esets))))
+        names(esets) <- make.unique(names(esets))
     output.full <- lapply(1:length(esets), function(i){
         output2 <- lapply(i:length(esets), function(j, i){
             if (verbose)
@@ -132,7 +134,7 @@ verbose=TRUE
     ##If all esets have the same colnames of pdata, add merged
     ##pairwise sample pdata to all.doppels:
     if( identical(nrow(all.doppels) > 0, TRUE) &&
-       !is.null(phenoFinder.args) &&
+##       !is.null(phenoFinder.args) &&
        identical(colnames(pData(esets[[1]])), unique(unlist(lapply(esets, function(eset) colnames(pData(eset)))))) ){
 ###        dataset1 <- sapply(strsplit(all.doppels$sample1, split=separator), function(x) x[1])
 ###        dataset1 <- sapply(strsplit(all.doppels$sample2, split=separator), function(x) x[1])
@@ -159,8 +161,10 @@ verbose=TRUE
                       JapaneseB=GSE32063_eset, 
                       Yoshihara2009=GSE12470_eset, 
                       Yoshihara2010=GSE17260_eset)
-    testesets <- lapply(testesets, function(X) { sampleNames(X) <-
-                                                     X$alt_sample_name; X })
+    testesets <- lapply(testesets, function(X){
+        sampleNames(X) <- X$alt_sample_name
+        pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
+        X })
     library(doppelgangR)
     results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
     summary(results1)

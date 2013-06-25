@@ -28,7 +28,7 @@ use.ComBat=TRUE,
         ## Calculate correlation matrix for a pair of ExpressionSets:
         if(use.ComBat){
             big.matrix <- do.call(cbind, lapply(eset.pair, exprs))
-            batch.var <- sapply(names(eset.pair), function(x) rep(x, ncol(eset.pair[[x]])))
+            batch.var <- lapply(names(eset.pair), function(x) rep(x, ncol(eset.pair[[x]])))
             batch.var <- do.call(c, batch.var)
             big.matrix.combat <- sva::ComBat(big.matrix, mod=model.matrix(~(rep(1, length(batch.var)))), batch=batch.var)
             matrix.pair <- lapply(unique(batch.var), function(x) big.matrix.combat[, batch.var %in% x])

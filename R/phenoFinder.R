@@ -14,33 +14,33 @@ separator=":",
 ...
 ### Extra arguments passed on to phenoDist
 ){
-    if((class(eset.pair) != "ExpressionSet")
-       & (class(eset.pair) != "list" || length(eset.pair) > 2))
-        stop("eset.pair should be a list of two esets")
-    if( identical(class(eset.pair), "list") & !identical(eset.pair[[1]], eset.pair[[2]]) ){
-        if(!identical(colnames(pData(eset.pair[[1]])), colnames(pData(eset.pair[[2]]))))
-        if(!identical(colnames(pData(eset.pair[[1]])),
-        colnames(pData(eset.pair[[2]]))))
-            stop("Both ExpressionSets should have the same columnames in their phenoData slots.")
-        matrix.one <- as.matrix(pData(eset.pair[[1]]))
-        matrix.two <- as.matrix(pData(eset.pair[[2]]))
-        matrix.one <- matrix.one[, apply(matrix.one, 2, function(x) !all(is.na(x)))]
-        matrix.two <- matrix.two[, match(colnames(matrix.one), colnames(matrix.two))]
-        rownames(matrix.one) <- paste(names(eset.pair)[1], rownames(matrix.one), sep=separator)
-        rownames(matrix.two) <- paste(names(eset.pair)[2], rownames(matrix.two), sep=separator)
-        similarity.mat <- 1 - phenoDist(matrix.one, matrix.two, ...)
-    }else{
+    if(class(eset.pair) == "ExpressionSet"){
+        eset.pair <- list(eset.pair, eset.pair)
+        names(eset.pair) <- 1:2
+    }
+    if((!identical(class(eset.pair), "list") | length(eset.pair) != 2))
+        stop("eset.pair should be a list of length 2")
+    if(!identical(colnames(pData(eset.pair[[1]])), colnames(pData(eset.pair[[2]]))))
+        stop("Both ExpressionSets should have the same colnames in their phenoData slots.")
+    matrix.one <- as.matrix(pData(eset.pair[[1]]))
+    ##This part removes columns that are all NA.  The complication
+    ##with keep.col is necessary because Surv objects get turned
+    ##into two elements in keep.col.
+    keep.col <- apply(matrix.one, 2, function(x) !all(is.na(x)))
+    keep.col <- keep.col[names(keep.col) %in% colnames(matrix.one)]
+    matrix.one <- matrix.one[, match(names(keep.col), colnames(matrix.one))]
+    matrix.one <- matrix.one[, keep.col]
+    rownames(matrix.one) <- paste(names(eset.pair)[1], rownames(matrix.one), sep=separator)
+    if( identical(eset.pair[[1]], eset.pair[[2]]) ){
         ##Calculate similarity matrix for a single ExpressionSet:
-        if(identical(class(eset.pair), "list")){
-            matrix.one <- pData(eset.pair[[1]])
-            rownames(matrix.one) <- paste(names(eset.pair)[1], rownames(matrix.one), sep=separator)
-        }else{
-            matrix.one <- pData(eset.pair)
-        }
-        ##get rid of columns that are all NA:
-        matrix.one <- matrix.one[, apply(matrix.one, 2, function(x) !all(is.na(x)))]
         similarity.mat <- 1 - phenoDist(matrix.one, ...)
         similarity.mat[!upper.tri(similarity.mat)] <- NA  ##NA for all but upper triangle.
+    }else{
+        ##Calculate similarity matrix for two distinct ExpressionSets:
+        matrix.two <- as.matrix(pData(eset.pair[[2]]))
+        matrix.two <- matrix.two[, match(colnames(matrix.one), colnames(matrix.two))]
+        rownames(matrix.two) <- paste(names(eset.pair)[2], rownames(matrix.two), sep=separator)
+        similarity.mat <- 1 - phenoDist(matrix.one, matrix.two, ...)
     }
     return(similarity.mat)
 ### A matrix of similarities between the phenotypes of pairs of samples.

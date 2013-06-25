@@ -47,5 +47,4 @@ setMethod("plot", signature(x="DoppelGang"),
                                     names(results[[i]])[j], sep = " / "),
                               xlab = "Pairwise Correlations", breaks="FD", ...)
                          abline(v=expr.doppels$similarity, col="red", lw=0.5)
-                         par(ask=TRUE)
                      }}})

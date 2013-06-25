@@ -22,7 +22,7 @@ separator=":"
     }
     if(class(eset.pair) != "list" | length(eset.pair) > 2)
         stop("eset.pair should be a list of two esets")
-    smokinggun.doppels <- sapply(smokingguns, function(x){
+    smokinggun.doppels <- lapply(smokingguns, function(x){
         if(!(x %in% colnames(pData(eset.pair[[1]]))) | !(x %in% colnames(pData(eset.pair[[2]])))){
             warning(paste(x, "not found in one of the pData(eset)"))
             return(NULL)

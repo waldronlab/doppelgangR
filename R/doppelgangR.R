@@ -53,16 +53,20 @@ verbose=TRUE
             outlierFinder.expr.args$prune.output <- FALSE
             output3[["expr.doppels"]] <-
                 do.call(outlierFinder, outlierFinder.expr.args)
+            ## If there is no phenoData in one of the esets, do not
+            ## search for phenotype doppelgangers:
+            if(min(c(dim(pData(esets[[1]])), dim(pData(esets[[2]])))) == 0)
+                phenoFinder.args <- NULL
             ## find potential "smoking gun" phenotypes
-            new.smokinggun.phenotypes <- unlist(sapply(colnames(pData(esets[[i]])), function(cname){
-                if(cname %in% colnames(pData(esets[[j]]))){
-                    if((sum(!is.na(pData(esets[[i]])[, cname])) > 2 &
-                        sum(!is.na(pData(esets[[j]])[, cname])) > 2) &
-                       (identical(length(pData(esets[[i]])[, cname]), length(unique(pData(esets[[i]])[, cname]))) |
-                        identical(length(pData(esets[[j]])[, cname]), length(unique(pData(esets[[j]])[, cname]))))
-                       )
-                        return(cname)}}))
-            if(automatic.smokingguns){
+            if(automatic.smokingguns & !is.null(phenoFinder.args)){
+                new.smokinggun.phenotypes <- unlist(sapply(colnames(pData(esets[[i]])), function(cname){
+                    if(cname %in% colnames(pData(esets[[j]]))){
+                        if((sum(!is.na(pData(esets[[i]])[, cname])) > 2 &
+                            sum(!is.na(pData(esets[[j]])[, cname])) > 2) &
+                           (identical(length(pData(esets[[i]])[, cname]), length(unique(pData(esets[[i]])[, cname]))) |
+                            identical(length(pData(esets[[j]])[, cname]), length(unique(pData(esets[[j]])[, cname]))))
+                           )
+                            return(cname)}}))
                 manual.smokingguns <- unique(c(manual.smokingguns, new.smokinggun.phenotypes))
             }
             output3[["smokingguns"]] <- manual.smokingguns
@@ -87,6 +91,11 @@ verbose=TRUE
                 outlierFinder.pheno.args$similarity.mat <- pheno.sim
                 outlierFinder.pheno.args$prune.output <- FALSE
                 output3[["pheno.doppels"]] <- do.call(outlierFinder, outlierFinder.pheno.args)
+                if(nrow(output3[["pheno.doppels"]]) == 0){
+                    output3[["pheno.doppels"]] <- output3[["expr.doppels"]][, 1:2]
+                    output3[["pheno.doppels"]]$similarity <- NA
+                    output3[["pheno.doppels"]]$doppel <- FALSE
+                }
                 ## This next block seems like a complicated way just to
                 ## prune sample pairs that are not identified by any of
                 ## the three searches.  Problem is that pheno.doppels and

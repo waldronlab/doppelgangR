@@ -11,7 +11,7 @@ phenoFinder.args=list(separator=separator),
 ### NULL, samples with similar phenotypes will not be searched for.
 phenoDist.args=list(vectorDistFun=vectorHammingDist),
 ### a list of arguments to be passed to the phenoDist function
-outlierFinder.expr.args=list(bonf.pvalue=0.001, transFun=atanh, tail="upper"),
+outlierFinder.expr.args=list(bonf.pvalue=0.005, transFun=atanh, tail="upper"),
 ### a list of arguments to be passed to outlierFinder when called for expression data
 outlierFinder.pheno.args=list(normal.upper.thresh=0.99, bonf.pvalue=NULL, tail="upper"),
 ### a list of arguments to be passed to outlierFinder when called for phenotype data
@@ -25,6 +25,8 @@ automatic.smokingguns=TRUE,
 ### phenotype variables that are unique to each patient in dataset 1,
 ### also unique to each patient in dataset 2, but contain exact
 ### matches between datasets 1 and 2.
+within.datasets.only=FALSE,
+### If TRUE, only search within each dataset for doppelgangers.
 verbose=TRUE
 ### print progress information.
 ){
@@ -33,7 +35,12 @@ verbose=TRUE
     if(length(esets) > length(unique(names(esets))))
         names(esets) <- make.unique(names(esets))
     output.full <- lapply(1:length(esets), function(i){
-        output2 <- lapply(i:length(esets), function(j, i){
+        if(within.datasets.only){
+            jseq <- i
+        }else{
+            jseq <- i:length(esets)
+        }
+        output2 <- lapply(jseq, function(j, i){
             if (verbose)
                 print(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
             output3 <- list()
@@ -102,21 +109,35 @@ verbose=TRUE
             }
             return(output3)
         }, i=i)
-        names(output2) <- names(esets)[i:length(esets)]
+        names(output2) <- names(esets)[jseq]
         return(output2)
     })
     names(output.full) <- names(esets)
-    pheno.doppels <- do.call(rbind, lapply(output.full, function(x) do.call(rbind, lapply(x, function(y) y$pheno.doppels))))
-    expr.doppels <- do.call(rbind, lapply(output.full, function(x) do.call(rbind, lapply(x, function(y) y$expr.doppels))))
-    smokinggun.doppels <- do.call(rbind, lapply(output.full, function(x) do.call(rbind, lapply(x, function(y) y$smokinggun.doppels))))
+    wrapUp <- function(object, element){
+        object <- lapply(object, function(x) do.call(rbind, lapply(x, function(y) y[[element]])))
+        object <- object[!sapply(object, is.null)]
+        do.call(rbind, object)
+    }
+    pheno.doppels <- wrapUp(output.full, "pheno.doppels")
+    expr.doppels <- wrapUp(output.full, "expr.doppels")
+    smokinggun.doppels <- wrapUp(output.full, "smokinggun.doppels")
     ## merge all doppelganger types
     all.doppels <- expr.doppels
     colnames(all.doppels)[3:4] <- paste("expr.", colnames(all.doppels)[3:4], sep="")
     addCols <- function(orig, add){
+        newrows1 <- paste(add[, 1], add[, 2])
+        newrows2 <- paste(add[, 2], add[, 1])
+        oldrows <- paste(orig[, 2], orig[, 1])
+        if(any(!(newrows1 %in% oldrows | newrows2 %in% oldrows))){
+            tmp <- add[!(newrows1 %in% oldrows | newrows2 %in% oldrows), 1:2]
+            tmp <- cbind(tmp, matrix(NA, nrow=nrow(tmp), ncol=(ncol(orig) - 2)))
+            colnames(tmp) <- colnames(orig)
+            orig <- rbind(orig, tmp)
+        }
         match.rows <- match(paste(add[, 1], add[, 2]), paste(orig[, 1], orig[, 2]))
         orig[[colnames(add)[3]]] <- NA
         orig[[colnames(add)[3]]][match.rows] <- add[, 3]
-        orig[[colnames(add)[4]]] <- NA
+        orig[[colnames(add)[4]]] <- FALSE
         orig[[colnames(add)[4]]][match.rows] <- add[, 4]
         orig
     }

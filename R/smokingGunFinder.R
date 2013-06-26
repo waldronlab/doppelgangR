@@ -18,7 +18,7 @@ separator=":"
 ){
     if(class(eset.pair) == "ExpressionSet"){
         eset.pair <- list(eset.pair, eset.pair)
-        separator=""
+        separator <- ""
     }
     if(class(eset.pair) != "list" | length(eset.pair) > 2)
         stop("eset.pair should be a list of two esets")
@@ -28,7 +28,11 @@ separator=":"
             return(NULL)
         }
         pdat.vec1 <- transFun(pData(eset.pair[[1]])[, x])
+        if(length(unique(pdat.vec1)) < length(pdat.vec1))
+            return(NULL)
         pdat.vec2 <- transFun(pData(eset.pair[[2]])[, x])
+        if(length(unique(pdat.vec2)) < length(pdat.vec2))
+            return(NULL)
         if(identical(pdat.vec1, pdat.vec2)){
             nonunique.elements <- names(table(pdat.vec1))[table(pdat.vec1) > 1]
             nonunique.samplenames <- sampleNames(eset.pair[[1]])[pdat.vec1 %in% nonunique.elements]
@@ -40,16 +44,24 @@ separator=":"
             }
         }else{
             if(any(pdat.vec1 %in% pdat.vec2)){
-                t(sapply(pdat.vec1[pdat.vec1 %in% pdat.vec2], function(y){
+                vec1.hits <- pdat.vec1[pdat.vec1 %in% pdat.vec2]
+                t(sapply(vec1.hits, function(y){
                     samplenames1 <- paste(names(eset.pair)[1], sampleNames(eset.pair[[1]])[pdat.vec1 %in% y], sep=separator)
                     samplenames2 <- paste(names(eset.pair)[2], sampleNames(eset.pair[[2]])[pdat.vec2 %in% y], sep=separator)
-                    return(as.matrix(.outer2df(samplenames1, samplenames2, bidirectional=FALSE, diag=TRUE)))
-                }))
+                    output <- as.matrix(.outer2df(samplenames1, samplenames2, bidirectional=FALSE, diag=TRUE))
+                    if(ncol(output) > 2){
+                        return(NULL)
+                    }else{
+                        return(output)
+                    }}))
             }else{
                 return(NULL)
             }
         }})
     smokinggun.doppels <- data.frame(do.call(rbind, smokinggun.doppels), stringsAsFactors=FALSE)
+###FIXME - this hack should avoid the multiple-match problem, but there is a better way
+    if(ncol(smokinggun.doppels) > 4)  
+        return(NULL)
     if(identical(nrow(smokinggun.doppels) > 0, TRUE)){
         colnames(smokinggun.doppels)[1:2] <- c("sample1", "sample2")
         smokinggun.doppels$identifier <- rownames(smokinggun.doppels)

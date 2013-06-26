@@ -114,9 +114,10 @@ verbose=TRUE
     })
     names(output.full) <- names(esets)
     wrapUp <- function(object, element){
-        object <- lapply(object, function(x) do.call(rbind, lapply(x, function(y) y[[element]])))
-        object <- object[!sapply(object, is.null)]
-        do.call(rbind, object)
+        tmp <- lapply(object, function(x) lapply(x, function(y) y[[element]]))
+        tmp <- lapply(object, function(x) do.call(rbind, lapply(x, function(y) y[[element]])))
+        tmp <- tmp[!sapply(tmp, is.null)]
+        do.call(rbind, tmp)
     }
     pheno.doppels <- wrapUp(output.full, "pheno.doppels")
     expr.doppels <- wrapUp(output.full, "expr.doppels")
@@ -155,12 +156,7 @@ verbose=TRUE
     ##If all esets have the same colnames of pdata, add merged
     ##pairwise sample pdata to all.doppels:
     if( identical(nrow(all.doppels) > 0, TRUE) &&
-##       !is.null(phenoFinder.args) &&
        identical(colnames(pData(esets[[1]])), unique(unlist(lapply(esets, function(eset) colnames(pData(eset)))))) ){
-###        dataset1 <- sapply(strsplit(all.doppels$sample1, split=separator), function(x) x[1])
-###        dataset1 <- sapply(strsplit(all.doppels$sample2, split=separator), function(x) x[1])
-###        sample1 <- sapply(strsplit(all.doppels$sample1, split=separator), function(x) x[2])
-###        sample1 <- sapply(strsplit(all.doppels$sample2, split=separator), function(x) x[2])
         merged.pdat <- apply(as.matrix(all.doppels[, 1:2]), 1, function(x){
             pdat1 <- pData(esets[[strsplit(x[1], split=separator)[[1]][1]]])[strsplit(x[1], split=separator)[[1]][2], ]
             pdat2 <- pData(esets[[strsplit(x[2], split=separator)[[1]][1]]])[strsplit(x[2], split=separator)[[1]][2], ]

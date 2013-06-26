@@ -136,6 +136,16 @@ verbose=TRUE
             orig <- rbind(orig, tmp)
         }
         match.rows <- match(paste(add[, 1], add[, 2]), paste(orig[, 1], orig[, 2]))
+        if(nrow(add) > 0 & nrow(orig) == 0){
+            ##adding to a zero-row dataframe
+            newdf <- add[, 1:2]
+            for (i in 3:ncol(orig))
+                newdf[[colnames(orig)[i]]] <- NA
+            orig <- newdf
+        }
+        if(nrow(add) == 0 & nrow(orig) == 0){
+            return(cbind(orig, add[, -1:-2]))
+        }
         orig[[colnames(add)[3]]] <- NA
         orig[[colnames(add)[3]]][match.rows] <- add[, 3]
         orig[[colnames(add)[4]]] <- FALSE
@@ -145,8 +155,13 @@ verbose=TRUE
     all.doppels <- addCols(all.doppels, pheno.doppels)
     colnames(all.doppels)[5:6] <- paste("pheno.", colnames(all.doppels)[5:6], sep="")
     if(is.null(smokinggun.doppels)){
-        all.doppels$smokinggun.similarity <- 0
-        all.doppels$smokinggun.doppel <- FALSE
+        if(nrow(all.doppels) > 0){
+            all.doppels$smokinggun.similarity <- 0
+            all.doppels$smokinggun.doppel <- FALSE
+        }else{
+            all.doppels <- cbind(all.doppels, all.doppels[, 3:4])
+            colnames(all.doppels)[7:8] <- c("smokinggun.similarity", "smokinggun.doppel")
+        }
     }else{
         all.doppels <- addCols(all.doppels, smokinggun.doppels)
         colnames(all.doppels)[7:8] <- paste("smokinggun.", colnames(all.doppels)[7:8], sep="")

@@ -8,8 +8,9 @@
     outlierFinder.expr.args = list(bonf.pvalue = 0.005, transFun = atanh, 
         tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, 
         bonf.pvalue = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I), 
-    manual.smokingguns = NULL, automatic.smokingguns = TRUE, 
-    within.datasets.only = FALSE, verbose = TRUE)}
+    impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, 
+        maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL, 
+    automatic.smokingguns = TRUE, within.datasets.only = FALSE)}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}
   \item{separator}{a delimitor to use between dataset names and sample names}
@@ -20,6 +21,8 @@ NULL, samples with similar phenotypes will not be searched for.}
   \item{outlierFinder.expr.args}{a list of arguments to be passed to outlierFinder when called for expression data}
   \item{outlierFinder.pheno.args}{a list of arguments to be passed to outlierFinder when called for phenotype data}
   \item{smokingGunFinder.args}{a list of arguments to be passed to smokingGunFinder}
+  \item{impute.knn.args}{a list of arguments to be passed to impute::impute.knn.  Set to
+NULL to do no knn imputation.}
   \item{manual.smokingguns}{a character vector of phenoData columns that, if identical, will
 be considered evidence of duplication}
   \item{automatic.smokingguns}{automatically look for "smoking guns."  If TRUE, look for
@@ -27,7 +30,6 @@ phenotype variables that are unique to each patient in dataset 1,
 also unique to each patient in dataset 2, but contain exact
 matches between datasets 1 and 2.}
   \item{within.datasets.only}{If TRUE, only search within each dataset for doppelgangers.}
-  \item{verbose}{print progress information.}
 }
 
 \value{Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.}

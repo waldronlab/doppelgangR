@@ -3,7 +3,7 @@
 cd ..
 R --vanilla <<RSCRIPT
 library(inlinedocs);
-package.skeleton.dx("doppelgangR")
+package.skeleton.dx("doppelgangR", excludePattern="AllClasses.R")
 RSCRIPT
 
 R CMD build doppelgangR

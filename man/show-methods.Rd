@@ -2,16 +2,15 @@
 \docType{methods}
 \alias{show-methods}
 \alias{show,DoppelGang-method}
-\title{ ~~ Methods for Function \code{show}  ~~}
+\title{Show a DoppelGang object}
 \description{
- ~~ Methods for function \code{show}  ~~
+Formats a summary of the DoppelGang object.
 }
 \section{Methods}{
 \describe{
 
 \item{\code{signature(object = "DoppelGang")}}{
-%%  ~~describe this method here~~
+Summaryizes the @summaryresults slot of a DoppelGang object
 }
 }}
 \keyword{methods}
-\keyword{ ~~ other possible keyword(s) ~~ }

@@ -3,7 +3,7 @@
 \title{Calculate distance between two vectors, rows of one matrix/dataframe, or rows of two matrices/dataframes.}
 \description{This function does some simple looping to allow x and y to be
 various combinations of vectors and matrices/dataframes.}
-\usage{phenoDist(x, y = NULL, bins = 10, vectorDistFun = vectorHammingDist, 
+\usage{phenoDist(x, y = NULL, bins = 10, vectorDistFun = vectorWeightedDist, 
     ...)}
 \arguments{
   \item{x}{A vector, matrix or dataframe}

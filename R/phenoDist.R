@@ -54,7 +54,7 @@ vectorDistFun=vectorWeightedDist,
     }
     idx <- sapply(X, is.numeric)
     if (sum(idx)==0) return(X)
-    X[,idx] <- as.data.frame(apply(X[,idx], 2, .discretizeRow))
+    X[,idx] <- as.data.frame(apply(X[,idx, drop=FALSE], 2, .discretizeRow))
     X
 }
 

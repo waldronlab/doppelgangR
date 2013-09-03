@@ -36,7 +36,7 @@ within.datasets.only=FALSE
     if(length(esets) > length(unique(names(esets))))
         names(esets) <- make.unique(names(esets))
     for (i in 1:length(esets)){
-        if(!is.null(impute.knn.args) & any(as.numeric(exprs(esets[[i]])))){
+        if(!is.null(impute.knn.args) & any(!complete.cases(exprs(esets[[i]])))){
             ##KNN imputation
             message(paste("KNN imputation for", names(esets)[i]))
             impute.knn.args$data <- exprs(esets[[i]])

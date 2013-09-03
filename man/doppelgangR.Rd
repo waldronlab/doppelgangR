@@ -40,20 +40,27 @@ matches between datasets 1 and 2.}
 
 
 \examples{
+library(doppelgangR)
 library(curatedOvarianData)
+
 data(GSE32062.GPL6480_eset)
 data(GSE32063_eset)
 data(GSE12470_eset)
 data(GSE17260_eset)
+
 testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
                   JapaneseB=GSE32063_eset, 
                   Yoshihara2009=GSE12470_eset, 
                   Yoshihara2010=GSE17260_eset)
+
 testesets <- lapply(testesets, function(X){
-    sampleNames(X) <- X$alt_sample_name
+    # standardize the sample ids to improve matching based on clinical annotation
+    sampleNames(X) <- make.names(paste(X$sample_type,
+        gsub("\\D","",X$alt_sample_name), sep="_"))
+    X$alt_sample_name <- sampleNames(X)
     pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
     X })
-library(doppelgangR)
+
 results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
 summary(results1)
 plot(results1)

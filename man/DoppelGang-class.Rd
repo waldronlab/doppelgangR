@@ -9,7 +9,7 @@
 %% \alias{summary}
 
 \title{DoppelGang S4 class}
-\description{S4 class containing results of doppelgangR() function.}
+\description{NA}
 \section{Objects from the Class}{Objects can be created by calls of the form \code{new(DoppelGang ...)}}
 \section{Slots}{
   \describe{
@@ -19,14 +19,12 @@
 }
 \section{Methods}{
   \describe{
-    \item{plot}{\code{signature(x = "DoppelGang")}: See ?plot,DoppelGang-method}
+    \item{plot}{\code{signature(x = "DoppelGang")}: ... }
     \item{print}{\code{signature(x = "DoppelGang")}: ... }
     \item{show}{\code{signature(object = "DoppelGang")}: ... }
     \item{summary}{\code{signature(object = "DoppelGang")}: ... }
 	 }
 }
-
-\seealso{\code{\link{plot,DoppelGang-method}}}
 
 \author{Levi Waldron and Markus Riester}
 

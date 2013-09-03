@@ -4,11 +4,15 @@ vectorHammingDist <- function #Calculate Hamming Distance between two vectors, u
 ### removing elements from both vectors corresponding to positions
 ### that are NA in either vector.
 (x,
-### a vector (normally character)
-y
-### a vector the same length as x
+### a matrix 
+y,
+### a matrix with the same number of columns as x
+k,
+### row in x to test for differences
+l
+### row in y to test for differences
 ){
-    z <- x != y
+    z <- x[k,] != y[l,]
     z <- sum(z, na.rm=TRUE) / length(na.omit(z))
     return(z)
 ### Returns a numeric value, the Hamming Distance (the number of

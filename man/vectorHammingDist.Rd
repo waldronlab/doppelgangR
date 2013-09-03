@@ -5,10 +5,12 @@
 the same position) between two vectors of the same length, after
 removing elements from both vectors corresponding to positions
 that are NA in either vector.}
-\usage{vectorHammingDist(x, y)}
+\usage{vectorHammingDist(x, y, k, l)}
 \arguments{
-  \item{x}{a vector (normally character)}
-  \item{y}{a vector the same length as x}
+  \item{x}{a matrix }
+  \item{y}{a matrix with the same number of columns as x}
+  \item{k}{row in x to test for differences}
+  \item{l}{row in y to test for differences}
 }
 
 \value{Returns a numeric value, the Hamming Distance (the number of

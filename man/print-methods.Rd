@@ -1,18 +1,32 @@
 \name{print-methods}
 \docType{methods}
 \alias{print-methods}
+\alias{print,ANY-method}
 \alias{print,DoppelGang-method}
-\title{Print a DoppelGang object}
+\alias{print,diagonalMatrix-method}
+\alias{print,sparseMatrix-method}
+\title{ ~~ Methods for Function \code{print}  ~~}
 \description{
-Prints the @summaryresults slot of a DoppelGang object.
+ ~~ Methods for function \code{print}  ~~
 }
 \section{Methods}{
 \describe{
 
-\item{\code{signature(x = "DoppelGang")}}{
-Prints the @summaryresults slot of a DoppelGang object.
+\item{\code{signature(x = "ANY")}}{
+%%  ~~describe this method here~~
 }
 
+\item{\code{signature(x = "DoppelGang")}}{
+%%  ~~describe this method here~~
+}
+
+\item{\code{signature(x = "diagonalMatrix")}}{
+%%  ~~describe this method here~~
+}
+
+\item{\code{signature(x = "sparseMatrix")}}{
+%%  ~~describe this method here~~
+}
 }}
 \keyword{methods}
-
+\keyword{ ~~ other possible keyword(s) ~~ }

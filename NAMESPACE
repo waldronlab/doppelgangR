@@ -1,6 +1,7 @@
 importFrom(sva, ComBat)
 
-export(doppelgangR, corFinder, outlierFinder, phenoDist, phenoFinder, smokingGunFinder, vectorHammingDist)
+export(doppelgangR, corFinder, outlierFinder, phenoDist, phenoFinder,
+smokingGunFinder, vectorHammingDist, vectorWeightedDist)
 
 exportClasses("DoppelGang")
 

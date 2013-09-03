@@ -6,33 +6,33 @@ phenoDist <- function #Calculate distance between two vectors, rows of one matri
 ### A vector, matrix or dataframe
 y=NULL,
 ### NULL, a vector, matrix, or dataframe.  If x is a vector, y must also be specified.
-vectorDistFun=vectorHammingDist,
+bins=10,
+### discretize continuous fields in the specified number of bins
+vectorDistFun=vectorWeightedDist,
 ### A function of two vectors that returns the distance between those vectors.
 ...
 ### Extra arguments passed on to vectorDistFun
 ){
     if (is.vector(x) && is.vector(y)) {
-        z <- vectorDistFun(x, y, ...)
+        z <- vectorDistFun(matrix(x, nrow=1), matrix(y, nrow=1), 1, 1, ...)
     }
     else {
-        if(identical(class(x), "data.frame"))
-            x <- as.matrix(x)
-        if(identical(class(y), "data.frame"))
-            y <- as.matrix(y)
+        x <- .discretizeDataFrame(x, bins)
         if(is.null(y)){
             z <- matrix(0, nrow = nrow(x), ncol = nrow(x))
             for (k in 1:(nrow(x) - 1)) {
                 for (l in (k + 1):nrow(x)) {
-                    z[k, l] <- vectorDistFun(x[k, ], x[l, ], ...)
+                    z[k, l] <- vectorDistFun(x, x, k, l, ...)
                     z[l, k] <- z[k, l]
                 }
             }
             dimnames(z) <- list(rownames(x), rownames(x))
         }else{
+            y <- .discretizeDataFrame(y, bins)
             z <- matrix(0, nrow = nrow(x), ncol = nrow(y))
             for (k in 1:(nrow(x))) {
                 for (l in 1:nrow(y)) {
-                    z[k, l] <- vectorDistFun(x[k, ], y[l, ], ...)
+                    z[k, l] <- vectorDistFun(x, y, k, l, ...)
                 }
             }
             dimnames(z) <- list(rownames(x), rownames(y))

@@ -58,16 +58,3 @@ vectorDistFun=vectorWeightedDist,
     X
 }
 
-.discretizeDataFrame <- function(X, bins=10) {
-    
-    .discretizeRow <- function(x) {
-        if (length(levels(as.factor(x))) > bins)
-            return(cut(x, breaks=bins))
-        as.factor(x)    
-    }
-    idx <- sapply(X, is.numeric)
-    if (sum(idx)==0) return(X)
-    X[,idx] <- as.data.frame(apply(X[,idx], 2, .discretizeRow))
-    X
-}
-

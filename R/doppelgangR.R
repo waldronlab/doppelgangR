@@ -17,6 +17,9 @@ outlierFinder.pheno.args=list(normal.upper.thresh=0.99, bonf.pvalue=NULL, tail="
 ### a list of arguments to be passed to outlierFinder when called for phenotype data
 smokingGunFinder.args=list(transFun=I),
 ### a list of arguments to be passed to smokingGunFinder
+impute.knn.args=list(k = 10, rowmax = 0.5, colmax = 0.8, maxp = 1500, rng.seed=362436069),
+### a list of arguments to be passed to impute::impute.knn.  Set to
+### NULL to do no knn imputation.
 manual.smokingguns=NULL,
 ### a character vector of phenoData columns that, if identical, will
 ### be considered evidence of duplication
@@ -25,15 +28,23 @@ automatic.smokingguns=TRUE,
 ### phenotype variables that are unique to each patient in dataset 1,
 ### also unique to each patient in dataset 2, but contain exact
 ### matches between datasets 1 and 2.
-within.datasets.only=FALSE,
+within.datasets.only=FALSE
 ### If TRUE, only search within each dataset for doppelgangers.
-verbose=TRUE
-### print progress information.
 ){
     if (is.null(names(esets)))
         names(esets) <- make.names(1:length(esets))
     if(length(esets) > length(unique(names(esets))))
         names(esets) <- make.unique(names(esets))
+    for (i in 1:length(esets)){
+        if(!is.null(impute.knn.args) & any(as.numeric(exprs(esets[[i]])))){
+            ##KNN imputation
+            message(paste("KNN imputation for", names(esets)[i]))
+            impute.knn.args$data <- exprs(esets[[i]])
+            impute.knn.output  <- do.call(impute::impute.knn, args=impute.knn.args)
+            exprs(esets[[i]]) <- impute.knn.output$data
+            .Random.seed <- impute.knn.output$rng.state  ##restore original RNG state
+        }
+    }
     output.full <- lapply(1:length(esets), function(i){
         if(within.datasets.only){
             jseq <- i
@@ -41,8 +52,7 @@ verbose=TRUE
             jseq <- i:length(esets)
         }
         output2 <- lapply(jseq, function(j, i){
-            if (verbose)
-                print(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
+            message(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
             output3 <- list()
             ## calculate correlation matrix
             corFinder.args$eset.pair <- esets[c(i, j)]
@@ -122,6 +132,7 @@ verbose=TRUE
         return(output2)
     })
     names(output.full) <- names(esets)
+    message("Finalizing...")
     wrapUp <- function(object, element){
         tmp <- lapply(object, function(x) lapply(x, function(y) y[[element]]))
         tmp <- lapply(object, function(x) do.call(rbind, lapply(x, function(y) y[[element]])))

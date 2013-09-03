@@ -2,10 +2,10 @@ Package: doppelgangR
 Maintainer: Levi Waldron <levi@jimmy.harvard.edu>
 Depends: R (>= 2.10), affy, methods, Biobase
 Suggests: curatedOvarianData
-Imports: sva
+Imports: sva, impute
 Author: Levi Waldron and Markus Riester
-Version: 0.4.6
-Date: 2013-06-25
+Version: 0.5.0
+Date: 2013-08-29
 License: GPL (>=2.0)
 Title: Identify likely duplicate samples from genomic or meta-data.
 Description: The main function is doppelgangR(), which takes as minimal 

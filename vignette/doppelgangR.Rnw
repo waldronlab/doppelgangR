@@ -96,7 +96,6 @@ Positive if the sample name is the same.
 
 <<output2rocfunc>>=
 doppelmelt <- function(obj, ds1, ds2){
-    library(reshape2)
     tmp1 <- obj@fullresults[[ds1]][[ds2]]$correlations
     tmp2 <- obj@fullresults[[ds2]][[ds1]]$correlations
     if(is.null(tmp1)){

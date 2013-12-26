@@ -56,7 +56,7 @@ testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
 testesets <- lapply(testesets, function(X){
     # standardize the sample ids to improve matching based on clinical annotation
     sampleNames(X) <- make.names(paste(X$sample_type,
-        gsub("\\D","",X$alt_sample_name), sep="_"))
+        gsub("\\\\D","",X$alt_sample_name), sep="_"))
     X$alt_sample_name <- sampleNames(X)
     pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
     X })

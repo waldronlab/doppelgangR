@@ -1,11 +1,11 @@
 Package: doppelgangR
-Maintainer: Levi Waldron <levi@jimmy.harvard.edu>
+Maintainer: Levi Waldron <levi.waldron@hunter.cuny.edu>
 Depends: R (>= 2.10), affy, methods, Biobase
-Suggests: curatedOvarianData
+Suggests: curatedOvarianData, knitr, ROCR, pROC
 Imports: sva, impute
 Author: Levi Waldron and Markus Riester
-Version: 0.5.0
-Date: 2013-08-29
+Version: 0.7.0
+Date: 2013-09-08
 License: GPL (>=2.0)
 Title: Identify likely duplicate samples from genomic or meta-data.
 Description: The main function is doppelgangR(), which takes as minimal 
@@ -15,3 +15,4 @@ Description: The main function is doppelgangR(), which takes as minimal
    identifiers found in pData(eset).
 URL: https://github.com/lwaldron/doppelgangR
 BugReports: https://github.com/lwaldron/doppelgangR/issues
+VignetteBuilder: knitr

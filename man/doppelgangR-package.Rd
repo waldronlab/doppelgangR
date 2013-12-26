@@ -12,10 +12,10 @@ identifiers found in pData(eset).}
 Maintainer: \tab Levi Waldron <levi@jimmy.harvard.edu>\cr
 Depends: \tab R (>= 2.10), affy, methods, Biobase\cr
 Suggests: \tab curatedOvarianData\cr
-Imports: \tab sva\cr
+Imports: \tab sva, impute\cr
 Author: \tab Levi Waldron and Markus Riester\cr
-Version: \tab 0.4.1\cr
-Date: \tab 2013-06-25\cr
+Version: \tab 0.6.0\cr
+Date: \tab 2013-09-04\cr
 License: \tab GPL (>=2.0)\cr
 Title: \tab Identify likely duplicate samples from genomic or meta-data.\cr
 URL: \tab https://github.com/lwaldron/doppelgangR\cr

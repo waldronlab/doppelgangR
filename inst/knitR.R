@@ -1,4 +1,4 @@
 library(knitr)
 opts_chunk$set(cache = TRUE)
-knit("doc/doppelgangR.Rnw")
+knit("../vignette//doppelgangR.Rnw")
 system("pdflatex doppelgangR.tex")

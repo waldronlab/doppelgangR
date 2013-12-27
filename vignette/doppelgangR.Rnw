@@ -203,4 +203,75 @@ with(tcgamelt.batch[!sub("microarray:", "", tcgamelt.batch[, 1]) %in% tcga.remov
      plotROC(cor, truepos, main="Proven RNA mix-ups\n removed"))
 @ 
 
+\section{Application to breast cancer}
+
+To save time in building the vignette, six breast cancer datasets
+available as Bioconductor packages are installed, loaded, and prepared
+\emph{outside} of this vignette.  The following code for preparing the ExpressionSets not run:
+
+<<createbreastesets, eval=FALSE>>=
+breast.packages <- c("breastCancerMAINZ", "breastCancerNKI",
+    "breastCancerTRANSBIG", "breastCancerUNT", "breastCancerUPP",
+    "breastCancerVDX")
+##
+other.packages <- "WGCNA"
+##
+if (!require(BiocInstaller))
+    stop("You need to install Bioconductor, which includes BiocInstaller.")
+##
+for (pkg in breast.packages){
+    if(!require(package=pkg, character.only=TRUE)){
+        print(paste("Need to install", pkg)) 
+        biocLite(pkg, suppressUpdates=TRUE, suppressAutoUpdate=TRUE, ask=FALSE)
+    }
+}
+##
+for (pkg in other.packages){
+    if(!require(package=pkg, character.only=TRUE)){
+        print(paste("Need to install", pkg)) 
+        biocLite(pkg, suppressUpdates=TRUE, suppressAutoUpdate=TRUE, ask=FALSE)
+    }
+}
+##
+esets <- lapply(breast.packages, function(pkg){
+    print(pkg)
+    library(affy)
+    esetname <- tolower(sub("breastCancer", "", pkg))
+    data(list=esetname)
+    output <- get(esetname)
+    output <- output[!is.na(featureData(output)$EntrezGene.ID), ]
+    merge.probeset <- WGCNA::collapseRows(datET=exprs(output),
+                                          rowGroup=featureData(output)$EntrezGene.ID,
+                                          rowID=featureNames(output))
+    output <- output[merge.probeset$selectedRow, ]
+    featureNames(output) <- featureData(output)$EntrezGene.ID
+    return(output)
+})
+names(esets) <- sub("breastCancer", "", breast.packages)
+##
+save(esets, file="esets_breast.rda")
+@ 
+
+Here we just load the prepared ExpressionSets.  These have had
+probesets collapsed to Entrez Gene identifiers, using the
+WGCNA::collapseRows() function using the probeset with maximum mean to
+represent each gene.
+<<loadbreastesets>>=
+load(url("http://bcb.dfci.harvard.edu/ovariancancer/dfiles_old/esets_breast.rda"))
+@ 
+
+Now run doppelgangR for UNT + UPP only.
+<<breastdoppel>>=
+output <- doppelgangR(esets[c("UNT", "UPP")], outlierFinder.expr.args = list(bonf.pvalue=10, transFun=atanh, tail="upper"), outlierFinder.pheno.args=NULL)
+output
+##output <- doppelgangR(esets)
+#save(output, file="output.rda")
+@ 
+
+<<plotbreastdoppel>>=
+par(mfrow=c(2,2))
+plot(output)
+@ 
+
+
 \end{document}

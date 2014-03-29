@@ -5,7 +5,7 @@ doppelgangR <- structure(function
 separator=":",
 ### a delimitor to use between dataset names and sample names
 corFinder.args=list(separator=separator, use.ComBat=TRUE, method="pearson"),
-### a list of arguments to be passed to the corFinder function.  
+### a list of arguments to be passed to the corFinder function.
 phenoFinder.args=list(separator=separator),
 ### a list of arguments to be passed to the phenoFinder function.  If
 ### NULL, samples with similar phenotypes will not be searched for.
@@ -28,9 +28,14 @@ automatic.smokingguns=TRUE,
 ### phenotype variables that are unique to each patient in dataset 1,
 ### also unique to each patient in dataset 2, but contain exact
 ### matches between datasets 1 and 2.
-within.datasets.only=FALSE
+within.datasets.only=FALSE,
 ### If TRUE, only search within each dataset for doppelgangers.
+cache.dir="cache"
+### The name of a directory in which to cache or look up results to save
+### re-calculating correlations.  Set to NULL for no caching.
 ){
+    if(!is.null(cache.dir))
+        dir.create(cache.dir, showWarnings=FALSE)
     if (is.null(names(esets)))
         names(esets) <- make.names(1:length(esets))
     if(length(esets) > length(unique(names(esets))))
@@ -56,7 +61,15 @@ within.datasets.only=FALSE
             output3 <- list()
             ## calculate correlation matrix
             corFinder.args$eset.pair <- esets[c(i, j)]
-            cor.sim <- do.call(corFinder, corFinder.args)
+            if(!is.null(cache.dir)){
+                cache.file <- paste(cache.dir, "/", digest(corFinder.args), ".rda", sep="")
+                if(file.exists(cache.file))
+                    load(cache.file)
+            }
+            if(!exists("cor.sim"))
+                cor.sim <- do.call(corFinder, corFinder.args)
+            if(!is.null(cache.dir) && !file.exists(cache.file))
+                save(cor.sim, file=cache.file)
             output3[["correlations"]] <- cor.sim
             ## find numeric (expression) doppelgangers
             outlierFinder.expr.args$similarity.mat <- cor.sim
@@ -213,8 +226,8 @@ within.datasets.only=FALSE
     data(GSE17260_eset)
 
     testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
-                      JapaneseB=GSE32063_eset, 
-                      Yoshihara2009=GSE12470_eset, 
+                      JapaneseB=GSE32063_eset,
+                      Yoshihara2009=GSE12470_eset,
                       Yoshihara2010=GSE17260_eset)
 
     testesets <- lapply(testesets, function(X){
@@ -225,10 +238,10 @@ within.datasets.only=FALSE
         pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
         X })
 
-    results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
+    results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE), cache.dir=NULL)
     summary(results1)
     plot(results1)
     ## Set phenoFinder.args to ignore similar phenotypes:
-    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL)
+    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
     summary(results2)
 })

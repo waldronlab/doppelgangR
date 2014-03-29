@@ -1,4 +1,5 @@
 importFrom(sva, ComBat)
+importFrom(digest, digest)
 importFrom(impute, impute.knn)
 
 export(doppelgangR, corFinder, outlierFinder, phenoDist, phenoFinder,

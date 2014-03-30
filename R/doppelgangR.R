@@ -66,7 +66,7 @@ cache.dir="cache"
         ## calculate correlation matrix
         corFinder.args$eset.pair <- esets[c(i, j)]
         if(!is.null(cache.dir)){
-            cache.file <- paste(cache.dir, "/", digest:digest(corFinder.args), ".rda", sep="")
+            cache.file <- paste(cache.dir, "/", digest::digest(corFinder.args), ".rda", sep="")
             if(file.exists(cache.file))
                 load(cache.file)
         }
@@ -114,7 +114,7 @@ cache.dir="cache"
                     pData(phenoFinder.args$eset.pair[[k]]) <-
                         pData(phenoFinder.args$eset.pair[[k]])[, -na.omit(match(manual.smokingguns, colnames(pData(phenoFinder.args$eset.pair[[k]]))))]
             if(!is.null(cache.dir)){
-                cache.file <- paste(cache.dir, "/", digest:digest(phenoFinder.args), ".rda", sep="")
+                cache.file <- paste(cache.dir, "/", digest::digest(phenoFinder.args), ".rda", sep="")
                 if(file.exists(cache.file))
                     load(cache.file)
             }

@@ -11,7 +11,7 @@
     impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, 
         maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL, 
     automatic.smokingguns = TRUE, within.datasets.only = FALSE, 
-    cache.dir = "cache")}
+    cache.dir = "cache", verbose = TRUE)}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}
   \item{separator}{a delimitor to use between dataset names and sample names}
@@ -33,6 +33,7 @@ matches between datasets 1 and 2.}
   \item{within.datasets.only}{If TRUE, only search within each dataset for doppelgangers.}
   \item{cache.dir}{The name of a directory in which to cache or look up results to save
 re-calculating correlations.  Set to NULL for no caching.}
+  \item{verbose}{Print progress information}
 }
 
 \value{Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.}

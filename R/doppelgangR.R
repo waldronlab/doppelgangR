@@ -6,11 +6,9 @@ separator=":",
 ### a delimitor to use between dataset names and sample names
 corFinder.args=list(separator=separator, use.ComBat=TRUE, method="pearson"),
 ### a list of arguments to be passed to the corFinder function.
-phenoFinder.args=list(separator=separator),
+phenoFinder.args=list(separator=separator, vectorDistFun=vectorWeightedDist),
 ### a list of arguments to be passed to the phenoFinder function.  If
 ### NULL, samples with similar phenotypes will not be searched for.
-phenoDist.args=list(vectorDistFun=vectorWeightedDist),
-### a list of arguments to be passed to the phenoDist function
 outlierFinder.expr.args=list(bonf.pvalue=0.005, transFun=atanh, tail="upper"),
 ### a list of arguments to be passed to outlierFinder when called for expression data
 outlierFinder.pheno.args=list(normal.upper.thresh=0.99, bonf.pvalue=NULL, tail="upper"),
@@ -30,9 +28,11 @@ automatic.smokingguns=TRUE,
 ### matches between datasets 1 and 2.
 within.datasets.only=FALSE,
 ### If TRUE, only search within each dataset for doppelgangers.
-cache.dir="cache"
+cache.dir="cache",
 ### The name of a directory in which to cache or look up results to save
 ### re-calculating correlations.  Set to NULL for no caching.
+verbose=TRUE
+### Print progress information
 ){
     if(!is.null(cache.dir))
         dir.create(cache.dir, showWarnings=FALSE)
@@ -61,14 +61,16 @@ cache.dir="cache"
         }else{
             jseq <- i:length(esets)
         }
-        message(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
+        if (verbose) message(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
         output3 <- list()
         ## calculate correlation matrix
         corFinder.args$eset.pair <- esets[c(i, j)]
         if(!is.null(cache.dir)){
-            cache.file <- paste(cache.dir, "/", digest::digest(corFinder.args), ".rda", sep="")
-            if(file.exists(cache.file))
+            cache.file <- paste(cache.dir, "/", digest::digest(list(corFinder, corFinder.args)), ".rda", sep="")
+            if(file.exists(cache.file)) {
+		if (verbose) message("\tSkipping corFinder, loading cached results.")
                 load(cache.file)
+            }		
         }
         if(!exists("cor.sim"))
             cor.sim <- do.call(corFinder, corFinder.args)
@@ -114,9 +116,11 @@ cache.dir="cache"
                     pData(phenoFinder.args$eset.pair[[k]]) <-
                         pData(phenoFinder.args$eset.pair[[k]])[, -na.omit(match(manual.smokingguns, colnames(pData(phenoFinder.args$eset.pair[[k]]))))]
             if(!is.null(cache.dir)){
-                cache.file <- paste(cache.dir, "/", digest::digest(phenoFinder.args), ".rda", sep="")
-                if(file.exists(cache.file))
+                cache.file <- paste(cache.dir, "/", digest::digest(list(phenoFinder, phenoFinder.args)), ".rda", sep="")
+                if(file.exists(cache.file)) {
+		    if (verbose) message("\tSkipping phenoFinder, loading cached results.")
                     load(cache.file)
+		}
             }
             if(!exists("pheno.sim"))
                 pheno.sim <- do.call(phenoFinder, phenoFinder.args)
@@ -154,7 +158,7 @@ cache.dir="cache"
         return(output3)
     })
     names(output.full) <- sapply(ds.combns, function(ij) paste(names(esets)[c(ij[1], ij[2])], collapse=separator))
-    message("Finalizing...")
+    if (verbose) message("Finalizing...")
     wrapUp <- function(object, element){
         tmp <- lapply(object, function(x) x[[element]])
         tmp <- tmp[!sapply(tmp, is.null)]

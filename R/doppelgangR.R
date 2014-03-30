@@ -9,7 +9,7 @@ corFinder.args=list(separator=separator, use.ComBat=TRUE, method="pearson"),
 phenoFinder.args=list(separator=separator),
 ### a list of arguments to be passed to the phenoFinder function.  If
 ### NULL, samples with similar phenotypes will not be searched for.
-phenoDist.args=list(vectorDistFun=vectorHammingDist),
+phenoDist.args=list(vectorDistFun=vectorWeightedDist),
 ### a list of arguments to be passed to the phenoDist function
 outlierFinder.expr.args=list(bonf.pvalue=0.005, transFun=atanh, tail="upper"),
 ### a list of arguments to be passed to outlierFinder when called for expression data
@@ -50,114 +50,120 @@ cache.dir="cache"
             .Random.seed <- impute.knn.output$rng.state  ##restore original RNG state
         }
     }
-    output.full <- lapply(1:length(esets), function(i){
+    ds.combns <- lapply(1:length(esets), function(i) c(i, i))
+    if(!within.datasets.only)
+        ds.combns <- c(ds.combns, combn(1:length(esets), 2, simplify=FALSE))
+    output.full <- lapply(ds.combns, function(ij){
+        i <- ij[1]
+        j <- ij[2]
         if(within.datasets.only){
             jseq <- i
         }else{
             jseq <- i:length(esets)
         }
-        output2 <- lapply(jseq, function(j, i){
-            message(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
-            output3 <- list()
-            ## calculate correlation matrix
-            corFinder.args$eset.pair <- esets[c(i, j)]
+        message(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
+        output3 <- list()
+        ## calculate correlation matrix
+        corFinder.args$eset.pair <- esets[c(i, j)]
+        if(!is.null(cache.dir)){
+            cache.file <- paste(cache.dir, "/", digest:digest(corFinder.args), ".rda", sep="")
+            if(file.exists(cache.file))
+                load(cache.file)
+        }
+        if(!exists("cor.sim"))
+            cor.sim <- do.call(corFinder, corFinder.args)
+        if(!is.null(cache.dir) && !file.exists(cache.file))
+            save(cor.sim, file=cache.file)
+        output3[["correlations"]] <- cor.sim
+        ## find numeric (expression) doppelgangers
+        outlierFinder.expr.args$similarity.mat <- cor.sim
+        outlierFinder.expr.args$prune.output <- FALSE
+        output3[["expr.doppels"]] <-
+            do.call(outlierFinder, outlierFinder.expr.args)
+        ## If there is no phenoData in one of the esets, do not
+        ## search for phenotype doppelgangers:
+        if(min(c(dim(pData(esets[[1]])), dim(pData(esets[[2]])))) == 0)
+            phenoFinder.args <- NULL
+        ## find potential "smoking gun" phenotypes
+        if(automatic.smokingguns & !is.null(phenoFinder.args)){
+            new.smokinggun.phenotypes <- unlist(sapply(colnames(pData(esets[[i]])), function(cname){
+                if(cname %in% colnames(pData(esets[[j]]))){
+                    if((sum(!is.na(pData(esets[[i]])[, cname])) > 2 &
+                        sum(!is.na(pData(esets[[j]])[, cname])) > 2) &
+                       (identical(length(pData(esets[[i]])[, cname]), length(unique(pData(esets[[i]])[, cname]))) |
+                        identical(length(pData(esets[[j]])[, cname]), length(unique(pData(esets[[j]])[, cname]))))
+                       )
+                        return(cname)}}))
+            manual.smokingguns <- unique(c(manual.smokingguns, new.smokinggun.phenotypes))
+        }
+        output3[["smokingguns"]] <- manual.smokingguns
+        if(!is.null(manual.smokingguns)){
+            smokingGunFinder.args$eset.pair <- esets[c(i, j)]
+            smokingGunFinder.args$smokingguns <- manual.smokingguns
+            output3[["smokinggun.doppels"]] <- do.call(smokingGunFinder, smokingGunFinder.args)
+        }
+        ## calculate phenotype similarity matrix
+        if(!is.null(phenoFinder.args)){
+            phenoFinder.args$eset.pair <- esets[c(i, j)]
+            ##keep no rows because we only need pData(x):
+            for (k in 1:2)
+                phenoFinder.args$eset.pair[[k]] <- phenoFinder.args$eset.pair[[k]][0, ]
+            ## do not use "smoking guns" when calculating phenotype distances
+            for (k in 1:2)
+                if(any(manual.smokingguns %in% colnames(pData(phenoFinder.args$eset.pair[[k]]))))
+                    pData(phenoFinder.args$eset.pair[[k]]) <-
+                        pData(phenoFinder.args$eset.pair[[k]])[, -na.omit(match(manual.smokingguns, colnames(pData(phenoFinder.args$eset.pair[[k]]))))]
             if(!is.null(cache.dir)){
-                cache.file <- paste(cache.dir, "/", digest(corFinder.args), ".rda", sep="")
+                cache.file <- paste(cache.dir, "/", digest:digest(phenoFinder.args), ".rda", sep="")
                 if(file.exists(cache.file))
                     load(cache.file)
             }
-            if(!exists("cor.sim"))
-                cor.sim <- do.call(corFinder, corFinder.args)
-            if(!is.null(cache.dir) && !file.exists(cache.file))
-                save(cor.sim, file=cache.file)
-            output3[["correlations"]] <- cor.sim
-            ## find numeric (expression) doppelgangers
-            outlierFinder.expr.args$similarity.mat <- cor.sim
-            outlierFinder.expr.args$prune.output <- FALSE
-            output3[["expr.doppels"]] <-
-                do.call(outlierFinder, outlierFinder.expr.args)
-            ## If there is no phenoData in one of the esets, do not
-            ## search for phenotype doppelgangers:
-            if(min(c(dim(pData(esets[[1]])), dim(pData(esets[[2]])))) == 0)
-                phenoFinder.args <- NULL
-            ## find potential "smoking gun" phenotypes
-            if(automatic.smokingguns & !is.null(phenoFinder.args)){
-                new.smokinggun.phenotypes <- unlist(sapply(colnames(pData(esets[[i]])), function(cname){
-                    if(cname %in% colnames(pData(esets[[j]]))){
-                        if((sum(!is.na(pData(esets[[i]])[, cname])) > 2 &
-                            sum(!is.na(pData(esets[[j]])[, cname])) > 2) &
-                           (identical(length(pData(esets[[i]])[, cname]), length(unique(pData(esets[[i]])[, cname]))) |
-                            identical(length(pData(esets[[j]])[, cname]), length(unique(pData(esets[[j]])[, cname]))))
-                           )
-                            return(cname)}}))
-                manual.smokingguns <- unique(c(manual.smokingguns, new.smokinggun.phenotypes))
-            }
-            output3[["smokingguns"]] <- manual.smokingguns
-            if(!is.null(manual.smokingguns)){
-                smokingGunFinder.args$eset.pair <- esets[c(i, j)]
-                smokingGunFinder.args$smokingguns <- manual.smokingguns
-                output3[["smokinggun.doppels"]] <-
-                    do.call(smokingGunFinder, smokingGunFinder.args)
-            }else{
-                output3[["smokinggun.doppels"]] <- NULL
-            }
-            ## calculate phenotype similarity matrix
-            if(!is.null(phenoFinder.args)){
-                phenoFinder.args$eset.pair <- esets[c(i, j)]
-                ## do not use "smoking guns" when calculating phenotype distances
-                for (k in 1:2)
-                    if(any(manual.smokingguns %in% colnames(pData(phenoFinder.args$eset.pair[[k]]))))
-                        pData(phenoFinder.args$eset.pair[[k]]) <-
-                            pData(phenoFinder.args$eset.pair[[k]])[, -na.omit(match(manual.smokingguns, colnames(pData(phenoFinder.args$eset.pair[[k]]))))]
+            if(!exists("pheno.sim"))
                 pheno.sim <- do.call(phenoFinder, phenoFinder.args)
-                ## find phenotype doppelgangers
-                outlierFinder.pheno.args$similarity.mat <- pheno.sim
-                outlierFinder.pheno.args$prune.output <- FALSE
-                output3[["pheno.doppels"]] <- do.call(outlierFinder, outlierFinder.pheno.args)
-                if(nrow(output3[["pheno.doppels"]]) == 0){
-                    output3[["pheno.doppels"]] <- output3[["expr.doppels"]][, 1:2]
-                    output3[["pheno.doppels"]]$similarity <- NA
-                    output3[["pheno.doppels"]]$doppel <- FALSE
-                }
-                ## This next block seems like a complicated way just to
-                ## prune sample pairs that are not identified by any of
-                ## the three searches.  Problem is that pheno.doppels and
-                ## expr.doppels keep all pairs, but smokinggun.doppels
-                ## shows only suspected doppels.
-                keep.rows <- output3[["pheno.doppels"]]$doppel | output3[["expr.doppels"]]$doppel
-                if(!is.null(output3[["smokinggun.doppels"]])){
-                    sample1.pheno <- output3[["pheno.doppels"]][, 1]
-                    sample2.pheno <- output3[["pheno.doppels"]][, 2]
-                    sample1.smokinggun <- output3[["smokinggun.doppels"]][, 1]
-                    sample2.smokinggun <- output3[["smokinggun.doppels"]][, 2]
-                    keep.rows <- keep.rows | (paste(sample1.pheno, sample2.pheno, collapse=":::") %in% paste(sample1.smokinggun, sample2.smokinggun, collapse=":::"))
-                }
-                output3[["pheno.doppels"]] <- output3[["pheno.doppels"]][keep.rows, ]
-                output3[["expr.doppels"]] <- output3[["expr.doppels"]][keep.rows, ]
-            }else{
-                ##Make pheno.doppels a zero-line data.frame with the same colnames as expr.doppels:
-                output3[["pheno.doppels"]] <- output3[["expr.doppels"]][0, ]
-                output3[["expr.doppels"]] <- output3[["expr.doppels"]][output3[["expr.doppels"]]$doppel, ]
+            if(!is.null(cache.dir) && !file.exists(cache.file))
+                save(pheno.sim, file=cache.file)
+            ## find phenotype doppelgangers
+            outlierFinder.pheno.args$similarity.mat <- pheno.sim
+            outlierFinder.pheno.args$prune.output <- FALSE
+            output3[["pheno.doppels"]] <- do.call(outlierFinder, outlierFinder.pheno.args)
+            if(nrow(output3[["pheno.doppels"]]) == 0){
+                output3[["pheno.doppels"]] <- output3[["expr.doppels"]][, 1:2]
+                output3[["pheno.doppels"]]$similarity <- NA
+                output3[["pheno.doppels"]]$doppel <- FALSE
             }
-            return(output3)
-        }, i=i)
-        names(output2) <- names(esets)[jseq]
-        return(output2)
+            ## This next block seems like a complicated way just to
+            ## prune sample pairs that are not identified by any of
+            ## the three searches.  Problem is that pheno.doppels and
+            ## expr.doppels keep all pairs, but smokinggun.doppels
+            ## shows only suspected doppels.
+            keep.rows <- output3[["pheno.doppels"]]$doppel | output3[["expr.doppels"]]$doppel
+            if(!is.null(output3[["smokinggun.doppels"]])){
+                sample1.pheno <- output3[["pheno.doppels"]][, 1]
+                sample2.pheno <- output3[["pheno.doppels"]][, 2]
+                sample1.smokinggun <- output3[["smokinggun.doppels"]][, 1]
+                sample2.smokinggun <- output3[["smokinggun.doppels"]][, 2]
+                keep.rows <- keep.rows | (paste(sample1.pheno, sample2.pheno, collapse=":::") %in% paste(sample1.smokinggun, sample2.smokinggun, collapse=":::"))
+            }
+            output3[["pheno.doppels"]] <- output3[["pheno.doppels"]][keep.rows, ]
+            output3[["expr.doppels"]] <- output3[["expr.doppels"]][keep.rows, ]
+        }else{
+            ##Make pheno.doppels a zero-line data.frame with the same colnames as expr.doppels:
+            output3[["pheno.doppels"]] <- output3[["expr.doppels"]][0, ]
+            output3[["expr.doppels"]] <- output3[["expr.doppels"]][output3[["expr.doppels"]]$doppel, ]
+        }
+        return(output3)
     })
-    names(output.full) <- names(esets)
+    names(output.full) <- sapply(ds.combns, function(ij) paste(names(esets)[c(ij[1], ij[2])], collapse=separator))
     message("Finalizing...")
     wrapUp <- function(object, element){
-        tmp <- lapply(object, function(x) lapply(x, function(y) y[[element]]))
-        tmp <- lapply(object, function(x) do.call(rbind, lapply(x, function(y) y[[element]])))
+        tmp <- lapply(object, function(x) x[[element]])
         tmp <- tmp[!sapply(tmp, is.null)]
+    ##    tmp <- lapply(tmp, function(x) x[x[, 4], ])
         do.call(rbind, tmp)
     }
     pheno.doppels <- wrapUp(output.full, "pheno.doppels")
     expr.doppels <- wrapUp(output.full, "expr.doppels")
     smokinggun.doppels <- wrapUp(output.full, "smokinggun.doppels")
-    ## merge all doppelganger types
-    all.doppels <- expr.doppels
-    colnames(all.doppels)[3:4] <- paste("expr.", colnames(all.doppels)[3:4], sep="")
     addCols <- function(orig, add){
         newrows1 <- paste(add[, 1], add[, 2])
         newrows2 <- paste(add[, 2], add[, 1])
@@ -169,6 +175,8 @@ cache.dir="cache"
             orig <- rbind(orig, tmp)
         }
         match.rows <- match(paste(add[, 1], add[, 2]), paste(orig[, 1], orig[, 2]))
+        match.rows2 <- match(paste(add[, 2], add[, 1]), paste(orig[, 1], orig[, 2]))
+        match.rows[is.na(match.rows)] <- match.rows2[is.na(match.rows)]
         if(nrow(add) > 0 & nrow(orig) == 0){
             ##adding to a zero-row dataframe
             newdf <- add[, 1:2]
@@ -185,6 +193,9 @@ cache.dir="cache"
         orig[[colnames(add)[4]]][match.rows] <- add[, 4]
         orig
     }
+    ## merge all doppelganger types
+    all.doppels <- expr.doppels
+    colnames(all.doppels)[3:4] <- paste("expr.", colnames(all.doppels)[3:4], sep="")
     all.doppels <- addCols(all.doppels, pheno.doppels)
     colnames(all.doppels)[5:6] <- paste("pheno.", colnames(all.doppels)[5:6], sep="")
     if(is.null(smokinggun.doppels)){
@@ -199,18 +210,23 @@ cache.dir="cache"
         all.doppels <- addCols(all.doppels, smokinggun.doppels)
         colnames(all.doppels)[7:8] <- paste("smokinggun.", colnames(all.doppels)[7:8], sep="")
     }
+    for (k in c(4, 6, 8))
+        all.doppels[, k][is.na(all.doppels[, k])] <- FALSE
     all.doppels <- all.doppels[all.doppels[, 4] | all.doppels[, 6] | all.doppels[, 8], ]
     rownames(all.doppels) <- NULL
     ##If all esets have the same colnames of pdata, add merged
     ##pairwise sample pdata to all.doppels:
     if( identical(nrow(all.doppels) > 0, TRUE) &&
        identical(colnames(pData(esets[[1]])), unique(unlist(lapply(esets, function(eset) colnames(pData(eset)))))) ){
-        merged.pdat <- apply(as.matrix(all.doppels[, 1:2]), 1, function(x){
-            pdat1 <- pData(esets[[strsplit(x[1], split=separator)[[1]][1]]])[strsplit(x[1], split=separator)[[1]][2], ]
-            pdat2 <- pData(esets[[strsplit(x[2], split=separator)[[1]][1]]])[strsplit(x[2], split=separator)[[1]][2], ]
-            paste(pdat1, pdat2, sep=separator)
-        })
-        merged.pdat <- t(merged.pdat)
+        all.pdat <- lapply(esets, pData)
+        for (k in 1:length(esets))
+            all.pdat[[k]]$sampleid <- paste(names(esets)[k], rownames(all.pdat[[k]]), sep=separator)
+        all.pdat <- do.call(rbind, all.pdat)
+        pdat.sample1 <- all.pdat[match(all.doppels[, 1], all.pdat$sampleid), ]
+        pdat.sample2 <- all.pdat[match(all.doppels[, 2], all.pdat$sampleid), ]
+        merged.pdat <- lapply(1:ncol(pdat.sample1), function(k) paste(pdat.sample1[, k], pdat.sample2[, k], sep=separator))
+        merged.pdat <- do.call(cbind, merged.pdat)
+        merged.pdat <- merged.pdat[, -ncol(merged.pdat)]
         colnames(merged.pdat) <- colnames(pData(esets[[1]]))
         all.doppels <- cbind(all.doppels, merged.pdat)
     }

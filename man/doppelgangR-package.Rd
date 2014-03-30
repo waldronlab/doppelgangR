@@ -1,5 +1,6 @@
 \name{doppelgangR-package}
 \alias{doppelgangR-package}
+\alias{doppelgangR}
 \docType{package}
 \title{Identify likely duplicate samples from genomic or meta-data.}
 \description{The main function is doppelgangR(), which takes as minimal
@@ -9,17 +10,18 @@ phenotype/clinical data (pData(eset)), and "smoking guns" - supposedly unique
 identifiers found in pData(eset).}
 \details{
 \tabular{ll}{Package: \tab doppelgangR\cr
-Maintainer: \tab Levi Waldron <levi@jimmy.harvard.edu>\cr
+Maintainer: \tab Levi Waldron <levi.waldron@hunter.cuny.edu>\cr
 Depends: \tab R (>= 2.10), affy, methods, Biobase\cr
-Suggests: \tab curatedOvarianData\cr
-Imports: \tab sva, impute\cr
+Suggests: \tab curatedOvarianData, knitr, ROCR, pROC\cr
+Imports: \tab sva, impute, digest\cr
 Author: \tab Levi Waldron and Markus Riester\cr
-Version: \tab 0.6.0\cr
-Date: \tab 2013-09-04\cr
+Version: \tab 0.8.1\cr
+Date: \tab 2014-03-29\cr
 License: \tab GPL (>=2.0)\cr
 Title: \tab Identify likely duplicate samples from genomic or meta-data.\cr
 URL: \tab https://github.com/lwaldron/doppelgangR\cr
-BugReports: \tab https://github.com/lwaldron/doppelgangR/issues\cr}
+BugReports: \tab https://github.com/lwaldron/doppelgangR/issues\cr
+VignetteBuilder: \tab knitr\cr}
 }
 \author{Levi Waldron and Markus Riester}
 

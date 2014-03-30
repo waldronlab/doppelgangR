@@ -4,17 +4,18 @@
 \description{Identify samples with suspiciously high correlations and phenotype similarities}
 \usage{doppelgangR(esets, separator = ":", corFinder.args = list(separator = separator, 
     use.ComBat = TRUE, method = "pearson"), phenoFinder.args = list(separator = separator), 
-    phenoDist.args = list(vectorDistFun = vectorHammingDist), 
+    phenoDist.args = list(vectorDistFun = vectorWeightedDist), 
     outlierFinder.expr.args = list(bonf.pvalue = 0.005, transFun = atanh, 
         tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, 
         bonf.pvalue = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I), 
     impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, 
         maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL, 
-    automatic.smokingguns = TRUE, within.datasets.only = FALSE)}
+    automatic.smokingguns = TRUE, within.datasets.only = FALSE, 
+    cache.dir = "cache")}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}
   \item{separator}{a delimitor to use between dataset names and sample names}
-  \item{corFinder.args}{a list of arguments to be passed to the corFinder function.  }
+  \item{corFinder.args}{a list of arguments to be passed to the corFinder function.}
   \item{phenoFinder.args}{a list of arguments to be passed to the phenoFinder function.  If
 NULL, samples with similar phenotypes will not be searched for.}
   \item{phenoDist.args}{a list of arguments to be passed to the phenoDist function}
@@ -30,6 +31,8 @@ phenotype variables that are unique to each patient in dataset 1,
 also unique to each patient in dataset 2, but contain exact
 matches between datasets 1 and 2.}
   \item{within.datasets.only}{If TRUE, only search within each dataset for doppelgangers.}
+  \item{cache.dir}{The name of a directory in which to cache or look up results to save
+re-calculating correlations.  Set to NULL for no caching.}
 }
 
 \value{Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.}
@@ -49,8 +52,8 @@ data(GSE12470_eset)
 data(GSE17260_eset)
 
 testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
-                  JapaneseB=GSE32063_eset, 
-                  Yoshihara2009=GSE12470_eset, 
+                  JapaneseB=GSE32063_eset,
+                  Yoshihara2009=GSE12470_eset,
                   Yoshihara2010=GSE17260_eset)
 
 testesets <- lapply(testesets, function(X){
@@ -61,10 +64,10 @@ testesets <- lapply(testesets, function(X){
     pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
     X })
 
-results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE))
+results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE), cache.dir=NULL)
 summary(results1)
 plot(results1)
 ## Set phenoFinder.args to ignore similar phenotypes:
-results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL)
+results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
 summary(results2)
 }

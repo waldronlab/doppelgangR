@@ -12,7 +12,7 @@ k,
 l
 ### row in y to test for differences
 ){
-    z <- x[k,] != y[l,]
+    z <- as.vector(x[k,] != y[l,])
     z <- sum(z, na.rm=TRUE) / length(na.omit(z))
     return(z)
 ### Returns a numeric value, the Hamming Distance (the number of

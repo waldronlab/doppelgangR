@@ -25,12 +25,10 @@ l
     p.y <- sapply(1:ncol(y), function(i) sum(y[l,i]==y[,i], 
     na.rm=TRUE)/nrow(y[!is.na(y[,i]),]))
 
-    p <- p.x * p.y
     idx <- x[k,] != y[l,]
-    p[idx] <- 1-p[idx]
-    # sum(log(p)) would be numerically stable, but current API requires a
-    # distance from 0 to 1
-    prod(p)
+    w <- 1 - p.x * p.y
+    if (sum(w) < 2 ) return(1)
+    1-(sum(ifelse(idx,-1,1)*w)/sum(w)+1)/2
 ### Returns a numeric value, the log of the probability of observing the
 ### matches in x and y
 }

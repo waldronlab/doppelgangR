@@ -11,7 +11,7 @@ identifiers found in pData(eset).}
 \details{
 \tabular{ll}{Package: \tab doppelgangR\cr
 Maintainer: \tab Levi Waldron <levi.waldron@hunter.cuny.edu>\cr
-Depends: \tab R (>= 2.10), affy, methods, Biobase\cr
+Depends: \tab R (>= 2.10), affy, methods, Biobase, digest\cr
 Suggests: \tab curatedOvarianData, knitr, ROCR, pROC\cr
 Imports: \tab sva, impute, digest\cr
 Author: \tab Levi Waldron and Markus Riester\cr

@@ -33,7 +33,12 @@ cache.dir="cache",
 ### re-calculating correlations.  Set to NULL for no caching.
 verbose=TRUE
 ### Print progress information
-){
+ ){
+    ##Save input args except for esets:
+    input.argnames <- ls()[-match("esets", ls())]
+    input.args <- lapply(input.argnames, function(x) get(x))
+    names(input.args) <- input.argnames
+    input.args$esets.names <- names(esets)
     if(!is.null(cache.dir))
         dir.create(cache.dir, showWarnings=FALSE)
     if (is.null(names(esets)))
@@ -70,7 +75,7 @@ verbose=TRUE
             if(file.exists(cache.file)) {
 		if (verbose) message("\tSkipping corFinder, loading cached results.")
                 load(cache.file)
-            }		
+            }
         }
         if(!exists("cor.sim"))
             cor.sim <- do.call(corFinder, corFinder.args)
@@ -234,7 +239,7 @@ verbose=TRUE
         colnames(merged.pdat) <- colnames(pData(esets[[1]]))
         all.doppels <- cbind(all.doppels, merged.pdat)
     }
-    new("DoppelGang", fullresults=output.full, summaryresults=all.doppels)
+    new("DoppelGang", fullresults=output.full, summaryresults=all.doppels, inputargs=input.args)
 ### Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.
 }, ex=function(){
     library(doppelgangR)

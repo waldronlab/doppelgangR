@@ -2,15 +2,15 @@
 \alias{doppelgangR}
 \title{doppelgangR}
 \description{Identify samples with suspiciously high correlations and phenotype similarities}
-\usage{doppelgangR(esets, separator = ":", corFinder.args = list(separator = separator, 
-    use.ComBat = TRUE, method = "pearson"), phenoFinder.args = list(separator = separator), 
-    phenoDist.args = list(vectorDistFun = vectorWeightedDist), 
-    outlierFinder.expr.args = list(bonf.pvalue = 0.005, transFun = atanh, 
-        tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, 
-        bonf.pvalue = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I), 
-    impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, 
-        maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL, 
-    automatic.smokingguns = TRUE, within.datasets.only = FALSE, 
+\usage{doppelgangR(esets, separator = ":", corFinder.args = list(separator = separator,
+    use.ComBat = TRUE, method = "pearson"), phenoFinder.args = list(separator = separator),
+    phenoDist.args = list(vectorDistFun = vectorWeightedDist),
+    outlierFinder.expr.args = list(bonf.pvalue = 0.005, transFun = atanh,
+        tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99,
+        bonf.pvalue = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I),
+    impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8,
+        maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL,
+    automatic.smokingguns = TRUE, within.datasets.only = FALSE,
     cache.dir = "cache", verbose = TRUE)}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}

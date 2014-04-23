@@ -15,6 +15,7 @@
   \describe{
     \item{\code{fullresults}:}{Object of class \code{"list"}}
     \item{\code{summaryresults}:}{Object of class \code{"data.frame"}}
+    \item{\code{inputargs}:}{\code{"list"} object containing input arguments to doppelgangR() function.}
   }
 }
 \section{Methods}{

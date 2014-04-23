@@ -3,6 +3,7 @@
 \alias{plot-methods}
 \alias{plot,DoppelGang-method}
 \alias{plot.DoppelGang}
+\alias{plot.doppelgangR}
 \title{ Histograms of all pairwise sample correlations, showing
   identified doppelgangers.}
 \description{Identified doppelgangers are shown with a red vertical line

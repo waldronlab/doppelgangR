@@ -10,12 +10,12 @@ identifiers found in pData(eset).}
 \details{
 \tabular{ll}{Package: \tab doppelgangR\cr
 Maintainer: \tab Levi Waldron <levi.waldron@hunter.cuny.edu>\cr
-Depends: \tab R (>= 2.10), affy, methods, Biobase, digest\cr
-Suggests: \tab curatedOvarianData, knitr, ROCR, pROC\cr
-Imports: \tab sva, impute, digest\cr
+Depends: \tab R (>= 2.10), affy, methods, Biobase\cr
+Suggests: \tab curatedOvarianData, knitr, ROCR, pROC, sm\cr
+Imports: \tab sva, impute, digest, mnormt\cr
 Author: \tab Levi Waldron and Markus Riester\cr
-Version: \tab 0.8.1\cr
-Date: \tab 2014-03-29\cr
+Version: \tab 0.9.0\cr
+Date: \tab 2014-04-23\cr
 License: \tab GPL (>=2.0)\cr
 Title: \tab Identify likely duplicate samples from genomic or meta-data.\cr
 URL: \tab https://github.com/lwaldron/doppelgangR\cr

@@ -1,4 +1,4 @@
-outlierFinder <- function ###Identifies outliers in a similarity matrix. 
+outlierFinder <- function ###Identifies outliers in a similarity matrix.
 ### By default uses the
 ### Fisher z-transform for Pearson correlation (atanh), and
 ### identifies outliers as those above the quantile of a normal
@@ -7,17 +7,17 @@ outlierFinder <- function ###Identifies outliers in a similarity matrix.
 ### Bonferroni-corrected cumulative probability of the upper tail.
 (similarity.mat,
 ### A matrix of similarities - larger values mean more similar.
-bonf.pvalue=0.05,
-### Bonferroni-corrected p-value.  A raw.pvalue is calculated by
+bonf.prob=0.05,
+### Bonferroni-corrected p-value.  A raw.prob is calculated by
 ### dividing this by the number of non-missing values in
-### similarity.mat, and the rejection threshold is qnorm(1-raw.pvalue,
+### similarity.mat, and the rejection threshold is qnorm(1-raw.prob,
 ### mean, sd) where mean and sd are estimated from the
 ### transFun-transformed similarity.mat.
 transFun=atanh,
 ### A function applied to the numeric values of similarity.mat, that
 ### should result in normally-distributed values.
 normal.upper.thresh=NULL,
-### Instead of specifying bonf.pvalue and transFun, an upper
+### Instead of specifying bonf.prob and transFun, an upper
 ### similarity threshold can be set, and values above this will be
 ### considered likely duplicates.
 tail="upper",
@@ -26,19 +26,19 @@ tail="upper",
 prune.output=TRUE
 ### If prune.output=TRUE, only return likely doppelgangers.
 ){
-    if(!is.null(bonf.pvalue) & !is.null(normal.upper.thresh))
-        stop("Specify only one of bonf.pvalue and normal.upper.thresh")
-    if(is.null(normal.upper.thresh) & !is.null(bonf.pvalue) & !is.null(transFun)){
+    if(!is.null(bonf.prob) & !is.null(normal.upper.thresh))
+        stop("Specify only one of bonf.prob and normal.upper.thresh")
+    if(is.null(normal.upper.thresh) & !is.null(bonf.prob) & !is.null(transFun)){
         zmat <- transFun(similarity.mat)
-        raw.pvalue <- bonf.pvalue / sum(!is.na(zmat))
+        raw.prob <- bonf.prob / sum(!is.na(zmat))
         if(identical(tail, "upper")){
-            z.cutoff <- qnorm(1-raw.pvalue, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            z.cutoff <- qnorm(1-raw.prob, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
             outlier.mat <- zmat > z.cutoff
         }else if(identical(tail, "lower")){
-            z.cutoff <- qnorm(raw.pvalue, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            z.cutoff <- qnorm(raw.prob, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
             outlier.mat <- zmat < z.cutoff
         }else if(identical(tail, "both")){
-            z.cutoff <- qnorm(c(raw.pvalue, 1-raw.pvalue), mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            z.cutoff <- qnorm(c(raw.prob, 1-raw.prob), mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
             outlier.mat <- (zmat < z.cutoff[1]) | (zmat > z.cutoff[2])
         }else{ stop("tail argument should be upper, lower, or both.") }
     }else if(!is.null(normal.upper.thresh)){

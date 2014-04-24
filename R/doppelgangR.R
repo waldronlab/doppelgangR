@@ -9,7 +9,7 @@ corFinder.args=list(separator=separator, use.ComBat=TRUE, method="pearson"),
 phenoFinder.args=list(separator=separator, vectorDistFun=vectorWeightedDist),
 ### a list of arguments to be passed to the phenoFinder function.  If
 ### NULL, samples with similar phenotypes will not be searched for.
-outlierFinder.expr.args=list(bonf.prob=0.005, transFun=atanh, tail="upper"),
+outlierFinder.expr.args=list(bonf.prob=0.5, transFun=atanh, tail="upper"),
 ### a list of arguments to be passed to outlierFinder when called for expression data
 outlierFinder.pheno.args=list(normal.upper.thresh=0.99, bonf.prob=NULL, tail="upper"),
 ### a list of arguments to be passed to outlierFinder when called for phenotype data

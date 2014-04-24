@@ -1,14 +1,14 @@
 outlierFinder <- function ###Identifies outliers in a similarity matrix.
 ### By default uses the
 ### Fisher z-transform for Pearson correlation (atanh), and
-### identifies outliers as those above the quantile of a normal
+### identifies outliers as those above the quantile of a skew-t
 ### distribution with mean and standard deviation estimated from the
 ### z-transformed matrix.  The quantile is calculated from the
 ### Bonferroni-corrected cumulative probability of the upper tail.
 (similarity.mat,
 ### A matrix of similarities - larger values mean more similar.
 bonf.prob=0.05,
-### Bonferroni-corrected p-value.  A raw.prob is calculated by
+### Bonferroni-corrected probability.  A raw.prob is calculated by
 ### dividing this by the number of non-missing values in
 ### similarity.mat, and the rejection threshold is qnorm(1-raw.prob,
 ### mean, sd) where mean and sd are estimated from the
@@ -30,15 +30,17 @@ prune.output=TRUE
         stop("Specify only one of bonf.prob and normal.upper.thresh")
     if(is.null(normal.upper.thresh) & !is.null(bonf.prob) & !is.null(transFun)){
         zmat <- transFun(similarity.mat)
-        raw.prob <- bonf.prob / sum(!is.na(zmat))
+        znum <- na.omit(as.numeric(zmat))
+        raw.prob <- bonf.prob / length(znum)
+        stfit <- st.mle(y=znum)
         if(identical(tail, "upper")){
-            z.cutoff <- qnorm(1-raw.prob, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            z.cutoff <- qst(p=1-raw.prob, location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])
             outlier.mat <- zmat > z.cutoff
         }else if(identical(tail, "lower")){
-            z.cutoff <- qnorm(raw.prob, mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            z.cutoff <- qst(p=raw.prob, location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])
             outlier.mat <- zmat < z.cutoff
         }else if(identical(tail, "both")){
-            z.cutoff <- qnorm(c(raw.prob, 1-raw.prob), mean=mean(as.numeric(zmat), na.rm=TRUE), sd=sd(as.numeric(zmat), na.rm=TRUE))
+            z.cutoff <- qst(p=c(raw.prob, 1-raw.prob), location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])
             outlier.mat <- (zmat < z.cutoff[1]) | (zmat > z.cutoff[2])
         }else{ stop("tail argument should be upper, lower, or both.") }
     }else if(!is.null(normal.upper.thresh)){

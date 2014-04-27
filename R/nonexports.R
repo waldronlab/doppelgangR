@@ -1979,22 +1979,6 @@ log.pt <- function(x, df){
     p
 }
 
-##---
-
-.onAttach <- function(library, pkg)
-{
-    ## Rv <- R.Version()
-    ## if(Rv$major < 2 |(Rv$major == 2 && Rv$minor < 2.0))
-    ##  stop("This package requires R 2.2.0 or later")
-    if(interactive())
-        {
-            meta <- packageDescription("sn")
-            packageStartupMessage(
-                "Package 'sn', ", meta$Version, " (", meta$Date, "). ",
-                "Type 'help(SN)' for summary information")
-        }
-    invisible()
-}
 
 
 st.mmle <- function(X, y, df, trace=FALSE)

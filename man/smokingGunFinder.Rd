@@ -17,9 +17,9 @@ unique to each sample.}
 added to sample names to keep track of dataset of origin.}
 }
 
-\value{Returns a four-column dataframe with columns: sample1, sample2,
-identifier, doppel.  "identifier" is the value of the supposedly
-unique ID that these samples had in common, doppel is TRUE.}
+\value{Returns an adjacency matrix for samples where matches have value
+1, non-matches have value zero.  Value for a sample against itself
+is NA.}
 
 \author{Levi Waldron and Markus Riester}
 

@@ -24,27 +24,26 @@ setMethod("show", signature="DoppelGang",
 
 setMethod("plot", signature(x="DoppelGang"),
           function(x, skip.no.doppels=FALSE, plot.pair=NULL, ...){
-              results <- x@fullresults
               if(!is.null(plot.pair)){
                   if(is.character(plot.pair) & length(plot.pair) == 2){
-                      study.names <- unique(unlist(strsplit(names(results1@fullresults), split=x@inputargs$separator)))
+                      study.names <- unique(unlist(strsplit(names(x@fullresults), split=x@inputargs$separator)))
                       if(!all(plot.pair %in% study.names))
                           stop("One or both of plot.pair do not match names(esets)")
-                      iplot <- na.omit(unique(match(c(paste(plot.pair, collapse=":"), paste(rev(plot.pair), collapse=x@inputargs$separator)), names(results))))
+                      iplot <- which(names(x@fullresults) %in% c(paste(plot.pair, collapse=":"), paste(rev(plot.pair), collapse=":")))
                   }else{
                       stop("plot.pair must be a character vector of length two, containing the names of two datasets seen in names(esets)")
                   }
               }else{
-                  iplot <- 1:length(results)
+                  iplot <- 1:length(x@fullresults)
               }
               for (i in iplot){
-                  cors <- results[[i]]$correlations
+                  cors <- x@fullresults[[i]]$correlations
                   cors <- na.omit(as.numeric(cors))
-                  expr.doppels <- results[[i]]$expr.doppels
+                  expr.doppels <- x@fullresults[[i]]$expr.doppels
                   expr.doppels <- expr.doppels[expr.doppels$doppel, ]
                   if(skip.no.doppels & (nrow(expr.doppels) == 0 | is.null(expr.doppels)))
                       next
-                  hist(cors, main = names(results)[i],
+                  hist(cors, main = names(x@fullresults)[i],
                        xlab = "Pairwise Correlations", breaks="FD", ...)
                   abline(v=expr.doppels$similarity, col="red", lw=0.5)
               }})

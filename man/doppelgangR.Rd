@@ -2,14 +2,14 @@
 \alias{doppelgangR}
 \title{doppelgangR}
 \description{Identify samples with suspiciously high correlations and phenotype similarities}
-\usage{doppelgangR(esets, separator = ":", corFinder.args = list(separator = separator,
-    use.ComBat = TRUE, method = "pearson"), phenoFinder.args = list(separator = separator,
-    vectorDistFun = vectorWeightedDist), outlierFinder.expr.args = list(bonf.prob = 0.5,
-    transFun = atanh, tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99,
-    bonf.prob = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I),
-    impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8,
-        maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL,
-    automatic.smokingguns = TRUE, within.datasets.only = FALSE,
+\usage{doppelgangR(esets, separator = ":", corFinder.args = list(separator = separator, 
+    use.ComBat = TRUE, method = "pearson"), phenoFinder.args = list(separator = separator, 
+    vectorDistFun = vectorWeightedDist), outlierFinder.expr.args = list(bonf.prob = 0.5, 
+    transFun = atanh, tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, 
+    bonf.prob = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I), 
+    impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, 
+        maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL, 
+    automatic.smokingguns = TRUE, within.datasets.only = FALSE, 
     cache.dir = "cache", verbose = TRUE)}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}
@@ -57,11 +57,9 @@ testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
 
 testesets <- lapply(testesets, function(X){
     # standardize the sample ids to improve matching based on clinical annotation
-    sampleNames(X) <- make.names(paste(X$sample_type,
-        gsub("\\\\D","",X$alt_sample_name), sep="_"))
-    X$alt_sample_name <- sampleNames(X)
+    X$alt_sample_name <- paste(X$sample_type, gsub("[^0-9]", "", X$alt_sample_name), sep="_")
     pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
-    X })
+    return(X) })
 
 results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE), cache.dir=NULL)
 summary(results1)

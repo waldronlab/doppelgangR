@@ -17,17 +17,17 @@ transFun=atanh,
 ### A function applied to the numeric values of similarity.mat, that
 ### should result in normally-distributed values.
 normal.upper.thresh=NULL,
-### Instead of specifying bonf.prob and transFun, an upper
-### similarity threshold can be set, and values above this will be
-### considered likely duplicates.
+### Instead of specifying bonf.prob and transFun, an upper similarity
+### threshold can be set, and values above this will be considered
+### likely duplicates.  If specified, this over-rides bonf.prob.
 tail="upper",
 ### "upper" to look for samples with very high similarity values,
 ### "lower" to look for very low values, or "both" to look for both.
 prune.output=TRUE
 ### If prune.output=TRUE, only return likely doppelgangers.
 ){
-    if(!is.null(bonf.prob) & !is.null(normal.upper.thresh))
-        stop("Specify only one of bonf.prob and normal.upper.thresh")
+    if(!is.null(normal.upper.thresh))
+        bonf.prob <- NULL
     if(is.null(normal.upper.thresh) & !is.null(bonf.prob) & !is.null(transFun)){
         zmat <- transFun(similarity.mat)
         znum <- na.omit(as.numeric(zmat))

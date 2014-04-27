@@ -20,8 +20,11 @@ separator=":",
     }
     if((!identical(class(eset.pair), "list") | length(eset.pair) != 2))
         stop("eset.pair should be a list of length 2")
-    if(!identical(colnames(pData(eset.pair[[1]])), colnames(pData(eset.pair[[2]]))))
-        stop("Both ExpressionSets should have the same colnames in their phenoData slots.")
+    if(!identical(colnames(pData(eset.pair[[1]])), colnames(pData(eset.pair[[2]])))){
+        warning(paste(names(eset.pair)[1], "and",names(eset.pair)[1], "have different column names in phenoData.  Skipping phenotype checking for this pair.  Set phenoFinger.args=NULL to disable phenotype checking altogether."))
+        na.output <- matrix(NA, nrow=ncol(eset.pair[[1]]), ncol=ncol(eset.pair[[2]]))
+        return(na.output)
+    }
     matrix.one <- as.matrix(pData(eset.pair[[1]]))
     ##This part removes columns that are all NA.  The complication
     ##with keep.col is necessary because Surv objects get turned

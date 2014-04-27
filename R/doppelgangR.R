@@ -73,14 +73,17 @@ verbose=TRUE
                 load(cache.file)
             }
         }
-        if(!exists("cor.sim"))
+        if(!exists("cor.sim")){
+            if(verbose) message("Calculating correlations...")
             cor.sim <- do.call(corFinder, corFinder.args)
+        }
         if(!is.null(cache.dir) && !file.exists(cache.file))
             save(cor.sim, file=cache.file)
         output3[["correlations"]] <- cor.sim
         ## find numeric (expression) doppelgangers
         outlierFinder.expr.args$similarity.mat <- cor.sim
         outlierFinder.expr.args$prune.output <- FALSE
+        if(verbose) message("Identifying correlation doppelgangers...")
         output3[["expr.doppels"]] <-
             do.call(outlierFinder, outlierFinder.expr.args)
         ## If there is no phenoData in one of the esets, do not
@@ -102,6 +105,7 @@ verbose=TRUE
         output3[["smokingguns"]] <- manual.smokingguns  ##FIXME: write full arguments somewhere else
         if(!is.null(manual.smokingguns)){
             ## find smokinggun doppelgangers
+            if(verbose) message("Identifying smoking-gun doppelgangers...")
             smokingGunFinder.args$eset.pair <- esets[c(i, j)]
             smokingGunFinder.args$smokingguns <- manual.smokingguns
             outlierFinder.smokinggun.args <- list()
@@ -128,13 +132,16 @@ verbose=TRUE
                     load(cache.file)
 		}
             }
-            if(!exists("pheno.sim"))
+            if(!exists("pheno.sim")){
+                if(verbose) message("Calculating phenotype similarities...")
                 pheno.sim <- do.call(phenoFinder, phenoFinder.args)
+            }
             if(!is.null(cache.dir) && !file.exists(cache.file))
                 save(pheno.sim, file=cache.file)
             ## find phenotype doppelgangers
             outlierFinder.pheno.args$similarity.mat <- pheno.sim
             outlierFinder.pheno.args$prune.output <- FALSE
+            if(verbose) message("Identifying phenotype doppelgangers...")
             output3[["pheno.doppels"]] <- do.call(outlierFinder, outlierFinder.pheno.args)
             ## if(nrow(output3[["pheno.doppels"]]) == 0){ #deprecated
             ##     output3[["pheno.doppels"]] <- output3[["expr.doppels"]][, 1:2]

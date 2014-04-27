@@ -26,22 +26,24 @@ tail="upper",
 prune.output=TRUE
 ### If prune.output=TRUE, only return likely doppelgangers.
 ){
+    if(is.null(transFun))
+        transFun <- I
+    similarity.mat <- transFun(similarity.mat)
     if(!is.null(normal.upper.thresh))
         bonf.prob <- NULL
-    if(is.null(normal.upper.thresh) & !is.null(bonf.prob) & !is.null(transFun)){
-        zmat <- transFun(similarity.mat)
-        znum <- na.omit(as.numeric(zmat))
+    if(!is.null(bonf.prob)){
+        znum <- na.omit(as.numeric(similarity.mat))
         raw.prob <- bonf.prob / length(znum)
         stfit <- st.mle(y=znum)
         if(identical(tail, "upper")){
             z.cutoff <- qst(p=1-raw.prob, location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])
-            outlier.mat <- zmat > z.cutoff
+            outlier.mat <- similarity.mat > z.cutoff
         }else if(identical(tail, "lower")){
             z.cutoff <- qst(p=raw.prob, location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])
-            outlier.mat <- zmat < z.cutoff
+            outlier.mat <- similarity.mat < z.cutoff
         }else if(identical(tail, "both")){
             z.cutoff <- qst(p=c(raw.prob, 1-raw.prob), location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])
-            outlier.mat <- (zmat < z.cutoff[1]) | (zmat > z.cutoff[2])
+            outlier.mat <- (similarity.mat < z.cutoff[1]) | (similarity.mat > z.cutoff[2])
         }else{ stop("tail argument should be upper, lower, or both.") }
     }else if(!is.null(normal.upper.thresh)){
         outlier.mat <- similarity.mat > normal.upper.thresh

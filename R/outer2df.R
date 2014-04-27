@@ -16,6 +16,8 @@ diag=TRUE
         output.samples <- x
     }else if(is.vector(x) & is.vector(y)){
         output.samples <- outer(x, y, paste, sep=bizarre.and.unlikely.separator)
+    }else{
+        stop("Require either x to be a matrix, or both x and y to be vectors.")
     }
     if(!bidirectional & !diag){
         output.samples <- output.samples[upper.tri(output.samples)]

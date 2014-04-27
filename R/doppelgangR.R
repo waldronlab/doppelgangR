@@ -58,6 +58,13 @@ verbose=TRUE
     ds.combns <- lapply(1:length(esets), function(i) c(i, i))
     if(!within.datasets.only)
         ds.combns <- c(ds.combns, combn(1:length(esets), 2, simplify=FALSE))
+    ## Create a negative result dataframe that will be used when a similarity-finder
+    ## (corFinder, phenoFinder, smokingGunFinder) is not called.
+    na.output <- matrix(0, nrow=ncol(eset.pair[[1]]), ncol=ncol(eset.pair[[2]]))
+    rownames(na.output) <- paste(names(eset.pair)[1], sampleNames(eset.pair[[1]]), sep=separator)
+    colnames(na.output) <- paste(names(eset.pair)[2], sampleNames(eset.pair[[2]]), sep=separator)
+    na.output <- outlierFinder(na.output, normal.upper.thresh=1, prune.output=FALSE)
+    na.output$similarity <- NA
 
     output.full <- lapply(ds.combns, function(ij){
         i <- ij[1]
@@ -73,9 +80,13 @@ verbose=TRUE
                 load(cache.file)
             }
         }
-        if(!exists("cor.sim")){
-            if(verbose) message("Calculating correlations...")
-            cor.sim <- do.call(corFinder, corFinder.args)
+        if(is.null(corFinder.args)){
+            cor.sim <- na.output
+        }else{
+            if(!exists("cor.sim")){
+                if(verbose) message("Calculating correlations...")
+                cor.sim <- do.call(corFinder, corFinder.args)
+            }
         }
         if(!is.null(cache.dir) && !file.exists(cache.file))
             save(cor.sim, file=cache.file)
@@ -90,6 +101,11 @@ verbose=TRUE
         ## search for phenotype doppelgangers:
         if(min(c(dim(pData(esets[[1]])), dim(pData(esets[[2]])))) == 0)
             phenoFinder.args <- NULL
+        ## If column names don't match, do not search for phenotype doppelgangers:
+        if(!identical(colnames(pData(eset.pair[[1]])), colnames(pData(eset.pair[[2]])))){
+            warning(paste(names(eset.pair)[1], "and",names(eset.pair)[1], "have different column names in phenoData.  Skipping phenotype checking for this pair.  Set phenoFinger.args=NULL to disable phenotype checking altogether."))
+            phenoFinder.args <- NULL
+        }
         ## automatically find potential "smoking gun" phenotypes
         if(automatic.smokingguns & !is.null(phenoFinder.args)){
             new.smokinggun.phenotypes <- unlist(sapply(colnames(pData(esets[[i]])), function(cname){
@@ -103,7 +119,9 @@ verbose=TRUE
             manual.smokingguns <- unique(c(manual.smokingguns, new.smokinggun.phenotypes))
         }
         output3[["smokingguns"]] <- manual.smokingguns  ##FIXME: write full arguments somewhere else
-        if(!is.null(manual.smokingguns)){
+        if(is.null(manual.smokingguns)){
+            output3[["smokinggun.doppels"]] <- na.output
+        }else{
             ## find smokinggun doppelgangers
             if(verbose) message("Identifying smoking-gun doppelgangers...")
             smokingGunFinder.args$eset.pair <- esets[c(i, j)]
@@ -115,7 +133,9 @@ verbose=TRUE
             output3[["smokinggun.doppels"]] <- do.call(outlierFinder, outlierFinder.smokinggun.args)
         }
         ## calculate phenotype similarity matrix
-        if(!is.null(phenoFinder.args)){
+        if(is.null(phenoFinder.args)){
+            output3[["pheno.doppels"]] <- na.output
+        }else{
             phenoFinder.args$eset.pair <- esets[c(i, j)]
             ##keep no rows because we only need pData(x):
             for (k in 1:2)

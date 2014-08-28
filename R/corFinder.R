@@ -28,6 +28,11 @@ use.ComBat=TRUE,
         ## Calculate correlation matrix for a pair of ExpressionSets:
         if(use.ComBat){
             big.matrix <- do.call(cbind, lapply(eset.pair, exprs))
+            if(any(!is.finite(big.matrix))){
+                all.finite <- apply(big.matrix, 1, function(x) all(is.finite(x)))
+                big.matrix <- big.matrix[all.finite, ]
+                if(nrow(big.matrix) < 2) stop("Fewer than two genes without all finite values.")
+            }
             batch.var <- lapply(names(eset.pair), function(x) rep(x, ncol(eset.pair[[x]])))
             batch.var <- do.call(c, batch.var)
             big.matrix.combat <- sva::ComBat(big.matrix, mod=model.matrix(~(rep(1, length(batch.var)))), batch=batch.var)

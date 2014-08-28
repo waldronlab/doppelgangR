@@ -103,7 +103,7 @@ verbose=TRUE
             phenoFinder.args <- NULL
         ## If column names don't match, do not search for phenotype doppelgangers:
         if(!identical(colnames(pData(esets[[i]])), colnames(pData(esets[[j]])))){
-            warning(paste(names(eset.pair)[1], "and",names(eset.pair)[1], "have different column names in phenoData.  Skipping phenotype checking for this pair.  Set phenoFinger.args=NULL to disable phenotype checking altogether."))
+            warning(paste(names(esets)[i], "and",names(esets)[j], "have different column names in phenoData.  Skipping phenotype checking for this pair.  Set phenoFinger.args=NULL to disable phenotype checking altogether."))
             phenoFinder.args <- NULL
         }
         ## automatically find potential "smoking gun" phenotypes

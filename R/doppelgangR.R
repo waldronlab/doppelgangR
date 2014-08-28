@@ -58,18 +58,18 @@ verbose=TRUE
     ds.combns <- lapply(1:length(esets), function(i) c(i, i))
     if(!within.datasets.only)
         ds.combns <- c(ds.combns, combn(1:length(esets), 2, simplify=FALSE))
-    ## Create a negative result dataframe that will be used when a similarity-finder
-    ## (corFinder, phenoFinder, smokingGunFinder) is not called.
-    na.output <- matrix(0, nrow=ncol(eset.pair[[1]]), ncol=ncol(eset.pair[[2]]))
-    rownames(na.output) <- paste(names(eset.pair)[1], sampleNames(eset.pair[[1]]), sep=separator)
-    colnames(na.output) <- paste(names(eset.pair)[2], sampleNames(eset.pair[[2]]), sep=separator)
-    na.output <- outlierFinder(na.output, normal.upper.thresh=1, prune.output=FALSE)
-    na.output$similarity <- NA
-
     output.full <- lapply(ds.combns, function(ij){
         i <- ij[1]
         j <- ij[2]
         if (verbose) message(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
+        ## Create a negative result dataframe that will be used when a similarity-finder
+        ## (corFinder, phenoFinder, smokingGunFinder) is not called.
+        na.output <- matrix(0, nrow=ncol(esets[[i]]), ncol=ncol(esets[[j]]))
+        rownames(na.output) <- paste(names(esets)[i], sampleNames(esets[[i]]), sep=separator)
+        colnames(na.output) <- paste(names(esets)[j], sampleNames(esets[[j]]), sep=separator)
+        na.output <- outlierFinder(na.output, normal.upper.thresh=1, prune.output=FALSE)
+        na.output$similarity <- NA
+        ## output object:
         output3 <- list()
         ## calculate correlation matrix
         corFinder.args$eset.pair <- esets[c(i, j)]
@@ -102,7 +102,7 @@ verbose=TRUE
         if(min(c(dim(pData(esets[[1]])), dim(pData(esets[[2]])))) == 0)
             phenoFinder.args <- NULL
         ## If column names don't match, do not search for phenotype doppelgangers:
-        if(!identical(colnames(pData(eset.pair[[1]])), colnames(pData(eset.pair[[2]])))){
+        if(!identical(colnames(pData(esets[[i]])), colnames(pData(esets[[j]])))){
             warning(paste(names(eset.pair)[1], "and",names(eset.pair)[1], "have different column names in phenoData.  Skipping phenotype checking for this pair.  Set phenoFinger.args=NULL to disable phenotype checking altogether."))
             phenoFinder.args <- NULL
         }
@@ -178,7 +178,6 @@ verbose=TRUE
         output3[["expr.doppels"]] <- output3[["expr.doppels"]][keep.rows, ]
         return(output3)
     })
-
     names(output.full) <- sapply(ds.combns, function(ij) paste(names(esets)[c(ij[1], ij[2])], collapse=separator))
     if (verbose) message("Finalizing...")
     wrapUp <- function(object, element){

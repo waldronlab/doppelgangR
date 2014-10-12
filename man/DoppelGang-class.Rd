@@ -3,10 +3,6 @@
 \docType{class}
 \alias{DoppelGang-class}
 \alias{DoppelGang}
-%% \alias{plot}
-%% \alias{print}
-%% \alias{show}
-%% \alias{summary}
 
 \title{DoppelGang S4 class}
 \description{S4 class containing results of doppelgangR() function.}
@@ -21,9 +17,12 @@
 \section{Methods}{
   \describe{
     \item{plot}{\code{signature(x = "DoppelGang")}: See ?plot,DoppelGang-method}
+    \item{summary}{\code{signature(object = "DoppelGang")}: produces a
+      data.frame of potential doppelgangers, with similarity measures
+      and available phenoData for both of each potential doppelganger
+      pair.  Can be saved as a csv table and inspected carefully in a spreadsheet.}
     \item{print}{\code{signature(x = "DoppelGang")}: ... }
     \item{show}{\code{signature(object = "DoppelGang")}: ... }
-    \item{summary}{\code{signature(object = "DoppelGang")}: ... }
 	 }
 }
 

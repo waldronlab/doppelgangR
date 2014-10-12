@@ -1,16 +1,15 @@
-setClass(Class = "DoppelGang", representation(fullresults = "list", summaryresults="data.frame", inputargs="list"))
+setClass(Class = "DoppelGang",
+         representation(fullresults = "list", summaryresults="data.frame", inputargs="list"))
 
 setGeneric("print")
 setGeneric("summary")
 setGeneric("plot")
-
-setMethod("print", signature(x="DoppelGang"),
-          function(x) print(x@summaryresults))
+setGeneric("show")
 
 setMethod("summary", signature(object="DoppelGang"),
-          function(object) summary(object@summaryresults))
+          function(object) object@summaryresults)
 
-setMethod("show", signature="DoppelGang",
+setMethod("show", signature(object="DoppelGang"),
           function(object){
               cat ("S4 object of class:" , class ( object ) , "\n")
               cat ("Number of potential doppelgangers:" , nrow(object@summaryresults), ": ",
@@ -18,9 +17,13 @@ setMethod("show", signature="DoppelGang",
                    sum(object@summaryresults$pheno.doppel), "phenotype, ",
                    sum(object@summaryresults$smokinggun.doppel), "smoking gun. \n")
               cat (" \n ")
-              cat ("Use print(object) for a data.frame of doppelgangrs.", "\n")
+              cat ("Use summary(object) to obtain a data.frame of potential doppelgangrs.", "\n")
               cat (" \n ")
           })
+
+setMethod("print", signature(x="DoppelGang"),
+          function(x) print(x@summaryresults))
+
 
 setMethod("plot", signature(x="DoppelGang"),
           function(x, skip.no.doppels=FALSE, plot.pair=NULL, ...){
@@ -47,3 +50,5 @@ setMethod("plot", signature(x="DoppelGang"),
                        xlab = "Pairwise Correlations", breaks="FD", ...)
                   abline(v=expr.doppels$similarity, col="red", lw=0.5)
               }})
+
+

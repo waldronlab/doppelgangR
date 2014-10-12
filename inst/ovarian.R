@@ -1,6 +1,6 @@
 library(curatedOvarianData)
 library(affy)
-source(system.file("extdata", 
+source(system.file("extdata",
     "patientselection_all.config",package="curatedOvarianData"))
 min.number.of.genes <- 2000
 source(system.file("extdata", "createEsetList.R", package =

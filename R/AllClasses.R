@@ -8,7 +8,7 @@ setMethod("print", signature(x="DoppelGang"),
           function(x) print(x@summaryresults))
 
 setMethod("summary", signature(object="DoppelGang"),
-          function(object) summary(object@summaryresults[, 3:min(ncol(object@summaryresults), 8)]))
+          function(object) summary(object@summaryresults))
 
 setMethod("show", signature="DoppelGang",
           function(object){
@@ -18,7 +18,7 @@ setMethod("show", signature="DoppelGang",
                    sum(object@summaryresults$pheno.doppel), "phenotype, ",
                    sum(object@summaryresults$smokinggun.doppel), "smoking gun. \n")
               cat (" \n ")
-              cat ("See object@summaryresults for a data.frame of doppelgangrs.", "\n")
+              cat ("Use print(object) for a data.frame of doppelgangrs.", "\n")
               cat (" \n ")
           })
 

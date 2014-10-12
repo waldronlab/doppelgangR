@@ -73,6 +73,10 @@ verbose=TRUE
         output3 <- list()
         ## calculate correlation matrix
         corFinder.args$eset.pair <- esets[c(i, j)]
+        if( sum(featureNames(corFinder.args$eset.pair[[1]]) %in% featureNames(corFinder.args$eset.pair[[2]])) < 2){
+            warning(paste(names(esets)[i], "and", names(esets)[j], "have no featureNames in common, skipping corFinder for this dataset pair."))
+            corFinder.args <- NULL
+        }
         if(!is.null(cache.dir)){
             cache.file <- paste(cache.dir, "/", digest::digest(list(corFinder, corFinder.args)), ".rda", sep="")
             if(file.exists(cache.file)) {

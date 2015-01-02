@@ -1,7 +1,7 @@
 library(curatedCRCData)
 library(affy)
 
-source(system.file("extdata", 
+source(system.file("extdata",
     "patientselection_all.config",package="curatedCRCData"))
 min.number.of.genes <- 2000
 source(system.file("extdata", "createEsetList.R", package =
@@ -16,3 +16,9 @@ dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL)
 warnings()
 #dop <- doppelgangR(esets)
 save(dop, file="crc_dop.rda")
+
+load("crc_dop.rda")
+write.csv(dop@summaryresults, file="crc_dop.csv")
+pdf("CRC_dop.pdf")
+plot(dop, skip.no.doppels=TRUE)
+dev.off()

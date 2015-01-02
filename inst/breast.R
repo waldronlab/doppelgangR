@@ -8,7 +8,7 @@ if (!require(BiocInstaller))
 
 for (pkg in breast.packages){
     if(!require(package=pkg, character.only=TRUE)){
-        print(paste("Need to install", pkg)) 
+        print(paste("Need to install", pkg))
         biocLite(pkg, suppressUpdates=TRUE, suppressAutoUpdate=TRUE, ask=FALSE)
     }
 }
@@ -16,7 +16,7 @@ for (pkg in breast.packages){
 
 for (pkg in other.packages){
     if(!require(package=pkg, character.only=TRUE)){
-        print(paste("Need to install", pkg)) 
+        print(paste("Need to install", pkg))
         biocLite(pkg, suppressUpdates=TRUE, suppressAutoUpdate=TRUE, ask=FALSE)
     }
 }
@@ -47,13 +47,13 @@ load("esets.rda")
 
 library(doppelgangR)
 
-output <- doppelgangR(esets)
-save(output, file="output.rda")
-load("output.rda")
+dop <- doppelgangR(esets)
+save(dop, file="breast_dop.rda")
+load("breast_dop.rda")
 
 
 
 pdf("~/Dropbox/tmp/breastdoppel.pdf")
-plot(output)
+plot(dop)
 dev.off()
 system("evince ~/Dropbox/breastdoppel.pdf &")

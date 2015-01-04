@@ -4,7 +4,7 @@ setClass(Class = "DoppelGang",
 setGeneric("print")
 setGeneric("summary")
 setGeneric("plot")
-setGeneric("show")
+#setGeneric("show")
 
 setMethod("summary", signature(object="DoppelGang"),
           function(object) object@summaryresults)

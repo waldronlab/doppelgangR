@@ -58,6 +58,7 @@ verbose=TRUE
     ds.combns <- lapply(1:length(esets), function(i) c(i, i))
     if(!within.datasets.only)
         ds.combns <- c(ds.combns, combn(1:length(esets), 2, simplify=FALSE))
+
     output.full <- lapply(ds.combns, function(ij){
         i <- ij[1]
         j <- ij[2]
@@ -122,13 +123,15 @@ verbose=TRUE
                         return(cname)}}))
             manual.smokingguns <- unique(c(manual.smokingguns, new.smokinggun.phenotypes))
         }
-        output3[["smokingguns"]] <- manual.smokingguns  ##FIXME: write full arguments somewhere else
+##        output3[["smokingguns"]] <- manual.smokingguns  ##FIXME: write full arguments somewhere else
         if(is.null(manual.smokingguns)){
             output3[["smokinggun.doppels"]] <- na.output
         }else{
             ## find smokinggun doppelgangers
             if(verbose) message("Identifying smoking-gun doppelgangers...")
             smokingGunFinder.args$eset.pair <- esets[c(i, j)]
+##            phenoData(smokingGunFinder.args$eset.pair[[1]]) <- phenoData(smokingGunFinder.args$eset.pair[[1]])[, manual.smokingguns]
+##            phenoData(smokingGunFinder.args$eset.pair[[2]]) <- phenoData(smokingGunFinder.args$eset.pair[[2]])[, manual.smokingguns]
             smokingGunFinder.args$smokingguns <- manual.smokingguns
             outlierFinder.smokinggun.args <- list()
             outlierFinder.smokinggun.args$similarity.mat <- do.call(smokingGunFinder, smokingGunFinder.args)
@@ -182,6 +185,7 @@ verbose=TRUE
         output3[["expr.doppels"]] <- output3[["expr.doppels"]][keep.rows, ]
         return(output3)
     })
+
     names(output.full) <- sapply(ds.combns, function(ij) paste(names(esets)[c(ij[1], ij[2])], collapse=separator))
     if (verbose) message("Finalizing...")
     wrapUp <- function(object, element){
@@ -243,9 +247,13 @@ verbose=TRUE
         all.pdat <- do.call(rbind, all.pdat)
         pdat.sample1 <- all.pdat[match(all.doppels[, 1], all.pdat$sampleid), ]
         pdat.sample2 <- all.pdat[match(all.doppels[, 2], all.pdat$sampleid), ]
-        merged.pdat <- lapply(1:ncol(pdat.sample1), function(k) paste(pdat.sample1[, k], pdat.sample2[, k], sep=separator))
+        merged.pdat <- lapply(1:ncol(pdat.sample1), function(k){
+            paste(pdat.sample1[, k],
+                  pdat.sample2[, k],
+                  sep=separator)
+        })
         merged.pdat <- do.call(cbind, merged.pdat)
-        merged.pdat <- merged.pdat[, -ncol(merged.pdat)]
+        merged.pdat <- subset(merged.pdat, select=-ncol(merged.pdat))
         colnames(merged.pdat) <- colnames(pData(esets[[1]]))
         all.doppels <- cbind(all.doppels, merged.pdat)
     }
@@ -269,12 +277,14 @@ verbose=TRUE
         # standardize the sample ids to improve matching based on clinical annotation
         X$alt_sample_name <- paste(X$sample_type, gsub("[^0-9]", "", X$alt_sample_name), sep="_")
         pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
+        X <- X[, 1:20]  ##speed computations
         return(X) })
-
-    results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE), cache.dir=NULL)
-    summary(results1)
+    results1 <- doppelgangR(testesets, cache.dir=NULL)
+    results1
     plot(results1)
-    ## Set phenoFinder.args to ignore similar phenotypes:
-    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
-    summary(results2)
+    summary(results1)
+    ## Set phenoFinder.args=NULL to ignore similar phenotypes, and
+    ## turn off ComBat batch correction:
+##    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
+##    summary(results2)
 })

@@ -26,8 +26,8 @@ separator=":",
     ##into two elements in keep.col.
     keep.col <- apply(matrix.one, 2, function(x) !all(is.na(x)))
     keep.col <- keep.col[names(keep.col) %in% colnames(matrix.one)]
-    matrix.one <- matrix.one[, match(names(keep.col), colnames(matrix.one))]
-    matrix.one <- matrix.one[, keep.col]
+    matrix.one <- subset(matrix.one, select=match(names(keep.col), colnames(matrix.one)))
+    matrix.one <- subset(matrix.one, select=keep.col)
     rownames(matrix.one) <- paste(names(eset.pair)[1], rownames(matrix.one), sep=separator)
     if( identical(eset.pair[[1]], eset.pair[[2]]) ){
         ##Calculate similarity matrix for a single ExpressionSet:

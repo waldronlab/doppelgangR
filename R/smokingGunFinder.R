@@ -23,8 +23,8 @@ separator=":"
     if(class(eset.pair) != "list" | length(eset.pair) > 2)
         stop("eset.pair should be a list of two esets")
     smokingmat <- matrix(0, nrow=ncol(eset.pair[[1]]), ncol=ncol(eset.pair[[2]]))
-    rownames(smokingmat) <- sampleNames(eset.pair[[1]])
-    colnames(smokingmat) <- sampleNames(eset.pair[[2]])
+    rownames(smokingmat) <- paste(names(eset.pair)[1], sampleNames(eset.pair[[1]]), sep=separator)
+    colnames(smokingmat) <- paste(names(eset.pair)[2], sampleNames(eset.pair[[2]]), sep=separator)
     for (x in smokingguns){
         if(!(x %in% colnames(pData(eset.pair[[1]]))) | !(x %in% colnames(pData(eset.pair[[2]]))))
             next

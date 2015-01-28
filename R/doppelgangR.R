@@ -89,8 +89,8 @@ verbose=TRUE
             warning(paste(names(esets)[i], "and", names(esets)[j], "have no featureNames in common, skipping corFinder for this dataset pair."))
             corFinder.args <- NULL
         }
-        if(!is.null(cache.dir)){
-            cache.file <- paste(cache.dir, "/", digest::digest(list(corFinder, corFinder.args)), ".rda", sep="")
+        if(!is.null(cache.dir) & !is.null(corFinder.args)){
+            cache.file <- paste(cache.dir, "/", digest::digest(list(corFinder, corFinder.args, esets[c(i, j)])), ".rda", sep="")
             if(file.exists(cache.file)) {
 		if (verbose) message("\tSkipping corFinder, loading cached results.")
                 load(cache.file)

@@ -67,7 +67,7 @@ testesets <- lapply(testesets, function(X){
 
 Run doppelgangR with default arguments:
 <<rundopp, results="hide", message=FALSE>>=
-results1 <- doppelgangR(testesets, phenoFinder.args=NULL)
+results1 <- doppelgangR(testesets, phenoFinder.args=NULL, cache.dir=NULL)
 @
 
 This creates an object of class \Rclass{DoppelGang}, which has print, summary, and plot methods:
@@ -94,7 +94,7 @@ dim(res.df)
 To illustrate the importance of ComBat batch correction, we run again without batch correction:
 
 <<rundop2, results="hide", message=FALSE>>=
-results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL)
+results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
 @
 
 Fewer duplicates are found:
@@ -195,9 +195,9 @@ tcgaov.esets <- list(microarray=TCGA_eset, rnaseq=TCGA.RNASeqV2_eset)
 @
 
 <<rundoptcga, results="hide", message=FALSE>>=
-tcgaout.batch <- doppelgangR(tcgaov.esets, phenoFinder.args=NULL, smokingGunFinder=NULL)
+tcgaout.batch <- doppelgangR(tcgaov.esets, phenoFinder.args=NULL, smokingGunFinder=NULL, cache.dir=NULL)
 tcgaout.nobatch <- doppelgangR(tcgaov.esets, phenoFinder.args=NULL, smokingGunFinder=NULL,
-                               corFinder.args=list(use.ComBat=FALSE))
+                               corFinder.args=list(use.ComBat=FALSE), cache.dir=NULL)
 @
 
 <<plottcta, fig.height=4.7, fig.caption="Microarray samples identified as having RNA-seq duplicates in the TCGA ovarian cancer dataset.">>=
@@ -277,7 +277,8 @@ load(url("http://bcb.dfci.harvard.edu/ovariancancer/dfiles_old/esets_breast.rda"
 
 Now run doppelgangR for UNT + UPP only.
 <<breastdoppel>>=
-output <- doppelgangR(esets[c("UNT", "UPP")], outlierFinder.expr.args = list(bonf.pvalue=10, transFun=atanh, tail="upper"), outlierFinder.pheno.args=NULL)
+output <- doppelgangR(esets[c("UNT", "UPP")], outlierFinder.expr.args = list(bonf.pvalue=10, transFun=atanh, tail="upper"),
+                      outlierFinder.pheno.args=NULL, cache.dir=NULL)
 output
 @
 

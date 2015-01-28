@@ -268,7 +268,7 @@ verbose=TRUE
        identical(colnames(pData(esets[[1]])),
                  unique(unlist(lapply(esets, function(eset) colnames(pData(eset)))))) ){
         all.pdat <- lapply(esets, pData)
-        for (k in 1:length(esets))
+        for (k in 1:length(all.pdat))
             all.pdat[[k]]$sampleid <- rownames(all.pdat[[k]])
         all.pdat <- do.call(rbind, all.pdat)
         pdat.sample1 <- all.pdat[match(all.doppels[, 1], all.pdat$sampleid), ]
@@ -286,7 +286,6 @@ verbose=TRUE
     new("DoppelGang", fullresults=output.full, summaryresults=all.doppels, inputargs=input.args)
 ### Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.
 }, ex=function(){
-    if(interactive()){
         library(curatedOvarianData)
         data(GSE32062.GPL6480_eset)
         data(GSE32063_eset)
@@ -306,7 +305,6 @@ verbose=TRUE
         results1
         plot(results1)
         summary(results1)
-    }
     ## Set phenoFinder.args=NULL to ignore similar phenotypes, and
     ## turn off ComBat batch correction:
 ##    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)

@@ -35,13 +35,12 @@ pData(m.eset) <- data.frame(c(pData(m.eset), data.frame(m.pdata)))
 n.eset <- ExpressionSet(assayData=n1)
 n.eset$id <- toupper(colnames(n1))
 ##m5 and n4 are "smoking gun" doppelgangers:
-n.eset$id[4] <- m.eset$id[5]
+n.eset$id[4] <- "gotcha"
+m.eset$id[5] <- "gotcha"
 pData(n.eset) <- data.frame(c(pData(n.eset), data.frame(n.pdata)))
 nsmoking <- nsmoking+1
 ##
 esets <- list(m=m.eset, n=n.eset)
-
-library(doppelgangR)
 
 ##------------------------------------------
 ##Check of all three types of doppelgangers:
@@ -63,7 +62,7 @@ checkEquals(sum(df1$smokinggun.doppel), nsmoking)
 checkEquals(sum(is.na(df1$expr.similarity)), 0)
 checkEquals(sum(is.na(df1$pheno.similarity)), 0)
 checkEquals(sum(is.na(df1$smokinggun.similarity)), 0)
-checkEquals(df1$id, c("M2:M3", "N2:N3", "M1:N1", "M5:M5", "M10:N10"))
+checkEquals(df1$id, c("M2:M3", "N2:N3", "M1:N1", "gotcha:gotcha", "M6:gotcha", "M4:N5", "M10:N10"))
 for (i in match(paste("X", 1:10, sep=""), colnames(df1))){
     cat(paste("Checking column", i, "\n"))
     checkEquals(all(grepl("[a-z]:[a-z]", df1[[i]])), TRUE)
@@ -111,3 +110,20 @@ cat("Check pruning: \n")
 res5 <- doppelgangR(esets, manual.smokingguns="id", automatic.smokingguns=FALSE, intermediate.pruning=TRUE, cache.dir=NULL)
 df5 <- summary(res5)
 checkEquals(df1, df5)
+
+
+##------------------------------------------
+cat("\n")
+cat("Check corFinder function: \n")
+##------------------------------------------
+cor1 <- corFinder(eset.pair=esets)
+cor2 <- corFinder(eset.pair=esets[c(2, 1)])
+checkEquals(cor1, t(cor2))
+
+cor1 <- corFinder(eset.pair=esets, use.ComBat=FALSE)
+cor2 <- corFinder(eset.pair=esets[c(2, 1)], use.ComBat=FALSE)
+checkEquals(cor1, t(cor2))
+
+cor1 <- corFinder(eset.pair=esets[c(1, 1)])
+cor2 <- corFinder(eset.pair=esets[c(1, 1)], use.ComBat=FALSE)
+checkEquals(cor1, cor2)

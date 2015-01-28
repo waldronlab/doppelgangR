@@ -39,7 +39,6 @@ identical(colnames(pData(eset[[1]])), colnames(pData(eset[[2]])))")
         matrix.two <- matrix.two[, match(colnames(matrix.one), colnames(matrix.two))]
         if(is.null(rownames(matrix.two)))
             rownames(matrix.two) <- make.names(1:nrow(matrix.two))
-
         similarity.mat <- 1 - phenoDist(matrix.one, matrix.two, ...)
     }
     return(similarity.mat)

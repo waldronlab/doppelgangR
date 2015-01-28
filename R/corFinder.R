@@ -18,7 +18,7 @@ use.ComBat=TRUE,
  ){
     if(!is(eset.pair, "list") || length(eset.pair) != 2)
         stop("eset.pair should be a list of two ExpressionSets")
-    if( !identical(exprs(eset.pair[[1]]), data.frame(exprs(eset.pair[[2]])) )){
+    if( !identical(all.equal(exprs(eset.pair[[1]]), exprs(eset.pair[[2]])), TRUE)){
         genes.intersect <- intersect(featureNames(eset.pair[[1]]), featureNames(eset.pair[[2]]))
         for (i in 1:length(eset.pair)){
             eset.pair[[i]] <- eset.pair[[i]][genes.intersect, ]
@@ -42,13 +42,7 @@ use.ComBat=TRUE,
         }
         cormat <- cor(matrix.pair[[1]], matrix.pair[[2]], ...)
     }else{
-        ##Calculate correlation matrix for a single ExpressionSet:
-        if(identical(class(eset.pair), "list")){
-            matrix.one <- exprs(eset.pair[[1]])
-##            colnames(matrix.one) <- paste(names(eset.pair)[1], colnames(matrix.one), sep=separator)
-        }else{
-            matrix.one <- exprs(eset.pair)
-        }
+        matrix.one <- exprs(eset.pair[[1]])
         cormat <- cor(matrix.one, ...)
         cormat[!upper.tri(cormat)] <- NA  ##NA for diagonal
     }

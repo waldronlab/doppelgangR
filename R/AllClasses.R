@@ -39,16 +39,24 @@ setMethod("plot", signature(x="DoppelGang"),
               }else{
                   iplot <- 1:length(x@fullresults)
               }
+              op <- par()
               for (i in iplot){
                   cors <- x@fullresults[[i]]$correlations
                   cors <- na.omit(as.numeric(cors))
-                  expr.doppels <- x@fullresults[[i]]$expr.doppels
+                  expr.doppels <- x@fullresults[[i]]$expr.doppels$outlierFinder.res
                   expr.doppels <- expr.doppels[expr.doppels$doppel, ]
                   if(skip.no.doppels & (nrow(expr.doppels) == 0 | is.null(expr.doppels)))
                       next
-                  hist(cors, main = names(x@fullresults)[i],
-                       xlab = "Pairwise Correlations", breaks="FD", ...)
+                  stfit <- x@fullresults[[i]]$expr.doppels$stfit
+                  hist(cors, main = paste(names(x@fullresults)[i], stfit$algorithm$message, sep="\n"),
+                       freq=TRUE, xlab = "Pairwise Correlations", breaks="FD", ...)
                   abline(v=expr.doppels$similarity, col="red", lw=0.5)
-              }})
-
-
+                  xvals <- seq(min(-0.999, par("usr")[1]), max(0.999, par("usr")[2]), length.out=100)
+                  transFun <- x@inputargs$outlierFinder.expr.args$transFun
+                  suppressWarnings(xvals <- xvals[!is.na(transFun(xvals))])
+                  yvals <- diff(pst(transFun(xvals), location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])) * length(cors)
+                  lines(xvals[-1], yvals)
+                  par(ask = prod(par("mfcol")) < length(x@fullresults) && dev.interactive())
+              }
+              suppressWarnings(par(op))
+          })

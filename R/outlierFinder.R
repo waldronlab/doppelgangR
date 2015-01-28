@@ -20,11 +20,9 @@ normal.upper.thresh=NULL,
 ### Instead of specifying bonf.prob and transFun, an upper similarity
 ### threshold can be set, and values above this will be considered
 ### likely duplicates.  If specified, this over-rides bonf.prob.
-tail="upper",
+tail="upper"
 ### "upper" to look for samples with very high similarity values,
 ### "lower" to look for very low values, or "both" to look for both.
-prune.output=TRUE
-### If prune.output=TRUE, only return likely doppelgangers.
 ){
     if(is.null(transFun))
         transFun <- I
@@ -47,21 +45,16 @@ prune.output=TRUE
         }else{ stop("tail argument should be upper, lower, or both.") }
     }else if(!is.null(normal.upper.thresh)){
         outlier.mat <- trans.mat > normal.upper.thresh
+        stfit <- NULL
     }else{
         return(NULL)
     }
-##    outlier.mat[is.na(outlier.mat)] <- FALSE
     output <- .outer2df(rownames(outlier.mat), colnames(outlier.mat), bidirectional=TRUE, diag=TRUE)
     output$similarity <- .outer2df(similarity.mat, bidirectional=TRUE, diag=TRUE)
     output$doppel <- .outer2df(outlier.mat, bidirectional=TRUE, diag=TRUE)
     output <- output[!is.na(output$similarity), ]
     output <- output[output[, 1] != output[, 2], ]
-    if(prune.output){
-        if (!any(outlier.mat))
-            return(NULL)
-        output <- output[output$doppel, ]
-    }
     colnames(output)[1:2] <- c("sample1", "sample2")
-    return(output)
+    return(list(outlierFinder.res=output, stfit=stfit))
 ### Returns either NULL or a dataframe with three columns: sample1, sample2, and similarity.
 }

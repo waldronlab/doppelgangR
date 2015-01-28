@@ -286,13 +286,18 @@ par(mfrow=c(2,2))
 plot(output)
 @
 
-\section{Impact of doppelgangers on model validation}
-Hidden doppelgangers present in both a training and test set can substantially inflate estimates of prediction model accuracy.  We demonstrate this using the UNT and UPP breast cancer datasets.
+%% \section{Impact of doppelgangers on model validation}
+%% Hidden doppelgangers present in both a training and test set can substantially inflate estimates of prediction model accuracy.  We demonstrate this using the UNT and UPP breast cancer datasets.
 
-<<>>=
-eset.training <- esets["UPP"]
-eset.test <- esets["UNT"]
-@
+%% <<>>=
+%% eset.training <- esets["UPP"]
+%% eset.test <- esets["UNT"]
+%% @
 
+\section{Parallelization}
+DoppelgangR checks for duplicates within each dataset in the list of
+ExpressionSets, and between each pair of datasets.  This is an
+``embarassingly parallel'' process that can be divided among multiple
+processors.  Parallelization is implemented via
 
 \end{document}

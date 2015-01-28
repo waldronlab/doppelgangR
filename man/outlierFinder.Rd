@@ -8,7 +8,7 @@ distribution with mean and standard deviation estimated from the
 z-transformed matrix.  The quantile is calculated from the
 Bonferroni-corrected cumulative probability of the upper tail.}
 \usage{outlierFinder(similarity.mat, bonf.prob = 0.05, transFun = atanh, 
-    normal.upper.thresh = NULL, tail = "upper", prune.output = TRUE)}
+    normal.upper.thresh = NULL, tail = "upper")}
 \arguments{
   \item{similarity.mat}{A matrix of similarities - larger values mean more similar.}
   \item{bonf.prob}{Bonferroni-corrected probability.  A raw.prob is calculated by
@@ -23,7 +23,6 @@ threshold can be set, and values above this will be considered
 likely duplicates.  If specified, this over-rides bonf.prob.}
   \item{tail}{"upper" to look for samples with very high similarity values,
 "lower" to look for very low values, or "both" to look for both.}
-  \item{prune.output}{If prune.output=TRUE, only return likely doppelgangers.}
 }
 
 \value{Returns either NULL or a dataframe with three columns: sample1, sample2, and similarity.}

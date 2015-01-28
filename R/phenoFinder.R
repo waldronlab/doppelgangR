@@ -14,13 +14,14 @@ separator=":",
 ...
 ### Extra arguments passed on to phenoDist
 ){
-    if(class(eset.pair) == "ExpressionSet"){
-        eset.pair <- list(eset.pair, eset.pair)
-        names(eset.pair) <- 1:2
-    }
-    if((!identical(class(eset.pair), "list") | length(eset.pair) != 2))
+    if((!is(eset.pair, "list") | length(eset.pair) != 2))
         stop("eset.pair should be a list of length 2")
+    if(!identical(colnames(pData(eset.pair[[1]])), colnames(pData(eset.pair[[2]]))))
+        stop("pData slots of esets must have identical column names, e.g.
+identical(colnames(pData(eset[[1]])), colnames(pData(eset[[2]])))")
     matrix.one <- as.matrix(pData(eset.pair[[1]]))
+    if(is.null(rownames(matrix.one)))
+        rownames(matrix.one) <- make.names(1:nrow(matrix.one))
     ##This part removes columns that are all NA.  The complication
     ##with keep.col is necessary because Surv objects get turned
     ##into two elements in keep.col.
@@ -28,8 +29,7 @@ separator=":",
     keep.col <- keep.col[names(keep.col) %in% colnames(matrix.one)]
     matrix.one <- subset(matrix.one, select=match(names(keep.col), colnames(matrix.one)))
     matrix.one <- subset(matrix.one, select=keep.col)
-    rownames(matrix.one) <- paste(names(eset.pair)[1], rownames(matrix.one), sep=separator)
-    if( identical(eset.pair[[1]], eset.pair[[2]]) ){
+    if( identical(all.equal(pData(eset.pair[[1]]), pData(eset.pair[[2]]) ), TRUE)){
         ##Calculate similarity matrix for a single ExpressionSet:
         similarity.mat <- 1 - phenoDist(matrix.one, ...)
         similarity.mat[!upper.tri(similarity.mat)] <- NA  ##NA for all but upper triangle.
@@ -37,7 +37,9 @@ separator=":",
         ##Calculate similarity matrix for two distinct ExpressionSets:
         matrix.two <- as.matrix(pData(eset.pair[[2]]))
         matrix.two <- matrix.two[, match(colnames(matrix.one), colnames(matrix.two))]
-        rownames(matrix.two) <- paste(names(eset.pair)[2], rownames(matrix.two), sep=separator)
+        if(is.null(rownames(matrix.two)))
+            rownames(matrix.two) <- make.names(1:nrow(matrix.two))
+
         similarity.mat <- 1 - phenoDist(matrix.one, matrix.two, ...)
     }
     return(similarity.mat)

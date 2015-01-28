@@ -1,3 +1,6 @@
+library(BiocParallel)
+multicoreParam <- MulticoreParam()
+
 breast.packages <- c("breastCancerMAINZ", "breastCancerNKI", "breastCancerTRANSBIG", "breastCancerUNT", "breastCancerUPP", "breastCancerVDX")
 
 other.packages <- "WGCNA"
@@ -39,21 +42,21 @@ esets <- lapply(breast.packages, function(pkg){
 })
 names(esets) <- sub("breastCancer", "", breast.packages)
 
-save(esets, file="esets.rda")
-load("esets.rda")
+save(esets, file="breast_esets.rda")
+##load("esets.rda")
 
 #set.seed(1)
 #eset2 <- lapply(esets, function(x) x[sample(1:nrow(x), 300), ])
 
 library(doppelgangR)
 
-dop <- doppelgangR(esets)
+dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
+                   outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
 save(dop, file="breast_dop.rda")
-load("breast_dop.rda")
+##load("breast_dop.rda")
 
-
-
-pdf("~/Dropbox/tmp/breastdoppel.pdf")
+write.csv(dop@summaryresults, file="breast_dop.csv")
+pdf("breastdoppel.pdf")
 plot(dop)
 dev.off()
-system("evince ~/Dropbox/breastdoppel.pdf &")
+##system("evince ~/Dropbox/breastdoppel.pdf &")

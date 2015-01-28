@@ -1,5 +1,9 @@
 library(curatedOvarianData)
 library(affy)
+library(logging)
+library(BiocParallel)
+multicoreParam <- MulticoreParam()
+
 source(system.file("extdata",
     "patientselection_all.config",package="curatedOvarianData"))
 min.number.of.genes <- 2000
@@ -9,7 +13,8 @@ rm(list=ls(pattern="_eset"))
 
 library(doppelgangR)
 
-dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL)
+dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
+                   outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
 #dop <- doppelgangR(esets)
 save(dop, file="ovarian_dop.rda")
 load("ovarian_dop.rda")

@@ -16,14 +16,12 @@ use.ComBat=TRUE,
 ...
 ### Extra arguments passed to the cor() function.
  ){
-    if((class(eset.pair) != "ExpressionSet")
-       & (class(eset.pair) != "list" || length(eset.pair) > 2))
-        stop("eset.pair should be a list of two esets")
-    if( identical(class(eset.pair), "list") & !identical(eset.pair[[1]], eset.pair[[2]]) ){
+    if(!is(eset.pair, "list") || length(eset.pair) != 2)
+        stop("eset.pair should be a list of two ExpressionSets")
+    if( !identical(exprs(eset.pair[[1]]), data.frame(exprs(eset.pair[[2]])) )){
         genes.intersect <- intersect(featureNames(eset.pair[[1]]), featureNames(eset.pair[[2]]))
         for (i in 1:length(eset.pair)){
             eset.pair[[i]] <- eset.pair[[i]][genes.intersect, ]
-            sampleNames(eset.pair[[i]]) <- paste(names(eset.pair)[i], sampleNames(eset.pair[[i]]), sep=separator)
         }
         ## Calculate correlation matrix for a pair of ExpressionSets:
         if(use.ComBat){
@@ -47,7 +45,7 @@ use.ComBat=TRUE,
         ##Calculate correlation matrix for a single ExpressionSet:
         if(identical(class(eset.pair), "list")){
             matrix.one <- exprs(eset.pair[[1]])
-            colnames(matrix.one) <- paste(names(eset.pair)[1], colnames(matrix.one), sep=separator)
+##            colnames(matrix.one) <- paste(names(eset.pair)[1], colnames(matrix.one), sep=separator)
         }else{
             matrix.one <- exprs(eset.pair)
         }

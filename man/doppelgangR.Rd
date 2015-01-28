@@ -9,8 +9,8 @@
     bonf.prob = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I), 
     impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, 
         maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL, 
-    automatic.smokingguns = TRUE, within.datasets.only = FALSE, 
-    cache.dir = "cache", verbose = TRUE)}
+    automatic.smokingguns = FALSE, within.datasets.only = FALSE, 
+    intermediate.pruning = FALSE, cache.dir = "cache", verbose = TRUE)}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}
   \item{separator}{a delimitor to use between dataset names and sample names}
@@ -29,6 +29,14 @@ phenotype variables that are unique to each patient in dataset 1,
 also unique to each patient in dataset 2, but contain exact
 matches between datasets 1 and 2.}
   \item{within.datasets.only}{If TRUE, only search within each dataset for doppelgangers.}
+  \item{intermediate.pruning}{The default setting FALSE will result in output with no missing
+values, but uses extra memory because all results from the
+expression, phenotype, and smoking gun doppelganger searches must
+be saved until the end.  Setting this to TRUE will save memory for
+very large searches, but distance metrics will only be available
+if that value was identified as a doppelganger (for example,
+phenotype doppelgangers will have missing values for the
+expression and smoking gun similarity).}
   \item{cache.dir}{The name of a directory in which to cache or look up results to save
 re-calculating correlations.  Set to NULL for no caching.}
   \item{verbose}{Print progress information}
@@ -42,29 +50,29 @@ re-calculating correlations.  Set to NULL for no caching.}
 
 
 \examples{
-library(doppelgangR)
-library(curatedOvarianData)
-
-data(GSE32062.GPL6480_eset)
-data(GSE32063_eset)
-data(GSE12470_eset)
-data(GSE17260_eset)
-
-testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
-                  JapaneseB=GSE32063_eset,
-                  Yoshihara2009=GSE12470_eset,
-                  Yoshihara2010=GSE17260_eset)
-
-testesets <- lapply(testesets, function(X){
-    # standardize the sample ids to improve matching based on clinical annotation
-    X$alt_sample_name <- paste(X$sample_type, gsub("[^0-9]", "", X$alt_sample_name), sep="_")
-    pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
-    return(X) })
-
-results1 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=TRUE), cache.dir=NULL)
-summary(results1)
-plot(results1)
-## Set phenoFinder.args to ignore similar phenotypes:
-results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
-summary(results2)
+    if(interactive()){
+        library(curatedOvarianData)
+        data(GSE32062.GPL6480_eset)
+        data(GSE32063_eset)
+        data(GSE12470_eset)
+        data(GSE17260_eset)
+        testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
+                          JapaneseB=GSE32063_eset,
+                          Yoshihara2009=GSE12470_eset,
+                          Yoshihara2010=GSE17260_eset)
+        testesets <- lapply(testesets, function(X){
+            ## standardize the sample ids to improve matching based on clinical annotation
+            X$alt_sample_name <- paste(X$sample_type, gsub("[^0-9]", "", X$alt_sample_name), sep="_")
+            pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
+            X <- X[, 1:20]  ##speed computations
+            return(X) })
+        results1 <- doppelgangR(testesets, cache.dir=NULL)
+        results1
+        plot(results1)
+        summary(results1)
+    }
+    ## Set phenoFinder.args=NULL to ignore similar phenotypes, and
+    ## turn off ComBat batch correction:
+##    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
+##    summary(results2)
 }

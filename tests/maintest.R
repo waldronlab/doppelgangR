@@ -111,6 +111,60 @@ res5 <- doppelgangR(esets, manual.smokingguns="id", automatic.smokingguns=FALSE,
 df5 <- summary(res5)
 checkEquals(df1, df5)
 
+##------------------------------------------
+cat("\n")
+cat("Check caching, with a third ExpressionSet that is almost identical to the first: \n")
+##------------------------------------------
+
+esets2 <- c(esets, esets[[1]])
+names(esets2)[3] <- "o"
+exprs(esets2[[3]]) <- exprs(esets2[[3]]) + rnorm(nrow(esets2[[3]]) * ncol(esets2[[3]]), sd=0.1)
+esets2[[3]]$X10 <- "a"
+sampleNames(esets2[[3]]) <- paste("X", sampleNames(esets2[[3]]), sep="")
+
+tmpcachedir <- tempdir()
+##Do this twice, so the second time the cache will be used:
+for (i in 1:2){
+    res6 <- doppelgangR(esets2, manual.smokingguns="id", automatic.smokingguns=FALSE, cache.dir=tmpcachedir)
+    ##Make sure comparison of m to n is the same as res1:
+    df6a <- summary(res6)
+    df6a <- df6a[grepl("^[mn]", df6a$sample1) & grepl("^[mn]", df6a$sample2), ]
+    rownames(df6a) <- 1:nrow(df6a)
+    checkEquals(df1, df6a)
+}
+
+df6b <- summary(res6)
+df6b <- df6b[grepl("^[mo]", df6b$sample1) & grepl("^[mo]", df6b$sample2), ]
+checkIdentical(df6b[df6b$sample1=="o:XX2" & df6b$sample2=="o:XX3", "expr.doppel"], TRUE)
+df6b <- df6b[-1:-2, ]
+##checkTrue(all(df6b$expr.doppel))  ## not a bug, but a shortcoming in the outlier detection that these are not all identified as expression doppelgangers.
+checkTrue(all(df6b$pheno.doppel))
+checkTrue(all(df6b$smokinggun.doppel))
+
+
+res7 <- doppelgangR(esets2, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
+      outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh,
+          tail = "upper"),    cache.dir=NULL)
+df7 <- summary(res7)
+has.o <- grepl("^o", df7$sample1) | grepl("^o", df7$sample2)
+
+df7a <- df7[has.o, ]
+df7a$sample1 <- sub("o", "m", df7a$sample1)
+df7a$sample1 <- sub("XX", "", df7a$sample1)
+df7a$sample2 <- sub("o", "m", df7a$sample2)
+df7a$sample2 <- sub("XX", "", df7a$sample2)
+
+df7b <- df7[!has.o, ]
+df7b <- df7b[(!grepl("^n", df7b$sample1) | !grepl("^n", df7b$sample2)), ]
+for (i in 1:nrow(df7a)){
+    df7a[i, 1:2] <- sort(df7a[i, 1:2])
+    df7b[i, 1:2] <- sort(df7b[i, 1:2])
+}
+df7a <- df7a[order(df7a$sample1, df7a$sample2), ]
+df7b <- df7b[order(df7b$sample1, df7b$sample2), ]
+checkTrue(all(df7a$expr.doppel == df7b$expr.doppel))
+checkTrue(all(df7a$pheno.doppel == df7b$pheno.doppel))
+checkTrue(all(df7a$smokinggun.doppel == df7b$smokinggun.doppel))
 
 ##------------------------------------------
 cat("\n")

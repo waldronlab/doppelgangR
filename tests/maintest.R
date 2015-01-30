@@ -135,7 +135,7 @@ for (i in 1:2){
 
 df6b <- summary(res6)
 df6b <- df6b[grepl("^[mo]", df6b$sample1) & grepl("^[mo]", df6b$sample2), ]
-checkIdentical(df6b[df6b$sample1=="o:XX2" & df6b$sample2=="o:XX3", "expr.doppel"], TRUE)
+checkIdentical(df6b[df6b$sample1=="o:X2" & df6b$sample2=="o:X3", "expr.doppel"], TRUE)
 df6b <- df6b[-1:-2, ]
 ##checkTrue(all(df6b$expr.doppel))  ## not a bug, but a shortcoming in the outlier detection that these are not all identified as expression doppelgangers.
 checkTrue(all(df6b$pheno.doppel))
@@ -150,9 +150,9 @@ has.o <- grepl("^o", df7$sample1) | grepl("^o", df7$sample2)
 
 df7a <- df7[has.o, ]
 df7a$sample1 <- sub("o", "m", df7a$sample1)
-df7a$sample1 <- sub("XX", "", df7a$sample1)
+df7a$sample1 <- sub("X", "", df7a$sample1)
 df7a$sample2 <- sub("o", "m", df7a$sample2)
-df7a$sample2 <- sub("XX", "", df7a$sample2)
+df7a$sample2 <- sub("X", "", df7a$sample2)
 
 df7b <- df7[!has.o, ]
 df7b <- df7b[(!grepl("^n", df7b$sample1) | !grepl("^n", df7b$sample2)), ]

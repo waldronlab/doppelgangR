@@ -4,8 +4,8 @@ Depends: R (>= 3.0), affy, methods, Biobase, BiocParallel
 Suggests: curatedOvarianData, knitr, ROCR, pROC
 Imports: sva, impute, digest, mnormt
 Author: Levi Waldron and Markus Riester
-Version: 0.10.2
-Date: 2015-01-28
+Version: 0.10.3
+Date: 2015-01-30
 License: GPL (>=2.0)
 Title: Identify likely duplicate samples from genomic or meta-data.
 Description: The main function is doppelgangR(), which takes as minimal

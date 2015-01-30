@@ -181,3 +181,17 @@ checkEquals(cor1, t(cor2))
 cor1 <- corFinder(eset.pair=esets[c(1, 1)])
 cor2 <- corFinder(eset.pair=esets[c(1, 1)], use.ComBat=FALSE)
 checkEquals(cor1, cor2)
+
+##Check missing values:
+exprs(esets[[1]])[1:10, 1:5] <- NA
+doppelgangR(esets[1:2])
+## More missing values:
+exprs(esets[[1]])[1:10, 1:8] <- NA
+doppelgangR(esets[1:2])
+## More missing values:
+exprs(esets[[1]])[1:10, 1:11] <- NA
+doppelgangR(esets[1:2])
+## infinite values:
+exprs(esets[[1]])[14, 1] <- -Inf
+exprs(esets[[1]])[15, 2] <- Inf
+doppelgangR(esets[1:2])

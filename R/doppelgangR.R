@@ -56,6 +56,11 @@ verbose=TRUE
         names(esets) <- make.unique(names(esets))
     for (i in 1:length(esets)){
         sampleNames(esets[[i]]) <- paste(names(esets)[i], sampleNames(esets[[i]]), sep=separator)
+        if(min(exprs(esets[[i]]), na.rm=TRUE) == -Inf | max(exprs(esets[[i]]), na.rm=TRUE) == Inf){
+            warning(paste("Replacing -+Inf with min/max expression values for dataset", names(esets)[i]))
+            exprs(esets[[i]])[exprs(esets[[i]])==-Inf] <- min(exprs(esets[[i]])[is.finite(exprs(esets[[i]]))], na.rm=TRUE)
+            exprs(esets[[i]])[exprs(esets[[i]])==Inf] <- max(exprs(esets[[i]])[is.finite(exprs(esets[[i]]))], na.rm=TRUE)
+        }
         if(!is.null(impute.knn.args) & any(!complete.cases(exprs(esets[[i]])))){
             ##KNN imputation
             message(paste("KNN imputation for", names(esets)[i]))

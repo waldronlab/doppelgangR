@@ -42,7 +42,7 @@ esets <- bplapply(breast.packages, function(pkg){
 })
 names(esets) <- sub("breastCancer", "", breast.packages)
 
-save(esets, file="breast_esets.rda", compress="bzip2"))
+save(esets, file="breast_esets.rda", compress="bzip2")
 ##load("esets.rda")
 
 #set.seed(1)

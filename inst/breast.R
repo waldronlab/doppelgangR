@@ -51,12 +51,12 @@ save(esets, file="breast_esets.rda", compress="bzip2"))
 library(doppelgangR)
 
 dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
-                   outlierFinder.expr.args=list(bonf.prob = 0.5, transFun = atanh, tail = "upper"))
-save(dop, file="breast_dop.rda")
+                   outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
+save(dop, file="breast_dop_1.0.rda")
 ##load("breast_dop.rda")
 
-write.csv(dop@summaryresults, file="breast_dop.csv")
-pdf("breastdoppel.pdf")
+write.csv(dop@summaryresults, file="breast_dop_1.0.csv")
+pdf("breast_dop_1.0.pdf")
 plot(dop)
 dev.off()
-##system("evince ~/Dropbox/breastdoppel.pdf &")
+

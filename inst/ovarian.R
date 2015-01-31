@@ -15,12 +15,12 @@ library(doppelgangR)
 save(esets, file="ovarian_esets.rda", compress="bzip2")
 
 dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
-                   outlierFinder.expr.args=list(bonf.prob = 0.5, transFun = atanh, tail = "upper"))
+                   outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
 #dop <- doppelgangR(esets)
-save(dop, file="ovarian_dop.rda")
+save(dop, file="ovarian_dop_1.0.rda")
 load("ovarian_dop.rda")
-write.csv(dop@summaryresults, file="ovarian_dop.csv")
+write.csv(dop@summaryresults, file="ovarian_dop_1.0.csv")
 
-pdf("ovarian_dop.pdf")
+pdf("ovarian_dop_1.0.pdf")
 plot(dop, skip.no.doppels=TRUE)
 dev.off()

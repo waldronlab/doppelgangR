@@ -42,7 +42,7 @@ esets <- bplapply(breast.packages, function(pkg){
 })
 names(esets) <- sub("breastCancer", "", breast.packages)
 
-save(esets, file="breast_esets.rda")
+save(esets, file="breast_esets.rda", compress="bzip2"))
 ##load("esets.rda")
 
 #set.seed(1)
@@ -51,7 +51,7 @@ save(esets, file="breast_esets.rda")
 library(doppelgangR)
 
 dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
-                   outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
+                   outlierFinder.expr.args=list(bonf.prob = 0.5, transFun = atanh, tail = "upper"))
 save(dop, file="breast_dop.rda")
 ##load("breast_dop.rda")
 

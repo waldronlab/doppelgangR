@@ -12,9 +12,10 @@ source(system.file("extdata", "createEsetList.R", package =
 rm(list=ls(pattern="_eset"))
 
 library(doppelgangR)
+save(esets, file="ovarian_esets.rda", compress="bzip2")
 
 dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
-                   outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
+                   outlierFinder.expr.args=list(bonf.prob = 0.5, transFun = atanh, tail = "upper"))
 #dop <- doppelgangR(esets)
 save(dop, file="ovarian_dop.rda")
 load("ovarian_dop.rda")

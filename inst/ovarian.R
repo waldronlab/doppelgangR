@@ -18,9 +18,9 @@ dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
                    outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
 #dop <- doppelgangR(esets)
 save(dop, file="ovarian_dop_1.0.rda")
-load("ovarian_dop.rda")
-write.csv(dop@summaryresults, file="ovarian_dop_1.0.csv")
 
+load("ovarian_dop_1.0.rda")
+write.csv(dop@summaryresults, file="ovarian_dop_1.0.csv")
 pdf("ovarian_dop_1.0.pdf")
 plot(dop, skip.no.doppels=TRUE)
 dev.off()

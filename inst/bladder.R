@@ -18,7 +18,7 @@ dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
 #dop <- doppelgangR(esets)
 save(dop, file="bladder_dop_1.0.rda")
 
-load("bladder_dop.rda")
+load("bladder_dop_1.0.rda")
 write.csv(dop@summaryresults, file="bladder_dop_1.0.csv")
 
 pdf("bladder_dop_1.0.pdf")

@@ -20,7 +20,7 @@ warnings()
 #dop <- doppelgangR(esets)
 save(dop, file="crc_dop_1.0.rda")
 
-load("crc_dop.rda")
+load("crc_dop_1.0.rda")
 write.csv(dop@summaryresults, file="crc_dop_1.0.csv")
 pdf("CRC_dop_1.0.pdf")
 plot(dop, skip.no.doppels=TRUE)

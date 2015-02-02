@@ -14,13 +14,13 @@ library(doppelgangR)
 save(esets, file="bladder_esets.rda", compress="bzip2")
 
 dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
-                   outlierFinder.expr.args=list(bonf.prob = 0.5, transFun = atanh, tail = "upper"))
+                   outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
 #dop <- doppelgangR(esets)
-save(dop, file="bladder_dop.rda")
+save(dop, file="bladder_dop_1.0.rda")
 
 load("bladder_dop.rda")
-write.csv(dop@summaryresults, file="bladder_dop.csv")
+write.csv(dop@summaryresults, file="bladder_dop_1.0.csv")
 
-pdf("bladder_dop.pdf")
+pdf("bladder_dop_1.0.pdf")
 plot(dop, skip.no.doppels=TRUE)
 dev.off()

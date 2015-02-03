@@ -7,18 +7,23 @@ if( !require(RTCGAToolbox) ){
 all.dates <- getFirehoseRunningDates()
 all.datasets <- getFirehoseDatasets()
 
-tcga.res <- list()
-for (i in 1:length(all.datasets)){
-    (ds.name <- all.datasets[i])
-    if(!ds.name %in% names(tcga.res)){
-        res <- try(getFirehoseData(ds.name, runDate=all.dates[1], RNAseq_Gene=TRUE, RNAseq2_Gene_Norm=TRUE, mRNA_Array=TRUE))
+if(file.exists("tcga.res")){
+    load("/scratch/lw391/doppelgangR/inst")
+}else{
+    tcga.res <- list()
+    for (i in 1:length(all.datasets)){
+        (ds.name <- all.datasets[i])
+        if(!ds.name %in% names(tcga.res)){
+            res <- try(getFirehoseData(ds.name, runDate=all.dates[1], RNAseq_Gene=TRUE, RNAseq2_Gene_Norm=TRUE, mRNA_Array=TRUE))
+        }
+        if(!is(res, "try-error")){
+            tcga.res[[ds.name]] <- res
+        }
     }
-    if(!is(res, "try-error")){
-        tcga.res[[ds.name]] <- res
-    }
+    save(tcga.res, file="/scratch/lw391/doppelgangR/inst/TCGA.rda")
+}else{
+    load("/scratch/lw391/doppelgangR/inst")
 }
-
-save(tcga.res, file="TCGA.rda")
 
 extractRTCGA <- function(object, type){
     typematch <- match.arg(type,
@@ -37,10 +42,17 @@ extractRTCGA <- function(object, type){
             output <- lapply(object@mRNAArray, function(tmp){
                 tmp@DataMatrix
             })
-            warning(paste("Taking the mRNA_Array platform with the greatest number of samples:", which.max(sapply(output, ncol))))
-            ## just silently take the platform with the greatest
-            ## number of samples:
-            output <- output[[which.max(sapply(output, ncol))]]
+            if(length(output) == 0){
+                output <- matrix(NA, nrow=0, ncol=0)
+            }else if(length(output) == 1){
+                output <- output[[1]]
+            }else{
+                ## just silently take the platform with the greatest
+                ## number of samples:
+                keeplist <- which.max(sapply(output, ncol))
+                output <- output[[keeplist]]
+                warning(paste("Taking the mRNA_Array platform with the greatest number of samples:", keeplist))
+            }
         }
     }else{
         stop(paste("Type", typematch, "not yet supported."))
@@ -48,10 +60,45 @@ extractRTCGA <- function(object, type){
     return(output)
 }
 
-load("ov.array.rda")
-dim(extractRTCGA(ov.array, "RNAseq_Gene"))
-dim(extractRTCGA(ov.array, "RNAseq2_Gene_Norm"))
-dim(extractRTCGA(ov.array, "mRNA_Array"))
+library(affy)
+if(file.exists("/scratch/lw391/doppelgangR/inst/tcga.esets.rda")){
+    load("/scratch/lw391/doppelgangR/inst/tcga.esets.rda")
+}else{
+    tcga.esets <- list()
+    for (i in 1:length(tcga.res)){
+        print(names(tcga.res)[i])
+        tmp <- list()
+        tmp[["mrna"]] <- extractRTCGA(tcga.res[[i]], "mRNA_Array")
+        tmp[["rnaseq"]] <- extractRTCGA(tcga.res[[i]], "RNAseq_Gene")
+        tmp[["rnaseq2"]] <- extractRTCGA(tcga.res[[i]], "RNAseq2_Gene_Norm")
+        pickplat <- which.max(sapply(tmp, ncol))
+        tcga.esets[[paste(names(tcga.res)[i], names(tmp)[pickplat])]] <- ExpressionSet(tmp[[pickplat]])
+    }
+    save(tcga.esets, file="/scratch/lw391/doppelgangR/inst/tcga.esets.rda")
+}
 
-load("TCGA.rda")
+cor.list <- lapply(tcga.esets, function(eset){
+    output <- cor(exprs(eset))
+    output[upper.tri(output)]
+})
+names(cor.list) <- names(tcga.esets)
 
+save(cor.list, file="/scratch/lw391/doppelgangR/inst/cor.list.rda")
+
+load("/scratch/lw391/doppelgangR/inst/cor.list.rda")
+
+par(ask=TRUE)
+for (i in 1:length(cor.list)){
+    hist(cor.list[[i]], main=names(cor.list)[i], breaks="FD")
+    abline(v=0.99, col="red"); abline(v=0.95, col="red")
+}
+
+100*sort(sapply(cor.list, function(x) sum(x > 0.95) / length(x)))
+sort(sapply(cor.list, median))
+sort(sapply(cor.list, quantile, 0.999))
+     
+##bimodal: KICH (RNAseq2), maybe KIRC and KIRP, LUSC, PAAD, PCPG, THCA, GBM
+
+##very high correlations normally: THCA, HNSC, LIHC, maybe KIRP, LAML, PCPG, PRAD, STAD, THYM, ESCA
+
+##looks good: ACC, BLCA, BRCA, CESC, COAD, COADREAD, DLBC, LGG, 

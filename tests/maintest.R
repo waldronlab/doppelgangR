@@ -195,3 +195,27 @@ doppelgangR(esets[1:2])
 exprs(esets[[1]])[14, 1] <- -Inf
 exprs(esets[[1]])[15, 2] <- Inf
 doppelgangR(esets[1:2])
+
+##------------------------------------------
+cat("\n")
+cat("Issue #13: Smoking guns only with cache=TRUE: \n")
+##------------------------------------------
+dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id")
+checkEquals(summary(dop)[, 1], "m:5")
+checkEquals(summary(dop)[, 2], "n:4")
+
+
+##------------------------------------------
+cat("\n")
+cat("Issue #14: Check with identical ExpressionSets:\n")
+##------------------------------------------
+##both of these error:
+dop <- doppelgangR(esets[[1]])
+dop <- doppelgangR(list(esets[[1]], esets[[1]]))
+
+esets2 <- c(esets, esets[[1]])
+esets2[[3]]$id <- tolower(esets2[[3]]$id)
+names(esets2)[3] <- "o"
+dop <- doppelgangR(esets2, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id", cache.dir=NULL)
+checkEquals(nrow(summary(dop)), 3)
+

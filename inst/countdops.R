@@ -64,7 +64,170 @@ for (i in 1:length(esetsfiles)){
                          experimentData(esets[[j]])@name)
     }
 }
-                
+
 output <- do.call(rbind, output)
 colnames(output) <- c("Cancer Type", "Dataset", "N.samples", "Lab", "Annotation", "PMID", "Name")
 write.csv(output, file="AllStudies.csv")
+
+## -----------------------------------------
+## -----------------------------------------
+## ROC plot from all correlations
+## -----------------------------------------
+## -----------------------------------------
+
+## Curation of smoking gun doppelgangers
+
+## Ovarian:
+## GSE12470_eset GSE17260_eset
+## GSE12470_eset GSE32062.GPL6480_eset
+## GSE12470_eset GSE32063_eset
+## PMID15897565_eset:X0074_1776_h133a_1784	PMID17290060_eset:X0074_1776_h133a_1784
+## PMID17290060_eset:X0193_0000_h133a_D1805	PMID19318476_eset:D1805
+
+library(affy)
+load("ovarian_esets.rda")
+esets <- esets[c("GSE12470_eset", "GSE17260_eset", "GSE32062.GPL6480_eset", "GSE32063_eset", "PMID15897565_eset", "PMID17290060_eset", "PMID19318476_eset")]
+##
+esets[["GSE12470_eset"]]$uniqueid <- paste("Yoshihara", esets[["GSE12470_eset"]]$sample_type, gsub("[^0-9]", "", esets[["GSE12470_eset"]]$alt_sample_name), sep="_")
+esets[["GSE32062.GPL6480_eset"]]$uniqueid <- paste("Yoshihara", esets[["GSE32062.GPL6480_eset"]]$sample_type, gsub("[^0-9]", "", esets[["GSE32062.GPL6480_eset"]]$alt_sample_name), sep="_")
+esets[["GSE32063_eset"]]$uniqueid <- paste("Yoshihara", esets[["GSE32063_eset"]]$sample_type, gsub("[^0-9]", "", esets[["GSE32063_eset"]]$alt_sample_name), sep="_")
+esets[["GSE17260_eset"]]$uniqueid <- paste("Yoshihara", esets[["GSE17260_eset"]]$sample_type, gsub("[^0-9]", "", esets[["GSE17260_eset"]]$alt_sample_name), sep="_")
+esets[["PMID15897565_eset"]]$uniqueid <- paste("Duke", esets[["PMID15897565_eset"]]$sample_type, sub(".+_", "", sampleNames(esets[["PMID15897565_eset"]])), sep="_")
+esets[["PMID17290060_eset"]]$uniqueid <- paste("Duke", esets[["PMID17290060_eset"]]$sample_type, gsub("[^0-9]", "", sub(".+_", "", sampleNames(esets[["PMID17290060_eset"]]))), sep="_")
+esets[["PMID17290060_eset"]]$uniqueid[esets[["PMID17290060_eset"]]$alt_sample_name=="M3142"] <- "M3142"
+esets[["PMID19318476_eset"]]$uniqueid <- paste("Duke", esets[["PMID19318476_eset"]]$sample_type, gsub("[^0-9]", "", esets[["PMID19318476_eset"]]$alt_sample_name), sep="_")
+library(doppelgangR)
+tmp <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="uniqueid", cache.dir=NULL)
+rm(esets)
+goldstandard <- list()
+goldstandard[["ovarian_dop.csv"]] <- paste(summary(tmp)[, 1], summary(tmp)[, 2])
+
+## ## Breast:
+## TRANSBIG:VDXOXFU_104	UNT:OXFU_104
+## TRANSBIG:VDXKIU_136B04	UPP:UPP_136B04
+## UNT:KIU_101B88	UPP:UPP_101B88
+load("breast_esets.rda")
+esets <- esets[c("TRANSBIG", "UNT", "UPP")]
+esets[["UNT"]]$uniqueid <- sub(".+_", "", sampleNames(esets[c("UNT")]))
+esets[["UPP"]]$uniqueid <- sub(".+_", "", sampleNames(esets[c("UPP")]))
+esets[["TRANSBIG"]]$uniqueid <- make.unique(sub(".+_", "", sampleNames(esets[c("TRANSBIG")])))
+tmp <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="uniqueid", cache.dir=NULL)
+goldstandard[["breast_dop.csv"]] <- paste(summary(tmp)[, 1], summary(tmp)[, 2])
+rm(esets)
+
+
+## ## CRC:
+## GSE13067_eset	GSE14333_eset:  41 manually
+## GSE18105_eset	GSE21510_eset
+load("CRC_esets.rda")
+
+esets <- esets[c("GSE13067_eset", "GSE14333_eset", "GSE18105_eset", "GSE21510_eset")]
+esets[["GSE13067_eset"]]$uniqueid <- paste("Jorissen", esets[["GSE13067_eset"]]$sample_type, sub(": .+", "", esets[["GSE13067_eset"]]$alt_sample_name), sep="_")
+esets[["GSE14333_eset"]]$uniqueid <- paste("Jorissen", esets[["GSE14333_eset"]]$sample_type, sub("-[0-9][A-Z]$", "", esets[["GSE14333_eset"]]$alt_sample_name), sep="_")
+##
+celltype <- sub(".+, ", "", esets[["GSE18105_eset"]]$alt_sample_name)
+esets[["GSE18105_eset"]]$uniqueid <- paste("Matsuyama", esets[["GSE18105_eset"]]$sample_type, celltype, gsub("[^0-9]", "", esets[["GSE18105_eset"]]$alt_sample_name), sep="_")
+##
+celltype <- sub(".+, ", "", esets[["GSE21510_eset"]]$alt_sample_name)
+celltype <- sub(" .+", "", celltype)
+esets[["GSE21510_eset"]]$uniqueid <- paste("Matsuyama", esets[["GSE21510_eset"]]$sample_type, celltype, gsub("[^0-9]", "", esets[["GSE21510_eset"]]$alt_sample_name), sep="_")
+
+crc.dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="uniqueid", cache.dir=NULL)
+goldstandard[["CRC_dop.csv"]] <- paste(summary(crc.dop)[, 1], summary(crc.dop)[, 2])
+rm(esets)
+
+
+
+## ## Bladder:
+## GSE5287_eset	GSE89_eset
+## GSE19915.GPL3883_eset	GSE32894_eset
+## GSE19915.GPL3883_eset GSE19915.GPL5186_eset
+
+load("bladder_esets.rda")
+
+esets <- esets[c("GSE5287_eset", "GSE89_eset", "GSE19915.GPL3883_eset", "GSE32894_eset", "GSE19915.GPL5186_eset")]
+##
+esets[["GSE5287_eset"]]$uniqueid <- paste("Als", esets[["GSE5287_eset"]]$sample_type, sub("Sample # ", "", esets[["GSE5287_eset"]]$alt_sample_name))
+esets[["GSE89_eset"]]$uniqueid <- paste("Als", esets[["GSE89_eset"]]$sample_type, sub("Sample # ", "", esets[["GSE89_eset"]]$alt_sample_name))
+##
+esets[["GSE19915.GPL3883_eset"]]$uniqueid <- paste("Lindgren", esets[["GSE19915.GPL3883_eset"]]$sample_type, sub("([UCN]+_[0-9]+).+", "\\1", esets[["GSE19915.GPL3883_eset"]]$alt_sample_name))
+esets[["GSE32894_eset"]]$uniqueid <- paste("Lindgren", esets[["GSE32894_eset"]]$sample_type, sub("([UCN]+_[0-9]+).+", "\\1", esets[["GSE32894_eset"]]$alt_sample_name))
+esets[["GSE19915.GPL5186_eset"]]$uniqueid <- paste("Lindgren", esets[["GSE19915.GPL5186_eset"]]$sample_type, sub("([UCN]+_[0-9]+).+", "\\1", esets[["GSE19915.GPL5186_eset"]]$alt_sample_name))
+
+summary(esets[["GSE19915.GPL5186_eset"]]$uniqueid %in% esets[["GSE19915.GPL3883_eset"]]$uniqueid)
+summary(esets[["GSE32894_eset"]]$uniqueid %in% esets[["GSE19915.GPL3883_eset"]]$uniqueid)
+summary(esets[["GSE32894_eset"]]$uniqueid %in% esets[["GSE19915.GPL5186_eset"]]$uniqueid)
+
+bladder.dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="uniqueid", cache.dir=NULL)
+goldstandard[["bladder_dop.csv"]] <- paste(summary(bladder.dop)[, 1], summary(bladder.dop)[, 2])
+rm(esets)
+
+
+
+matrixToDf <- function(x){
+    data.frame(sample=array(outer(rownames(x), colnames(x), FUN=paste)),
+               correlation=as.numeric(x))
+}
+
+library(ROCR)
+if(file.exists("pairwise.perf.rda")){
+    load("pairwise.perf.rda")
+}else{
+    pairwise.perf <- list()
+    pairwise.auc <- list()
+    for (sname in snames){
+        print(sname)
+        load(sub("csv", "rda", sname))
+        pairwise.cors <- lapply(dop@fullresults, function(x) na.omit(matrixToDf(x$correlations)))
+##        pairwise.cors <- do.call(rbind, pairwise.cors)
+        ##
+        pairwise.perf[[sname]] <- list()
+        pairwise.auc[[sname]] <- list()
+        for (i in 1:length(pairwise.cors)){
+            pairwise.cors[[i]]$TP <- 0
+            pairwise.cors[[i]]$TP[match(goldstandard[[sname]], pairwise.cors[[i]]$sample)] <- 1
+            if(identical(all.equal(sum(pairwise.cors[[i]]$TP), 0), TRUE)) next
+            pairwise.pred <- prediction(predictions=pairwise.cors[[i]]$correlation, labels=pairwise.cors[[i]]$TP)
+            pairwise.perf[[sname]][[names(pairwise.cors)[i]]] <- performance(pairwise.pred, measure="tpr", x.measure="fpr")
+            pairwise.auc[[sname]][[names(pairwise.cors)[i]]] <- performance(pairwise.pred, measure="auc")
+        }
+        ##
+        ##        pairwise.perf[[sname]] <- roc(predictor=pairwise.cors$correlation, response=pairwise.cors$TP, plot=TRUE)
+    }
+    save(pairwise.perf, pairwise.auc, file="pairwise.perf.rda")
+}
+
+pdf("pairwise.perf.pdf")
+par(mfrow=c(2, 2))
+for (i in 1:length(pairwise.perf)){
+    for (j in 1:length(pairwise.perf[[i]])){
+        plot(pairwise.perf[[i]][[j]], add=(j>1), main=sub("_dop.csv", "", names(pairwise.perf)[i]), lty=j)
+    }
+    mycex <- ifelse(names(pairwise.perf)[i] %in% c("bladder_dop.csv", "ovarian_dop.csv"), 0.75, 1)
+    legend("bottomright", legend=gsub("_eset", "", names(pairwise.perf[[i]])), lty=1:length(pairwise.perf[[i]]), bty='n', cex=mycex)
+}
+dev.off()
+
+##Mean AUC is 0.98:
+mean(unlist(sapply(pairwise.auc, function(auc1) sapply(auc1, function(auc2) auc2@y.values[[1]]))))
+
+## pairwise.spline <- lapply(pairwise.perf, function(pairwise.cancer){
+##     lapply(pairwise.cancer, function(perf1){
+##         spline(perf1@x.values[[1]], perf1@y.values[[1]], xout=seq(0, 1, length.out=1001))
+##     })
+## })
+
+## pairwise.splineout <- lapply(pairwise.spline, function(pairwise.1cancer){
+##     data.frame(smoothx=rowMeans(sapply(pairwise.1cancer, function(x) x$x)),
+##                smoothy=rowMeans(sapply(pairwise.1cancer, function(x) x$y)))
+## })
+
+## pdf("pairwise.perf.pdf")
+## par(mfrow=c(2, 2))
+## for (i in 1:4){
+##     plot(pairwise.splineout[[i]], main=sub("_dop.csv", "", snames[i]), type="l", xlim=c(0, 1), ylim=c(0, 1))
+##     abline(a=0, b=1, lty=2)
+## }
+## dev.off()
+
+

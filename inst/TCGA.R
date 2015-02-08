@@ -7,7 +7,7 @@ if( !require(RTCGAToolbox) ){
 all.dates <- getFirehoseRunningDates()
 all.datasets <- getFirehoseDatasets()
 
-if(file.exists("tcga.res")){
+if(file.exists("/scratch/lw391/doppelgangR/inst/TCGA.rda")){
     load("/scratch/lw391/doppelgangR/inst")
 }else{
     tcga.res <- list()
@@ -127,6 +127,28 @@ suitability.table <- suitability.table[order(suitability.table$quantile99, suita
 rownames(suitability.table) <- 1:nrow(suitability.table)
 suitability.table$Study.Name <- tolower(suitability.table$Study.Name)
 
+library(pipeR)
+library(XML)
+library(stringr)
+url1 <- "http://cancergenome.nih.gov/publications/publicationguidelines"
+tabb <- readHTMLTable(url1, stringsAsFactors=FALSE)
+tt <- tabb[1][[1]]
+names(tt) <- c("disease", "restrict")
+tt$disease %>>% strsplit("\\(") %>>% sapply("[", 2) %>>%
+  gsub(pattern="\\)", replacement="", x=.) %>>% tolower -> tt$disease
+tt <- tt[complete.cases(tt),]
+tt[tt[,"disease"]=="coad, read",1] <- c("coad")
+tt <- rbind(tt[1:7,],c("read", NA),tt[-(1:7),])
+  for (i in 25:nrow(tt))
+tt$restrict[i] <- str_extract_all(tt$restrict, "[0-9]{2}/[0-9]{2}/[0-9]{4}")[[i]]
+tt$restrict <- ifelse(str_detect(tt$restrict, "No restrictions"), NA, tt$restrict)
+
+tt2 <- tt[match(suitability.table$cancertype, toupper(tt[, 1])), ]
+tt2$restrict[is.na(tt2$disease)] <- "unknown"
+tt2$restrict[is.na(tt2$restrict)] <- "unrestricted"
+suitability.table$embargoed <- tt2$restrict
+
+write.csv(suitability.table, file="suitability.table.csv")
 
 library(xtable)
 sink("suitability.table.html")

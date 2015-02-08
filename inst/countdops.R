@@ -45,3 +45,26 @@ output <- t(output)
 output
 
 write.csv(output, file="doppelgangers_summary.csv")
+
+## summarize all samples
+library(affy)
+output <- list()
+esetsfiles <- dir(pattern="_esets\\.rda$")
+k <- 0
+for (i in 1:length(esetsfiles)){
+    load(esetsfiles[i])
+    for (j in 1:length(esets)){
+        k <- k+1
+        output[[k]] <- c(sub("_esets.rda", "", esetsfiles[i]),
+                         names(esets)[j],
+                         ncol(esets[[j]]),
+                         experimentData(esets[[j]])@lab,
+                         esets[[j]]@annotation,
+                         experimentData(esets[[j]])@pubMedIds,
+                         experimentData(esets[[j]])@name)
+    }
+}
+                
+output <- do.call(rbind, output)
+colnames(output) <- c("Cancer Type", "Dataset", "N.samples", "Lab", "Annotation", "PMID", "Name")
+write.csv(output, file="AllStudies.csv")

@@ -7,8 +7,13 @@ if( !require(RTCGAToolbox) ){
 all.dates <- getFirehoseRunningDates()
 all.datasets <- getFirehoseDatasets()
 
-if(file.exists("/scratch/lw391/doppelgangR/inst/TCGA.rda")){
-    load("/scratch/lw391/doppelgangR/inst")
+data.path <- "/scratch/lw391/doppelgangR/inst"
+data.path <- ""
+data.file <- file.path(data.path, "TCGA.rda")
+
+
+if(file.exists(data.file)){
+    load(data.file)
 }else{
     tcga.res <- list()
     for (i in 1:length(all.datasets)){
@@ -20,9 +25,7 @@ if(file.exists("/scratch/lw391/doppelgangR/inst/TCGA.rda")){
             tcga.res[[ds.name]] <- res
         }
     }
-    save(tcga.res, file="/scratch/lw391/doppelgangR/inst/TCGA.rda")
-}else{
-    load("/scratch/lw391/doppelgangR/inst")
+    save(tcga.res, file=data.file)
 }
 
 extractRTCGA <- function(object, type){
@@ -61,8 +64,8 @@ extractRTCGA <- function(object, type){
 }
 
 library(affy)
-if(file.exists("/scratch/lw391/doppelgangR/inst/tcga.esets.rda")){
-    load("/scratch/lw391/doppelgangR/inst/tcga.esets.rda")
+if(file.exists(file.path(data.path, "tcga.esets.rda"))){
+    load(file.path(data.path, "tcga.esets.rda"))
 }else{
     tcga.esets <- list()
     for (i in 1:length(tcga.res)){
@@ -74,8 +77,11 @@ if(file.exists("/scratch/lw391/doppelgangR/inst/tcga.esets.rda")){
         pickplat <- which.max(sapply(tmp, ncol))
         tcga.esets[[paste(names(tcga.res)[i], names(tmp)[pickplat])]] <- ExpressionSet(tmp[[pickplat]])
     }
-    save(tcga.esets, file="/scratch/lw391/doppelgangR/inst/tcga.esets.rda")
+    save(tcga.esets, file=file.path(data.path, "tcga.esets.rda"))
 }
+
+# use only primary tumors
+tcga.esets <- lapply(tcga.esets, function(x) x[,substr(sampleNames(x),14,15) %in% c( "01", "03", "09" )] )
 
 cor.list <- lapply(tcga.esets, function(eset){
     output <- cor(exprs(eset))
@@ -83,9 +89,9 @@ cor.list <- lapply(tcga.esets, function(eset){
 })
 names(cor.list) <- names(tcga.esets)
 
-save(cor.list, file="/scratch/lw391/doppelgangR/inst/cor.list.rda")
+save(cor.list, file=file.path(data.path, "cor.list.rda"))
 
-load("/scratch/lw391/doppelgangR/inst/cor.list.rda")
+#load("/scratch/lw391/doppelgangR/inst/cor.list.rda")
 
 ztrans.list <- lapply(cor.list, atanh)
 
@@ -125,6 +131,7 @@ suitability.table <- suitability.table[, c(4, 6, 5, 3, 2:1)]
 ##
 suitability.table <- suitability.table[order(suitability.table$quantile99, suitability.table$perc.gt.95), ]
 rownames(suitability.table) <- 1:nrow(suitability.table)
+suitability.table$Study.Name[is.na(suitability.table$Study.Name )] <- "Colorectal adenocarcinoma"
 suitability.table$Study.Name <- tolower(suitability.table$Study.Name)
 
 library(pipeR)
@@ -169,6 +176,20 @@ for (i in match(suitability.table$cancertype, sub(" .+", "", names(cor.list)))){
 }
 dev.off()
 
+# remove restricted 
+
+cor.list <- cor.list[-unlist(sapply(toupper(tt[!is.na(tt$restrict),1]), grep, names(cor.list)))]
+cor.list <- cor.list[!grepl("mrna$", names(cor.list))]
+names(cor.list) <- gsub(" rnaseq2","", names(cor.list))
+names(cor.list) <- gsub(" rnaseq","", names(cor.list))
+names(cor.list) <- suitability.table$Study.Name[match(names(cor.list), suitability.table$cancertype)]
+
+d.f <- do.call(rbind, lapply(names(cor.list), function(i) data.frame(Cancer=i, COR=cor.list[[i]])))
+d.f$Cancer <- factor(d.f$Cancer, levels=names(cor.list)[order(sapply(cor.list, median))])
+
+pdf("tcgacor.pdf", width=12,height=6)
+ggplot(d.f, aes(Cancer,COR))+geom_violin()+theme_classic()+theme(axis.text.x = element_text(angle = 45, hjust = 1))+xlab("")+ylab("Pairwise Pearson Correlation")
+dev.off()
 
 ##bimodal: KICH (RNAseq2), maybe KIRC and KIRP, LUSC, PAAD, PCPG, THCA, GBM
 

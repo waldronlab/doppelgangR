@@ -185,7 +185,7 @@ names(cor.list) <- gsub(" rnaseq","", names(cor.list))
 names(cor.list) <- suitability.table$Study.Name[match(names(cor.list), suitability.table$cancertype)]
 
 d.f <- do.call(rbind, lapply(names(cor.list), function(i) data.frame(Cancer=i, COR=cor.list[[i]])))
-d.f$Cancer <- factor(d.f$Cancer, levels=names(cor.list)[order(sapply(cor.list, median))])
+d.f$Cancer <- factor(d.f$Cancer, levels=names(cor.list)[order(sapply(cor.list, quantile, p=0.99),decreasing=TRUE)])
 
 pdf("tcgacor.pdf", width=12,height=6)
 ggplot(d.f, aes(Cancer,COR))+geom_violin()+theme_classic()+theme(axis.text.x = element_text(angle = 45, hjust = 1))+xlab("")+ylab("Pairwise Pearson Correlation")

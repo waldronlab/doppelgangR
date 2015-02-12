@@ -1,6 +1,6 @@
 if( !require(RTCGAToolbox) ){
     library(devtools)
-    install_github("mksamur/RTCGAToolbox")
+    install_github("LiNk-NY/RTCGAToolbox")
     library(RTCGAToolbox)
 }
 
@@ -8,7 +8,7 @@ all.dates <- getFirehoseRunningDates()
 all.datasets <- getFirehoseDatasets()
 
 data.path <- "/scratch/lw391/doppelgangR/inst"
-data.path <- ""
+data.path <- "."
 data.file <- file.path(data.path, "TCGA.rda")
 
 
@@ -28,53 +28,18 @@ if(file.exists(data.file)){
     save(tcga.res, file=data.file)
 }
 
-extractRTCGA <- function(object, type){
-    typematch <- match.arg(type,
-          choices=c("RNAseq_Gene", "Clinic", "miRNASeq_Gene",
-              "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq",
-              "CNA_CGH", "Methylation", "Mutation", "mRNA_Array",
-              "miRNA_Array", "RPPA"))
-    if(identical(typematch, "RNAseq_Gene")){
-        output <- object@RNASeqGene
-    }else if(identical(typematch, "RNAseq2_Gene_Norm")){
-        output <- object@RNASeq2GeneNorm
-    }else if(identical(typematch, "mRNA_Array")){
-        if(is(object@mRNAArray, "FirehosemRNAArray")){
-            output <- object@mRNAArray@Datamatrix
-        }else if(is(object@mRNAArray, "list")){
-            output <- lapply(object@mRNAArray, function(tmp){
-                tmp@DataMatrix
-            })
-            if(length(output) == 0){
-                output <- matrix(NA, nrow=0, ncol=0)
-            }else if(length(output) == 1){
-                output <- output[[1]]
-            }else{
-                ## just silently take the platform with the greatest
-                ## number of samples:
-                keeplist <- which.max(sapply(output, ncol))
-                output <- output[[keeplist]]
-                warning(paste("Taking the mRNA_Array platform with the greatest number of samples:", keeplist))
-            }
-        }
-    }else{
-        stop(paste("Type", typematch, "not yet supported."))
-    }
-    return(output)
-}
-
 library(affy)
 if(file.exists(file.path(data.path, "tcga.esets.rda"))){
     load(file.path(data.path, "tcga.esets.rda"))
 }else{
     tcga.esets <- list()
     for (i in 1:length(tcga.res)){
-        print(names(tcga.res)[i])
         tmp <- list()
-        tmp[["mrna"]] <- extractRTCGA(tcga.res[[i]], "mRNA_Array")
-        tmp[["rnaseq"]] <- extractRTCGA(tcga.res[[i]], "RNAseq_Gene")
-        tmp[["rnaseq2"]] <- extractRTCGA(tcga.res[[i]], "RNAseq2_Gene_Norm")
-        pickplat <- which.max(sapply(tmp, ncol))
+        tmp[["mrna"]] <- extract(tcga.res[[i]], "mRNA_Array")
+        tmp[["rnaseq"]] <- extract(tcga.res[[i]], "RNAseq_Gene")
+        tmp[["rnaseq2"]] <- extract(tcga.res[[i]], "RNAseq2_Gene_Norm")
+        pickplat <- 1+which.max(sapply(tmp[2:3], ncol))
+        print(paste(names(tcga.res)[i], ":", names(tmp)[pickplat]))
         tcga.esets[[paste(names(tcga.res)[i], names(tmp)[pickplat])]] <- ExpressionSet(tmp[[pickplat]])
     }
     save(tcga.esets, file=file.path(data.path, "tcga.esets.rda"))

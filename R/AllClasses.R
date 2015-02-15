@@ -48,14 +48,16 @@ setMethod("plot", signature(x="DoppelGang"),
                   if(skip.no.doppels & (nrow(expr.doppels) == 0 | is.null(expr.doppels)))
                       next
                   stfit <- x@fullresults[[i]]$expr.doppels$stfit
-                  hist(cors, main = paste(names(x@fullresults)[i], stfit$algorithm$message, sep="\n"),
+                  hist.stats <- hist(cors, main = paste(names(x@fullresults)[i], stfit$algorithm$message, sep="\n"),
                        freq=TRUE, xlab = "Pairwise Correlations", breaks="FD", ...)
                   abline(v=expr.doppels$similarity, col="red", lw=0.5)
-                  xvals <- seq(min(-0.999, par("usr")[1]), max(0.999, par("usr")[2]), length.out=100)
+                  xvals <- hist.stats$breaks
                   transFun <- x@inputargs$outlierFinder.expr.args$transFun
                   suppressWarnings(xvals <- xvals[!is.na(transFun(xvals))])
-                  yvals <- diff(pst(transFun(xvals), location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])) * length(cors)
-                  lines(xvals[-1], yvals)
+                  dens.vals <- diff(pst(transFun(xvals), location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"]))
+                  xvals <- (xvals[-length(xvals)] + xvals[-1]) / 2
+                  freq.vals <- dens.vals * sum(hist.stats$counts)
+                  lines(xvals, freq.vals)
                   par(ask = prod(par("mfcol")) < length(x@fullresults) && dev.interactive())
               }
               suppressWarnings(par(op))

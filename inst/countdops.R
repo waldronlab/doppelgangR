@@ -100,7 +100,8 @@ library(doppelgangR)
 tmp <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="uniqueid", cache.dir=NULL)
 rm(esets)
 goldstandard <- list()
-goldstandard[["ovarian_dop.csv"]] <- paste(summary(tmp)[, 1], summary(tmp)[, 2])
+goldstandard[["ovarian_dop.csv"]] <- rbind(paste(summary(tmp)[, 1], summary(tmp)[, 2]),
+                                           paste(summary(tmp)[, 2], summary(tmp)[, 1]))
 
 ## ## Breast:
 ## TRANSBIG:VDXOXFU_104	UNT:OXFU_104
@@ -112,7 +113,8 @@ esets[["UNT"]]$uniqueid <- sub(".+_", "", sampleNames(esets[c("UNT")]))
 esets[["UPP"]]$uniqueid <- sub(".+_", "", sampleNames(esets[c("UPP")]))
 esets[["TRANSBIG"]]$uniqueid <- make.unique(sub(".+_", "", sampleNames(esets[c("TRANSBIG")])))
 tmp <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="uniqueid", cache.dir=NULL)
-goldstandard[["breast_dop.csv"]] <- paste(summary(tmp)[, 1], summary(tmp)[, 2])
+goldstandard[["breast_dop.csv"]] <- rbind(paste(summary(tmp)[, 1], summary(tmp)[, 2]),
+                                          paste(summary(tmp)[, 2], summary(tmp)[, 1]))
 rm(esets)
 
 
@@ -133,7 +135,8 @@ celltype <- sub(" .+", "", celltype)
 esets[["GSE21510_eset"]]$uniqueid <- paste("Matsuyama", esets[["GSE21510_eset"]]$sample_type, celltype, gsub("[^0-9]", "", esets[["GSE21510_eset"]]$alt_sample_name), sep="_")
 
 crc.dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="uniqueid", cache.dir=NULL)
-goldstandard[["CRC_dop.csv"]] <- paste(summary(crc.dop)[, 1], summary(crc.dop)[, 2])
+goldstandard[["CRC_dop.csv"]] <- rbind(paste(summary(crc.dop)[, 1], summary(crc.dop)[, 2]),
+                                       paste(summary(crc.dop)[, 2], summary(crc.dop)[, 1]))
 rm(esets)
 
 
@@ -159,15 +162,55 @@ summary(esets[["GSE32894_eset"]]$uniqueid %in% esets[["GSE19915.GPL3883_eset"]]$
 summary(esets[["GSE32894_eset"]]$uniqueid %in% esets[["GSE19915.GPL5186_eset"]]$uniqueid)
 
 bladder.dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="uniqueid", cache.dir=NULL)
-goldstandard[["bladder_dop.csv"]] <- paste(summary(bladder.dop)[, 1], summary(bladder.dop)[, 2])
+goldstandard[["bladder_dop.csv"]] <- rbind(paste(summary(bladder.dop)[, 1], summary(bladder.dop)[, 2]),
+                                           paste(summary(bladder.dop)[, 2], summary(bladder.dop)[, 1]))
 rm(esets)
-
 
 
 matrixToDf <- function(x){
     data.frame(sample=array(outer(rownames(x), colnames(x), FUN=paste)),
                correlation=as.numeric(x))
 }
+
+doppelmelt <- function(obj, ds){
+    cormat <- obj@fullresults[[ds]]$correlations
+    if(identical(rownames(cormat), colnames(cormat))){
+        cormat[lower.tri(cormat)] <- cormat[upper.tri(cormat)]
+    }
+    if(nrow(cormat) < ncol(cormat)) cormat <- t(cormat)
+    idx <- sapply(rownames(cormat), function(x) which.max(cormat[x, ]))
+    corvec <- sapply(1:nrow(cormat), function(i) cormat[i, idx[i]])
+    output <- data.frame(sample=paste(rownames(cormat), colnames(cormat)[idx]),
+                         correlation=corvec, stringsAsFactors=FALSE)
+    return(output)
+}
+plotROC <- function(pred, labels, plot = TRUE, na.rm = TRUE, colorize = FALSE, ...) {
+    require(ROCR)
+    require(pROC)
+    if (na.rm) {
+        idx <- !is.na(labels)
+        pred <- pred[idx]
+        labels <- labels[idx]
+    }
+    pred.rocr <- prediction(pred, labels)
+    perf.rocr <- performance(pred.rocr, "tpr", "fpr")
+    auc <- performance(pred.rocr, "auc")@y.values[[1]][[1]]
+    roc.obj <- roc(labels, pred)
+    auc.ci <- ci(roc.obj)
+    significant <- ifelse(ci(roc.obj, conf.level=0.9)[1] > 0.5, "*", "")
+    best <- coords(roc.obj,x="best")
+    if (plot) {
+        plot(perf.rocr, colorize = colorize, cex.lab = 1.3, ...)
+        text(0, 0.9, paste("AUC = ", round(auc, digits = 2), significant,
+        sep=""), cex = 1.5, pos = 4)
+        abline(a = 0, b = 1, lty = 2)
+        text(1, 0.1, paste("n =", length(labels)), cex = 1.5, pos = 2)
+        abline(a = 0, b = 1, lty = 2)
+    }
+    invisible(list(auc,auc.ci,best))
+}
+
+
 
 library(ROCR)
 if(file.exists("pairwise.perf.rda")){
@@ -178,14 +221,21 @@ if(file.exists("pairwise.perf.rda")){
     for (sname in snames){
         print(sname)
         load(sub("csv", "rda", sname))
-        pairwise.cors <- lapply(dop@fullresults, function(x) na.omit(matrixToDf(x$correlations)))
+##        pairwise.cors <- lapply(dop@fullresults, function(x) na.omit(matrixToDf(x$correlations)))
+        pairwise.dsnames <- names(dop@fullresults)
+        ## Look across studies only
+        pairwise.dsnames <- pairwise.dsnames[sapply(strsplit(pairwise.dsnames, ":"), function(x) !identical(x[1], x[2]))]
+        pairwise.cors <- lapply(pairwise.dsnames, function(ds){
+            doppelmelt(dop, ds)
+        })
+        names(pairwise.cors) <- pairwise.dsnames
 ##        pairwise.cors <- do.call(rbind, pairwise.cors)
         ##
         pairwise.perf[[sname]] <- list()
         pairwise.auc[[sname]] <- list()
         for (i in 1:length(pairwise.cors)){
             pairwise.cors[[i]]$TP <- 0
-            pairwise.cors[[i]]$TP[match(goldstandard[[sname]], pairwise.cors[[i]]$sample)] <- 1
+            pairwise.cors[[i]]$TP[ pairwise.cors[[i]]$sample %in% goldstandard[[sname]] ] <- 1
             if(identical(all.equal(sum(pairwise.cors[[i]]$TP), 0), TRUE)) next
             pairwise.pred <- prediction(predictions=pairwise.cors[[i]]$correlation, labels=pairwise.cors[[i]]$TP)
             pairwise.perf[[sname]][[names(pairwise.cors)[i]]] <- performance(pairwise.pred, measure="tpr", x.measure="fpr")
@@ -208,7 +258,7 @@ for (i in 1:length(pairwise.perf)){
 }
 dev.off()
 
-##Mean AUC is 0.98:
+##Mean AUC is 0.97:
 mean(unlist(sapply(pairwise.auc, function(auc1) sapply(auc1, function(auc2) auc2@y.values[[1]]))))
 
 ## pairwise.spline <- lapply(pairwise.perf, function(pairwise.cancer){

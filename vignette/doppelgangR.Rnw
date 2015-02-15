@@ -16,7 +16,6 @@ options(width=78)
 \author{Levi Waldron and Markus Riester}
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
 
 <<include=FALSE>>=
 library(knitr)

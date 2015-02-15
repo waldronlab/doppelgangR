@@ -111,13 +111,14 @@ Positive if the sample name is the same.
 
 <<output2rocfunc>>=
 doppelmelt <- function(obj, ds1, ds2){
-    tmp1 <- obj@fullresults[[ds1]][[ds2]]$correlations
-    tmp2 <- obj@fullresults[[ds2]][[ds1]]$correlations
-    if(is.null(tmp1)){
-        cormat <- tmp2
+    if(paste(ds1, ds2, sep=":") %in% names(obj@fullresults)){
+        ds <- paste(ds1, ds2, sep=":")
+    }else if(paste(ds2, ds1, sep=":") %in% names(obj@fullresults)){
+        ds <- paste(ds2, ds1, sep=":")
     }else{
-        cormat <- tmp1
+        return(NULL)
     }
+    cormat <- obj@fullresults[[ds]]$correlations
     if(nrow(cormat) < ncol(cormat)) cormat <- t(cormat)
     idx <- sapply(rownames(cormat), function(x) which.max(cormat[x, ]))
     corvec <- sapply(1:nrow(cormat), function(i) cormat[i, idx[i]])
@@ -187,9 +188,8 @@ microarray and RNA-seq.  We would like to see how well we can identify
 the duplicates based on expression data alone.
 
 <<tcgaovcload>>=
-tmpfile <- tempfile()
-download.file("http://bcb.dfci.harvard.edu/ovariancancer/dfiles_old/TCGA.RNASeqV2_eset.rda", destfile=tmpfile)
-load(tmpfile)
+library(curatedOvarianData)
+data(TCGA.RNASeqV2_eset)
 data(TCGA_eset)
 tcgaov.esets <- list(microarray=TCGA_eset, rnaseq=TCGA.RNASeqV2_eset)
 @
@@ -202,13 +202,13 @@ tcgaout.nobatch <- doppelgangR(tcgaov.esets, phenoFinder.args=NULL, smokingGunFi
 
 <<plottcta, fig.height=4.7, fig.caption="Microarray samples identified as having RNA-seq duplicates in the TCGA ovarian cancer dataset.">>=
 par(mfrow=c(2, 3))
-plot(tcgaout.batch, xlim=c(0.8, 1))
-plot(tcgaout.nobatch, xlim=c(0.8, 1))
+plot(tcgaout.batch, xlim=c(0.6, 1))
+plot(tcgaout.nobatch, xlim=c(0.6, 1))
 @
 
 <<tcgaroc, fig.height=3.5, fig.cap="Identification of Affymetrix microarray profiles that have duplicate RNA-seq profiles in the TCGA ovarian cancer dataset.  Note that most of the errors after batch correction are due to an RNA mix-up in the TCGA Affymetrix dataset.">>=
-tcgamelt.batch <- doppelmelt(tcgaout.batch, 1, 2)
-tcgamelt.nobatch <- doppelmelt(tcgaout.nobatch, 1, 2)
+tcgamelt.batch <- doppelmelt(tcgaout.batch, "microarray", "rnaseq")
+tcgamelt.nobatch <- doppelmelt(tcgaout.nobatch, "microarray", "rnaseq")
 tcga.remove <- read.delim(system.file("extdata", "TCGA_remove.txt", package="doppelgangR"),
                           as.is=TRUE)[, 1]
 par(mfrow=c(1,3))

@@ -1,3 +1,6 @@
-.hgtags
-runinline.sh
-.build.timestamp
+^.*\.rda$
+^.*\.csv$
+^.*\.txt$
+^.*\.html$
+^.*/cache/
+

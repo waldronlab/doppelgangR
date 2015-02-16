@@ -89,16 +89,15 @@ res.df <- summary(results1)
 dim(res.df)
 @
 
-
 To illustrate the importance of ComBat batch correction, we run again without batch correction:
 
 <<rundop2, results="hide", message=FALSE>>=
 results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
 @
 
-Fewer duplicates are found:
+Now only 4 (instead of 43) doppelganger pairs are found:
 <<summarizedop2>>=
-summary(results2)
+dim(summary(results2))
 @
 
 We define a couple functions to assess which is more accurate, with or
@@ -176,7 +175,54 @@ plotROC(roc1$cor, roc1$truepos, main="Batch correction")
 %%        legend=c(paste("RESUBSTITUTION area under curve =",round(rocobj.resubstitution$AUC,2)),
 %%          paste("CROSS-VALIDATED area under curve =",round(rocobj.cv$AUC,2))))
 
+\section{The impact of duplicates on prognostic model validation}
 
+<<<>>>=
+library(simulatorZ)
+library(survival)
+esets <- testesets
+for (i in 1:length(esets)){
+    esets[[i]]$y <- Surv(esets[[i]]$days_to_death, esets[[i]]$vital_status=="deceased")
+}
+##survmodel <- rowCoxTests(X=esets[["JapaneseA"]], y="y")  #doesn't work
+modelcoefs <- rowCoxTests(X=exprs(esets[["Yoshihara2010"]]), y=esets[["Yoshihara2010"]]$y)
+##modelcoefs$coef[modelcoefs$p.value > 0.1] <- 0
+preds <- data.frame(y=esets[["JapaneseA"]]$y,
+                    linpred=t(exprs(esets[["JapaneseA"]])) %*% sign(modelcoefs$coef),
+                    is.dup=sampleNames(esets[["JapaneseA"]]) %in% sampleNames(esets[["Yoshihara2010"]]))
+preds <- preds[order(preds$is.dup, decreasing=TRUE), ]
+max.dup <- max(which(preds$is.dup))
+preds$percent.dups <- sapply(1:nrow(preds), function(i){
+    if(i > max.dup) return(0)
+    return( (max.dup - i + 1) / nrow(preds) * 100)
+})
+
+hr.removedups <- t(sapply(0:max.dup, function(i){
+    if(i>0){
+        dat <- preds[-1:-i, ]
+    }else{
+        dat <- preds
+    }
+    coxfit <- coxph(y ~ (linpred > median(linpred)), data=dat)
+    output <- (summary(coxfit))$conf.int
+    names(output) <- c("exp(coef)", "exp(-coef)", "lower .95", "upper .95")
+    output
+}))
+hr.removedups <- data.frame(hr.removedups)
+hr.removedups$ndups <- (nrow(hr.removedups)-1):0
+
+hr.removedups$percent.dups <- preds$percent.dups[1:nrow(hr.removedups)]
+midlowess <- lowess(exp.coef. ~ percent.dups, data=hr.removedups)
+##lowerlowess <- lowess(lower..95 ~ ndups, data=hr.removedups)
+##upperlowess <- lowess(upper..95 ~ ndups, data=hr.removedups)
+@
+
+HR vs. percent duplication plot:
+
+<<>>=
+plot(exp.coef. ~ percent.dups, data=hr.removedups, ylab="Hazard Ratio", xlab="% of samples duplicated in training set")
+lines(midlowess$x, midlowess$y, lw=2)
+@
 
 \section{Finding duplicates between microarray and RNA-seq data}
 

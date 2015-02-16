@@ -77,7 +77,7 @@ summary(results1)
 Plot creates a histogram of sample pairwise correlations within and between each study:
 
 <<plotdop, fig.cap="Doppelgangers identified on the basis of similar expression profiles.  The vertical red lines indicate samples that were flagged.">>=
-par(mfrow=c(2,2))
+par(mfrow=c(2,2), las=1)
 plot(results1)
 @
 
@@ -126,7 +126,7 @@ doppelmelt <- function(obj, ds1, ds2){
     output$truepos <- sub(".+:", "", output[, 1]) == sub(".+:", "", output[, 2])
     return(output)
 }
-plotROC <- function(pred, labels, plot = TRUE, na.rm = TRUE, colorize = FALSE, ...) {
+plotROC <- function(pred, labels, plot = TRUE, na.rm = TRUE, colorize = FALSE, addtext=TRUE, ...) {
     require(ROCR)
     require(pROC)
     if (na.rm) {
@@ -143,11 +143,12 @@ plotROC <- function(pred, labels, plot = TRUE, na.rm = TRUE, colorize = FALSE, .
     best <- coords(roc.obj,x="best")
     if (plot) {
         plot(perf.rocr, colorize = colorize, cex.lab = 1.3, ...)
+        abline(a = 0, b = 1, lty = 2)
+        if(addtext){
         text(0, 0.9, paste("AUC = ", round(auc, digits = 2), significant,
-        sep=""), cex = 1.5, pos = 4)
-        abline(a = 0, b = 1, lty = 2)
+                           sep=""), cex = 1.5, pos = 4)
         text(1, 0.1, paste("n =", length(labels)), cex = 1.5, pos = 2)
-        abline(a = 0, b = 1, lty = 2)
+    }
     }
     invisible(list(auc,auc.ci,best))
 }
@@ -156,7 +157,7 @@ plotROC <- function(pred, labels, plot = TRUE, na.rm = TRUE, colorize = FALSE, .
 <<yoshihararoc, fig.height=3, fig.cap="Identification of Duplicate samples between the Japanese A dataset and Yoshihara 2010 dataset, without (left) and with (right) batch correction.">>=
 roc1 <- doppelmelt(results1, "JapaneseA", "Yoshihara2010")
 roc2 <- doppelmelt(results2, "JapaneseA", "Yoshihara2010")
-par(mfrow=c(1,2))
+par(mfrow=c(1,2), las=1)
 plotROC(roc2$cor, roc2$truepos, main="No batch correction")
 plotROC(roc1$cor, roc1$truepos, main="Batch correction")
 @
@@ -220,6 +221,7 @@ midlowess <- lowess(exp.coef. ~ percent.dups, data=hr.removedups)
 HR vs. percent duplication plot:
 
 <<>>=
+par(las=1)
 plot(exp.coef. ~ percent.dups, data=hr.removedups, ylab="Hazard Ratio", xlab="% of samples duplicated in training set")
 lines(midlowess$x, midlowess$y, lw=2)
 @
@@ -246,7 +248,7 @@ tcgaout.nobatch <- doppelgangR(tcgaov.esets, phenoFinder.args=NULL, smokingGunFi
 @
 
 <<plottcta, fig.height=4.7, fig.caption="Microarray samples identified as having RNA-seq duplicates in the TCGA ovarian cancer dataset.">>=
-par(mfrow=c(2, 3))
+par(mfrow=c(2, 3), las=1)
 plot(tcgaout.batch, xlim=c(0.6, 1))
 plot(tcgaout.nobatch, xlim=c(0.6, 1))
 @
@@ -256,11 +258,31 @@ tcgamelt.batch <- doppelmelt(tcgaout.batch, "microarray", "rnaseq")
 tcgamelt.nobatch <- doppelmelt(tcgaout.nobatch, "microarray", "rnaseq")
 tcga.remove <- read.delim(system.file("extdata", "TCGA_remove.txt", package="doppelgangR"),
                           as.is=TRUE)[, 1]
-par(mfrow=c(1,3))
-with(tcgamelt.nobatch, plotROC(cor, truepos, main="No batch correction"))
-with(tcgamelt.batch, plotROC(cor, truepos, main="Batch correction"))
-with(tcgamelt.batch[!sub("microarray:", "", tcgamelt.batch[, 1]) %in% tcga.remove, ],
-     plotROC(cor, truepos, main="Proven RNA mix-ups\n removed"))
+par(mfrow=c(1,3), las=1)
+
+nobatch.rocr <- with(tcgamelt.nobatch, prediction(cor, as.integer(truepos)))
+withbatch.rocr <- with(tcgamelt.batch, prediction(cor, as.integer(truepos)))
+remove.rocr <- with(tcgamelt.batch[!sub("microarray:", "", tcgamelt.batch[, 1]) %in% tcga.remove, ],
+                    prediction(cor, as.integer(truepos)))
+@
+
+Plotting of three ROCs in one for RNA-seq vs microarray in TCGA
+ovarian cancer.
+<<>>=
+#pdf("TCGA-rnaseq.pdf", width=3, height=3)
+#par(mar=c(4, 4, 0.2, 0.2))
+par(las=1)
+nobatch.auc <- round(performance(nobatch.rocr, "auc")@y.values[[1]][[1]], 2)
+withbatch.auc <- round(performance(withbatch.rocr, "auc")@y.values[[1]][[1]], 2)
+remove.auc <- round(performance(remove.rocr, "auc")@y.values[[1]][[1]], 2)
+plot(performance(nobatch.rocr, "tpr", "fpr"), lty=3)
+plot(performance(withbatch.rocr, "tpr", "fpr"), add=TRUE, type="l", , lty=2)
+plot(performance(remove.rocr, "tpr", "fpr"), add=TRUE, type="l", lty=1, lw=2)
+legend("bottomright", lty=1:3, bty="n", cex=0.7,
+       legend=c(paste("Mix-ups removed (AUC=", remove.auc, ")", sep=""),
+           paste("Batch correction (AUC=", withbatch.auc, ")", sep=""),
+           paste("No correction (AUC=", nobatch.auc, ")", sep="")))
+#dev.off()
 @
 
 \section{Application to breast cancer}
@@ -328,7 +350,7 @@ output
 @
 
 <<plotbreastdoppel>>=
-par(mfrow=c(2,2))
+par(mfrow=c(2,2), las=1)
 plot(output)
 @
 

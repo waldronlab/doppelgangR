@@ -1,6 +1,6 @@
 Package: doppelgangR
 Maintainer: Levi Waldron <levi.waldron@hunter.cuny.edu>
-Depends: R (>= 3.0), Biobase, BiocParallel
+Depends: R (>= 3.2), Biobase, BiocParallel
 Suggests: curatedOvarianData, knitr, ROCR, pROC, RUnit
 Imports: sva, impute, digest, mnormt, methods
 Author: Levi Waldron and Markus Riester
@@ -16,3 +16,4 @@ Description: The main function is doppelgangR(), which takes as minimal
 URL: https://github.com/lwaldron/doppelgangR
 BugReports: https://github.com/lwaldron/doppelgangR/issues
 VignetteBuilder: knitr
+biocViews: Microarray, GeneExpression, QualityControl

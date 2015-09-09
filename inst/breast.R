@@ -28,7 +28,7 @@ for (pkg in other.packages){
 
 esets <- bplapply(breast.packages, function(pkg){
     print(pkg)
-    library(affy)
+    library(Biobase)
     esetname <- tolower(sub("breastCancer", "", pkg))
     data(list=esetname)
     output <- get(esetname)

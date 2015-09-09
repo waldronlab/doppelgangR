@@ -1,5 +1,5 @@
 library(curatedCRCData)
-library(affy)
+library(Biobase)
 library(BiocParallel)
 multicoreParam <- MulticoreParam()
 

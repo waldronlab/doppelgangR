@@ -1,5 +1,5 @@
 library(curatedOvarianData)
-library(affy)
+library(Biobase)
 library(logging)
 library(BiocParallel)
 multicoreParam <- MulticoreParam()

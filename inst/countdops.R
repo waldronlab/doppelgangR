@@ -1,10 +1,13 @@
 library(gdata)
+library(R.utils)
 
 snames <- paste(c("bladder", "CRC", "breast", "ovarian"), "_dop.csv", sep="")
 
 if(file.exists("manual_duplicates_curation.rda")){
     load("manual_duplicates_curation.rda")
 }else{
+    if(file.exists("manual_duplicates_curation.xls.bz2"))
+        bunzip2("manual_duplicates_curation.xls.bz2", "manual_duplicates_curation.xls")
     manuals <- lapply(snames, function(x) read.xls("manual_duplicates_curation.xls", sheet=x, as.is=TRUE))
     names(manuals) <- snames
     save(manuals, file="manual_duplicates_curation.rda")
@@ -47,7 +50,7 @@ output
 write.csv(output, file="doppelgangers_summary.csv")
 
 ## summarize all samples
-library(affy)
+library(Biobase)
 output <- list()
 esetsfiles <- dir(pattern="_esets\\.rda$")
 k <- 0
@@ -84,7 +87,7 @@ write.csv(output, file="AllStudies.csv")
 ## PMID15897565_eset:X0074_1776_h133a_1784	PMID17290060_eset:X0074_1776_h133a_1784
 ## PMID17290060_eset:X0193_0000_h133a_D1805	PMID19318476_eset:D1805
 
-library(affy)
+library(Biobase)
 load("ovarian_esets.rda")
 esets <- esets[c("GSE12470_eset", "GSE17260_eset", "GSE32062.GPL6480_eset", "GSE32063_eset", "PMID15897565_eset", "PMID17290060_eset", "PMID19318476_eset")]
 ##

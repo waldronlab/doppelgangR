@@ -1,5 +1,5 @@
 library(RUnit)
-library(affy)
+library(Biobase)
 library(doppelgangR)
 
 ncor <- 0; npheno <- 0; nsmoking <- 0
@@ -17,6 +17,8 @@ m1[, 1] <- n1[, 1] + rnorm(100, sd=0.25); ncor <- ncor+1
 m1[, 2] <- m1[, 3] + rnorm(100, sd=0.25); ncor <- ncor+1
 ##n:2 & n:3 are expression doppelgangers:
 n1[, 2] <- n1[, 3] + rnorm(100, sd=0.25); ncor <- ncor+1
+##n:8 & n:9 are expression doppelgangers:
+n1[, 8] <- n1[, 9] + rnorm(100, sd=0.25); ncor <- ncor+1
 #n:4 & m:6 are expression doppelgangers:
 n1[, 4] <- m1[, 6] + rnorm(100, sd=0.25); ncor <- ncor+1
 #n:5 & m:4 are expression doppelgangers:
@@ -62,7 +64,7 @@ checkEquals(sum(df1$smokinggun.doppel), nsmoking)
 checkEquals(sum(is.na(df1$expr.similarity)), 0)
 checkEquals(sum(is.na(df1$pheno.similarity)), 0)
 checkEquals(sum(is.na(df1$smokinggun.similarity)), 0)
-checkEquals(df1$id, c("M2:M3", "N2:N3", "M1:N1", "gotcha:gotcha", "M6:gotcha", "M4:N5", "M10:N10"))
+checkEquals(df1$id, c("M2:M3", "N2:N3", "N8:N9", "M1:N1", "gotcha:gotcha", "M6:gotcha", "M4:N5", "M10:N10"))
 for (i in match(paste("X", 1:10, sep=""), colnames(df1))){
     cat(paste("Checking column", i, "\n"))
     checkEquals(all(grepl("[a-z]:[a-z]", df1[[i]])), TRUE)
@@ -115,7 +117,6 @@ checkEquals(df1, df5)
 cat("\n")
 cat("Check caching, with a third ExpressionSet that is almost identical to the first: \n")
 ##------------------------------------------
-
 esets2 <- c(esets, esets[[1]])
 names(esets2)[3] <- "o"
 exprs(esets2[[3]]) <- exprs(esets2[[3]]) + rnorm(nrow(esets2[[3]]) * ncol(esets2[[3]]), sd=0.1)
@@ -194,11 +195,12 @@ doppelgangR(esets[1:2])
 ## infinite values:
 exprs(esets[[1]])[14, 1] <- -Inf
 exprs(esets[[1]])[15, 2] <- Inf
-doppelgangR(esets[1:2])
+obs <- tryCatch(doppelgangR(esets[1:2]), warning=conditionMessage)
+checkIdentical("Replacing -+Inf with min/max expression values for dataset m", obs)
 
 ##------------------------------------------
 cat("\n")
-cat("Issue #13: Smoking guns only with cache=TRUE: \n")
+cat("Smoking guns only with cache=TRUE: \n")
 ##------------------------------------------
 dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id")
 checkEquals(summary(dop)[, 1], "m:5")
@@ -207,15 +209,24 @@ checkEquals(summary(dop)[, 2], "n:4")
 
 ##------------------------------------------
 cat("\n")
-cat("Issue #14: Check with identical ExpressionSets:\n")
+cat("Identical ExpressionSets:\n")
 ##------------------------------------------
-##both of these error:
-dop <- doppelgangR(esets[[1]])
-dop <- doppelgangR(list(esets[[1]], esets[[1]]))
-
-esets2 <- c(esets, esets[[1]])
-esets2[[3]]$id <- tolower(esets2[[3]]$id)
-names(esets2)[3] <- "o"
-dop <- doppelgangR(esets2, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id", cache.dir=NULL)
-checkEquals(nrow(summary(dop)), 3)
-
+df1 <- summary(doppelgangR(esets[[1]], cache.dir=NULL))
+checkTrue(df1$sample1 == 3)
+checkTrue(df1$sample2 == 2)
+##
+df2 <- summary(doppelgangR(esets[[2]], cache.dir=NULL))
+checkTrue(all(df2$sample1 == c(3, 9)))
+checkTrue(all(df2$sample2 == c(2, 8)))
+##
+df3 <- summary(doppelgangR(list(ExpressionSet1=esets[[1]], ExpressionSet2=esets[[1]]), cache.dir=NULL))
+checkTrue(nrow(df1) * 4 + ncol(esets[[1]]) == nrow(df3))
+##
+df4 <- summary(doppelgangR(list(ExpressionSet1=esets[[2]], ExpressionSet2=esets[[2]]), cache.dir=NULL, outlierFinder.expr.args = list(bonf.prob = 2, transFun = atanh, tail = "upper")))
+checkTrue(nrow(df2) * 4 + ncol(esets[[2]]) == nrow(df4))
+##
+df5 <- summary(doppelgangR(list(eset1=esets[[1]], eset2=esets[[2]]), cache.dir=NULL))
+df6 <- summary(doppelgangR(esets, cache.dir=NULL))
+checkIdentical(df5[, -1:-2], df6[, -1:-2])
+checkIdentical(sub("eset2", "n", sub("eset1", "m", df5$sample1)), df6$sample1)
+checkIdentical(sub("eset2", "n", sub("eset1", "m", df5$sample2)), df6$sample2)

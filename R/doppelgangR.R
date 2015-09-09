@@ -47,13 +47,24 @@ verbose=TRUE
     input.argnames <- ls()[-match("esets", ls())]
     input.args <- lapply(input.argnames, function(x) get(x))
     names(input.args) <- input.argnames
+    if(is(esets, "ExpressionSet")){
+        esets <- list(ExpressionSet1=esets, ExpressionSet2=esets)
+        eset.method <- TRUE
+        within.datasets.only <- FALSE
+        between.datasets.only <- TRUE
+    }else{
+        eset.method <- FALSE
+        between.datasets.only <- FALSE
+    }
+    if (!is(esets, "list")){
+        stop("esets must be an ExpressionSet or a list of ExpressionSets")
+    }
     input.args$esets.names <- names(esets)
     if(!is.null(cache.dir))
         dir.create(cache.dir, showWarnings=FALSE)
     if (is.null(names(esets)))
         names(esets) <- paste("dataset", 1:length(esets), sep="_")
-    if(length(esets) > length(unique(names(esets))))
-        names(esets) <- make.unique(names(esets))
+    names(esets) <- make.unique(names(esets))
     for (i in 1:length(esets)){
         sampleNames(esets[[i]]) <- paste(names(esets)[i], sampleNames(esets[[i]]), sep=separator)
         if(min(exprs(esets[[i]]), na.rm=TRUE) == -Inf | max(exprs(esets[[i]]), na.rm=TRUE) == Inf){
@@ -70,7 +81,9 @@ verbose=TRUE
             .Random.seed <- impute.knn.output$rng.state  ##restore original RNG state
         }
     }
-    ds.combns <- lapply(1:length(esets), function(i) c(i, i))
+    ds.combns <- NULL
+    if(!between.datasets.only)
+        ds.combns <- lapply(1:length(esets), function(i) c(i, i))
     if(!within.datasets.only)
         ds.combns <- c(ds.combns, combn(1:length(esets), 2, simplify=FALSE))
     output.full <- bplapply(ds.combns, function(ij){
@@ -82,7 +95,7 @@ verbose=TRUE
         na.output <- matrix(0, nrow=ncol(esets[[i]]), ncol=ncol(esets[[j]]))
         rownames(na.output) <- sampleNames(esets[[i]])
         colnames(na.output) <- sampleNames(esets[[j]])
-        if(i == j){
+        if(identical(i, j)){
             na.output[!upper.tri(na.output)] <- NA
         }
         na.output <- outlierFinder(na.output, normal.upper.thresh=1)
@@ -95,11 +108,18 @@ verbose=TRUE
             corFinder.args <- NULL
         }
         if(!is.null(cache.dir) & !is.null(corFinder.args)){
-            cache.file <- paste(cache.dir, "/", digest::digest(list(corFinder, corFinder.args, esets[c(i, j)])), ".rda", sep="")
+            do.cache <- TRUE
+            cache.file <- file.path(cache.dir,
+                   paste0(digest::digest(list(corFinder,
+                                              corFinder.args,
+                                              esets[c(i, j)])),
+                          ".rda"))
             if(file.exists(cache.file)) {
 		if (verbose) message("\tSkipping corFinder, loading cached results.")
                 load(cache.file)
             }
+        }else{
+            do.cache <- FALSE
         }
         if(is.null(corFinder.args)){
             cor.sim <- na.output
@@ -110,7 +130,9 @@ verbose=TRUE
                 cor.sim <- do.call(corFinder, corFinder.args)
             }
         }
-        if(!is.null(cache.dir) && !file.exists(cache.file))
+       if(eset.method)
+           diag(cor.sim) <- NA
+        if(do.cache && !is.null(cache.dir) && !file.exists(cache.file))
             save(cor.sim, file=cache.file)
         ## find numeric (expression) doppelgangers
         outlierFinder.expr.args$similarity.mat <- cor.sim
@@ -153,8 +175,15 @@ verbose=TRUE
             smokingGunFinder.args$smokingguns <- manual.smokingguns
             outlierFinder.smokinggun.args <- list()
             outlierFinder.smokinggun.args$similarity.mat <- do.call(smokingGunFinder, smokingGunFinder.args)
+           if(eset.method)
+               diag(outlierFinder.smokinggun.args$similarity.mat) <- NA
             outlierFinder.smokinggun.args$normal.upper.thresh <- 0.5
             output3[["smokinggun.doppels"]] <- do.call(outlierFinder, outlierFinder.smokinggun.args)
+            ## if(eset.method){
+            ##     ##Get rid of matches to self:
+            ##     output3[["smokinggun.doppels"]] <-
+            ##         output3[["smokinggun.doppels"]][sub(".+:", "", output3[["smokinggun.doppels"]]$sample1) != sub(".+:", "", output3[["smokinggun.doppels"]]$sample2), ]
+            ## }
         }
         ## calculate phenotype similarity matrix
         if(is.null(phenoFinder.args)){
@@ -169,7 +198,7 @@ verbose=TRUE
                 if(any(manual.smokingguns %in% colnames(pData(phenoFinder.args$eset.pair[[k]]))))
                     pData(phenoFinder.args$eset.pair[[k]]) <-
                         pData(phenoFinder.args$eset.pair[[k]])[, (!colnames(pData(phenoFinder.args$eset.pair[[k]])) %in% manual.smokingguns)]
-            if(!is.null(cache.dir)){
+            if(do.cache && !is.null(cache.dir)){
                 cache.file <- paste(cache.dir, "/", digest::digest(list(phenoFinder, phenoFinder.args)), ".rda", sep="")
                 if(file.exists(cache.file)) {
 		    if (verbose) message("\tSkipping phenoFinder, loading cached results.")
@@ -179,8 +208,10 @@ verbose=TRUE
             if(!exists("pheno.sim")){
                 if(verbose) message("Calculating phenotype similarities...")
                 pheno.sim <- do.call(phenoFinder, phenoFinder.args)
+               if(eset.method)
+                   diag(pheno.sim) <- NA
             }
-            if(!is.null(cache.dir) && !file.exists(cache.file))
+            if(do.cache && !is.null(cache.dir) && !file.exists(cache.file))
                 save(pheno.sim, file=cache.file)
             ## find phenotype doppelgangers
             outlierFinder.pheno.args$similarity.mat <- pheno.sim
@@ -203,17 +234,28 @@ verbose=TRUE
         }
         return(output3)
     })
+    has.errors <- sapply(output.full, function(x) any(grep("error", class(x))))
+    if(any(has.errors)){
+        ds.errors <- ds.combns[has.errors]
+        warning(paste0("The following dataset combinations resulted in errors: ",
+                       paste(lapply(ds.errors, function(idx) paste(names(esets)[idx], collapse="/")),
+                             collapse=", ")))
+        warning(output.full[has.errors])
+    }
     names(output.full) <- sapply(ds.combns, function(ij){
         paste(names(esets)[c(ij[1], ij[2])], collapse=separator)})
     if (verbose) message("Finalizing...")
     wrapUp <- function(object, element){
         tmp <- lapply(object, function(x) x[[element]]$outlierFinder.res)
         tmp <- tmp[!sapply(tmp, is.null)]
-        do.call(rbind, tmp)
+        tmp <- do.call(rbind, tmp)
+        rownames(tmp) <- NULL
+        return(tmp)
     }
     pheno.doppels <- wrapUp(output.full, "pheno.doppels")
     expr.doppels <- wrapUp(output.full, "expr.doppels")
     smokinggun.doppels <- wrapUp(output.full, "smokinggun.doppels")
+##    browser()  ##problem is that samples 1 and 1 from esets 1 and 2 get removed for expr.doppels and pheno.doppels
     addCols <- function(orig, add){
         newrows1 <- paste(add[, 1], add[, 2])
         newrows2 <- paste(add[, 2], add[, 1])
@@ -252,6 +294,11 @@ verbose=TRUE
         all.doppels <- addCols(all.doppels, smokinggun.doppels)
         colnames(all.doppels)[7:8] <- sub("pheno", "smokinggun", colnames(all.doppels)[5:6])
     }else{
+        if(eset.method){
+        ##     pheno.doppels <- pheno.doppels[!sub(".+:", "", pheno.doppels[, 1]) == sub(".+:", "", pheno.doppels[, 2]), ]
+            smokinggun.doppels <- smokinggun.doppels[!sub(".+:", "", smokinggun.doppels[, 1]) == sub(".+:", "", smokinggun.doppels[, 2]), ]
+            rownames(smokinggun.doppels) <- NULL
+        }
         if(identical(expr.doppels[, 1:2], pheno.doppels[, 1:2]) &
            identical(expr.doppels[, 1:2], smokinggun.doppels[, 1:2])){
             all.doppels <- cbind(all.doppels, pheno.doppels[, 3:4], smokinggun.doppels[, 3:4])
@@ -287,6 +334,12 @@ verbose=TRUE
         merged.pdat <- subset(merged.pdat, select=-ncol(merged.pdat))
         colnames(merged.pdat) <- colnames(pData(esets[[1]]))
         all.doppels <- cbind(all.doppels, merged.pdat)
+        if(eset.method){
+            all.doppels$sample1 <- sub(".+:", "", all.doppels$sample1)
+            all.doppels$sample2 <- sub(".+:", "", all.doppels$sample2)
+            ##Alternating rows only
+            all.doppels <- all.doppels[seq(1, nrow(all.doppels), by=2), ]
+        }
     }
     new("DoppelGang", fullresults=output.full, summaryresults=all.doppels, inputargs=input.args)
 ### Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.

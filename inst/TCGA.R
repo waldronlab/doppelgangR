@@ -28,7 +28,7 @@ if(file.exists(data.file)){
     save(tcga.res, file=data.file)
 }
 
-library(affy)
+library(Biobase)
 if(file.exists(file.path(data.path, "tcga.esets.rda"))){
     load(file.path(data.path, "tcga.esets.rda"))
 }else{

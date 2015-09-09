@@ -2,6 +2,8 @@
 \docType{methods}
 \alias{plot-methods}
 \alias{plot,DoppelGang-method}
+\alias{plot,DoppelGang}
+\alias{plot,DoppelGang,ANY}
 \alias{plot.DoppelGang}
 \alias{plot.doppelgangR}
 \title{ Histograms of all pairwise sample correlations, showing

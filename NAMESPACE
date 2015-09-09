@@ -1,10 +1,14 @@
+importFrom(Biobase, exprs, featureNames, sampleNames, pData, 'sampleNames<-', 
+           'exprs<-', 'pData<-')
+importFrom(BiocParallel, bplapply)
 importFrom(sva, ComBat)
 importFrom(digest, digest)
 importFrom(impute, impute.knn)
 importFrom(mnormt, pmt, biv.nt.prob, pmnorm)
+import(methods)
 export(doppelgangR, corFinder, outlierFinder, phenoDist, phenoFinder,
-smokingGunFinder, vectorHammingDist, vectorWeightedDist,
-st.mle, mst.mle, dst, pst, qst, rst)
+       smokingGunFinder, vectorHammingDist, vectorWeightedDist,
+       st.mle, mst.mle, dst, pst, qst, rst)
 
 exportClasses("DoppelGang")
 

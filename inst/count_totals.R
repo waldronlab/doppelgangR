@@ -1,4 +1,4 @@
-library(affy)
+library(Biobase)
 efiles <- dir(pattern="^.*_esets\\.rda$")
 
 res <- sapply(rev(efiles), function(efile){

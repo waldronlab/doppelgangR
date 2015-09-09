@@ -32,7 +32,8 @@ tail="upper"
     if(!is.null(bonf.prob)){
         znum <- na.omit(as.numeric(trans.mat))
         raw.prob <- bonf.prob / length(znum)
-        stfit <- st.mle(y=znum)
+##        stfit <- st.mle(y=znum)
+        stfit <- st.mle(y=znum[is.finite(znum)])
         if(identical(tail, "upper")){
             z.cutoff <- qst(p=1-raw.prob, location=stfit$dp["location"], scale=stfit$dp["scale"], shape=stfit$dp["shape"], df=stfit$dp["df"])
             outlier.mat <- trans.mat > z.cutoff

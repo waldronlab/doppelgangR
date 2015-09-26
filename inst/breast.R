@@ -55,6 +55,12 @@ dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
 save(dop, file="breast_dop_1.0.rda")
 ##load("breast_dop.rda")
 
+##Look for smoking guns only:
+dop.gun <- doppelgangR(esets, manual.smokingguns="alt_sample_name", phenoFinder.args=NULL, 
+                       corFinder.args=NULL, impute.knn.args=NULL)
+save(dop.gun, file="breast_dopgun_1.0.rda")
+write.csv(summary(dop.gun), file="breast_dopgun_1.0.csv")
+
 write.csv(dop@summaryresults, file="breast_dop_1.0.csv")
 pdf("breast_dop_1.0.pdf")
 plot(dop)

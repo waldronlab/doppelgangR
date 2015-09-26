@@ -104,6 +104,15 @@ for (i in grep("expr.similarity", colnames(df1), invert=TRUE)){
     checkEquals(df4[, i], df1[!df1$expr.doppel, i])
 }
 
+##------------------------------------------
+cat("\n")
+cat("Check smoking guns only: \n")
+##------------------------------------------
+res4b <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id", automatic.smokingguns=FALSE, cache.dir=NULL)
+df4b <- summary(res4b); rownames(df4b) <- NULL
+df4b.compare <- df1[df1$smokinggun.doppel, ]; rownames(df4b.compare) <- NULL
+checkIdentical(df4b.compare[, -3:-6], df4b[, -3:-6])  ##don't check expr and pheno columns
+
 
 ##------------------------------------------
 cat("\n")

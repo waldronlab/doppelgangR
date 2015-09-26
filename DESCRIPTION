@@ -1,7 +1,7 @@
 Package: doppelgangR
 Maintainer: Levi Waldron <levi.waldron@hunter.cuny.edu>
 Depends: R (>= 3.2), Biobase, BiocParallel
-Suggests: curatedOvarianData, knitr, ROCR, pROC, RUnit
+Suggests: BiocStyle, knitr, rmarkdown, curatedOvarianData, ROCR, pROC, RUnit, simulatorZ
 Imports: sva, impute, digest, mnormt, methods
 Author: Levi Waldron and Markus Riester
 Version: 0.11

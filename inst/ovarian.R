@@ -19,6 +19,18 @@ dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
 #dop <- doppelgangR(esets)
 save(dop, file="ovarian_dop_1.0.rda")
 
+##Look for smoking guns only:
+dop.gun <- doppelgangR(esets, manual.smokingguns="alt_sample_name", phenoFinder.args=NULL, 
+                       corFinder.args=NULL, impute.knn.args=NULL)
+save(dop.gun, file="ovarian_dopgun_1.0.rda")
+write.csv(summary(dop.gun), file="ovarian_dopgun_1.0.csv")
+
+##Look for smoking guns only:
+dop.gun <- doppelgangR(esets, manual.smokingguns="alt_sample_name", phenoFinder.args=NULL, 
+                       corFinder.args=NULL, impute.knn.args=NULL)
+save(dop.gun, file="ovarian_dopgun_1.0.rda")
+write.csv(summary(dop.gun), file="ovarian_dopgun_1.0.csv")
+
 load("ovarian_dop_1.0.rda")
 write.csv(dop@summaryresults, file="ovarian_dop_1.0.csv")
 pdf("ovarian_dop_1.0.pdf")

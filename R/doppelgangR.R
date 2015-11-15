@@ -146,7 +146,7 @@ verbose=TRUE
         }
         ## If there is no phenoData in one of the esets, do not
         ## search for phenotype doppelgangers:
-        if(min(c(dim(pData(esets[[1]])), dim(pData(esets[[2]])))) == 0)
+        if(min(c(ncol(pData(esets[[1]])), ncol(pData(esets[[2]])))) == 0)
             phenoFinder.args <- NULL
         ## If column names don't match, do not search for phenotype doppelgangers:
         if(!identical(colnames(pData(esets[[i]])), colnames(pData(esets[[j]])))){
@@ -318,7 +318,8 @@ verbose=TRUE
     ##pairwise sample pdata to all.doppels:
     if( identical(nrow(all.doppels) > 0, TRUE) &&
        identical(colnames(pData(esets[[1]])),
-                 unique(unlist(lapply(esets, function(eset) colnames(pData(eset)))))) ){
+                 unique(unlist(lapply(esets, function(eset) colnames(pData(eset)))))) &&
+       ncol(pData(esets[[1]])) > 0 && ncol(pData(esets[[2]])) > 0)  {
         all.pdat <- lapply(esets, pData)
         for (k in 1:length(all.pdat))
             all.pdat[[k]]$sampleid <- rownames(all.pdat[[k]])

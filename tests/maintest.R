@@ -239,3 +239,18 @@ df6 <- summary(doppelgangR(esets, cache.dir=NULL))
 checkIdentical(df5[, -1:-2], df6[, -1:-2])
 checkIdentical(sub("eset2", "n", sub("eset1", "m", df5$sample1)), df6$sample1)
 checkIdentical(sub("eset2", "n", sub("eset1", "m", df5$sample2)), df6$sample2)
+
+## with zero-column pData:
+withpheno <- summary(doppelgangR(esets))
+esets3 <- esets
+pData(esets3[[1]]) <- pData(esets3[[1]])[, 0]
+withoutpheno <- summary(doppelgangR(esets3))
+
+pData(esets3[[2]]) <- pData(esets3[[2]])[, 0]
+withoutpheno2 <- summary(doppelgangR(esets3))
+
+withoutpheno3 <- withoutpheno[!withoutpheno$pheno.doppel, ]
+withoutpheno4 <- withoutpheno2[!withoutpheno2$pheno.doppel, ]
+
+checkIdentical(withoutpheno[, 1:4], withoutpheno3[, 1:4])
+checkIdentical(withoutpheno2[, 1:4], withoutpheno4[, 1:4])

@@ -432,6 +432,40 @@ plot(output)
 %% eset.test <- esets["UNT"]
 %% ```
 
+\section{Cell-line data}
+
+Download pre-processed Affymetrix expression data for all NCI60 and CCLE:
+
+```{r cell_line_load}
+download.path <- "."
+
+download.file("http://s3.amazonaws.com/cancerhub/celllines/NCI60_mrna.rds", file.path(download.path, "NCI60_mrna.rds"))
+download.file("http://s3.amazonaws.com/cancerhub/celllines/CCLE_mrna.rds", file.path(download.path, "CCLE_mrna.rds"))
+nci60.eset <- readRDS(file.path(download.path, "NCI60_mrna.rds"))
+ccle.eset <- readRDS(file.path(download.path, "CCLE_mrna.rds"))
+nci60.eset$tissue <- gsub("_.*$","", sampleNames(nci60.eset))
+ccle.eset$tissue <- gsub("^.*_","", sampleNames(ccle.eset))
+eset.list <- list(CCLE=ccle.eset, NCI60=nci60.eset)
+````
+
+Run doppelgangR without trying to match clinical annotation:
+```{r cell_line_run}
+ret <- doppelgangR(eset.list, phenoFinder.args=NULL, smokingGunFinder.args=NULL, outlierFinder.expr.args=list(bonf.prob = 3.0, transFun = atanh, tail = "upper"))
+```
+
+Now evaluate the results, using a curated mapping NCI60 to CCLE sample id mapping file:
+```{r cell_line_evaluate}
+nci60_ccle <- read.csv(system.file("extdata", "NCI60_CCLE_overlap.csv",
+                    package="doppelgangR"), as.is=TRUE)
+
+roc1 <- doppelmelt(ret, "NCI60", "CCLE")
+
+true.match <- gsub("NCI60:","",roc1[,2])== nci60_ccle$NCI60[match(gsub("CCLE:","",roc1[,1]), nci60_ccle$CCLE)]
+table(true.match)
+roc1$truepos[!is.na(true.match)] <- true.match[!is.na(true.match)]
+plotROC(roc1$cor, roc1$truepos, main="NCI60/CCLE doppelgangers")
+```
+
 \section{Parallelization}
 DoppelgangR checks for duplicates within each dataset in the list of
 ExpressionSets, and between each pair of datasets.  This is an

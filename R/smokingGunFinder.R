@@ -26,8 +26,12 @@ separator=":"
             next
         pdat.vec1 <- transFun(pData(eset.pair[[1]])[, x])
         pdat.vec2 <- transFun(pData(eset.pair[[2]])[, x])
-        for (i in 1:length(pdat.vec1))
-            smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] <- smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] + 1
+        for (i in 1:length(pdat.vec1)){
+          if(is.na(pdat.vec1[i])) next
+          matches <- pdat.vec2 %in% pdat.vec1[i]
+          matches[is.na(pdat.vec2)] <- FALSE
+          smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] <- smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] + 1
+        }
     }
    if( identical(all.equal(pData(eset.pair[[1]]), pData(eset.pair[[2]]) ), TRUE)){
         smokingmat[!upper.tri(smokingmat)] <- NA  ##NA for all but upper triangle.

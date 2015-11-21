@@ -19,6 +19,18 @@ use.ComBat=TRUE,
     if(!is(eset.pair, "list") || length(eset.pair) != 2)
         stop("eset.pair should be a list of two ExpressionSets")
     if( !identical(all.equal(exprs(eset.pair[[1]]), exprs(eset.pair[[2]])), TRUE)){
+	matrix.pair <- .getMatrixPair(eset.pair, use.ComBat)
+        cormat <- cor(matrix.pair[[1]], matrix.pair[[2]], ...)
+    }else{
+        matrix.one <- exprs(eset.pair[[1]])
+        cormat <- cor(matrix.one, ...)
+        cormat[!upper.tri(cormat)] <- NA  ##NA for diagonal
+    }
+    return(cormat)
+###   Returns a matrix of sample-wise Pearson Correlations.
+}
+
+.getMatrixPair <- function(eset.pair, use.ComBat) {
         genes.intersect <- intersect(featureNames(eset.pair[[1]]), featureNames(eset.pair[[2]]))
         for (i in 1:length(eset.pair)){
             eset.pair[[i]] <- eset.pair[[i]][genes.intersect, ]
@@ -40,12 +52,6 @@ use.ComBat=TRUE,
             matrix.pair <- lapply(eset.pair, exprs)
             names(matrix.pair) <- names(eset.pair)
         }
-        cormat <- cor(matrix.pair[[1]], matrix.pair[[2]], ...)
-    }else{
-        matrix.one <- exprs(eset.pair[[1]])
-        cormat <- cor(matrix.one, ...)
-        cormat[!upper.tri(cormat)] <- NA  ##NA for diagonal
-    }
-    return(cormat)
-###   Returns a matrix of sample-wise Pearson Correlations.
+	return(matrix.pair)
 }
+

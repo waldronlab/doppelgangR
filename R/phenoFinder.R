@@ -29,14 +29,14 @@ identical(colnames(pData(eset[[1]])), colnames(pData(eset[[2]])))")
     keep.col <- keep.col[names(keep.col) %in% colnames(matrix.one)]
     matrix.one <- subset(matrix.one, select=match(names(keep.col), colnames(matrix.one)))
     matrix.one <- subset(matrix.one, select=keep.col)
-    if( identical(all.equal(pData(eset.pair[[1]]), pData(eset.pair[[2]]) ), TRUE)){
+    if( .checkSameEsets(esets)){
         ##Calculate similarity matrix for a single ExpressionSet:
         similarity.mat <- 1 - phenoDist(matrix.one, ...)
         similarity.mat[!upper.tri(similarity.mat)] <- NA  ##NA for all but upper triangle.
     }else{
         ##Calculate similarity matrix for two distinct ExpressionSets:
         matrix.two <- as.matrix(pData(eset.pair[[2]]))
-        matrix.two <- matrix.two[, match(colnames(matrix.one), colnames(matrix.two))]
+        matrix.two <- matrix.two[, match(colnames(matrix.one), colnames(matrix.two)), drop=FALSE]
         if(is.null(rownames(matrix.two)))
             rownames(matrix.two) <- make.names(1:nrow(matrix.two))
         similarity.mat <- 1 - phenoDist(matrix.one, matrix.two, ...)

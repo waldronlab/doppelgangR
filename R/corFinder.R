@@ -18,7 +18,7 @@ use.ComBat=TRUE,
  ){
     if(!is(eset.pair, "list") || length(eset.pair) != 2)
         stop("eset.pair should be a list of two ExpressionSets")
-    if( !identical(all.equal(exprs(eset.pair[[1]]), exprs(eset.pair[[2]])), TRUE)){
+    if( !.checkSameEsets(eset.pair)){
         genes.intersect <- intersect(featureNames(eset.pair[[1]]), featureNames(eset.pair[[2]]))
         for (i in 1:length(eset.pair)){
             eset.pair[[i]] <- eset.pair[[i]][genes.intersect, ]

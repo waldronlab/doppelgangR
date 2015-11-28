@@ -29,7 +29,7 @@ identical(colnames(pData(eset[[1]])), colnames(pData(eset[[2]])))")
     keep.col <- keep.col[names(keep.col) %in% colnames(matrix.one)]
     matrix.one <- subset(matrix.one, select=match(names(keep.col), colnames(matrix.one)))
     matrix.one <- subset(matrix.one, select=keep.col)
-    if( .checkSameEsets(esets)){
+    if( .checkSameEsets(eset.pair)){
         ##Calculate similarity matrix for a single ExpressionSet:
         similarity.mat <- 1 - phenoDist(matrix.one, ...)
         similarity.mat[!upper.tri(similarity.mat)] <- NA  ##NA for all but upper triangle.

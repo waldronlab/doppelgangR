@@ -34,8 +34,8 @@ batch.var=factor(batch.var)
 
 library(affy)
 affybatch <- read.affybatch(filenames=fnames)
-library(arrayQualityMetrics)
-aqm <- arrayQualityMetrics(affybatch, do.logtransform=TRUE)
+##library(arrayQualityMetrics)
+##aqm <- arrayQualityMetrics(affybatch, do.logtransform=TRUE)
 
 eset2 = mas5(affybatch)
 exprs(eset2) = log2(exprs(eset2))

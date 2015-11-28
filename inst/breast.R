@@ -55,21 +55,24 @@ table(table(unlist(lapply(esets, sampleNames))))
 
 library(doppelgangR)
 
-dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
-                   outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
-save(dop, file="breast_dop_1.0.rda")
-##load("breast_dop.rda")
-
+if(file.exists("breast_dop.rda")){
+  load("breast_dop.rda")
+}else{
+  dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
+                     outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
+  warnings()
+  save(dop, file="breast_dop.rda")
+}
 ##Look for smoking guns only:
 for (i in 1:length(esets))
     esets[[i]]$samplenames <- sampleNames(esets[[i]])
 dop.gun <- doppelgangR(esets, manual.smokingguns=c("alt_sample_name", "unique_patient_ID", "samplenames"),
                        phenoFinder.args=NULL, corFinder.args=NULL, impute.knn.args=NULL)
-save(dop.gun, file="breast_dopgun_1.0.rda")
-write.csv(summary(dop.gun), file="breast_dopgun_1.0.csv")
+save(dop.gun, file="breast_dopgun.rda")
+write.csv(summary(dop.gun), file="breast_dopgun.csv")
 
-write.csv(dop@summaryresults, file="breast_dop_1.0.csv")
-pdf("breast_dop_1.0.pdf")
+write.csv(dop@summaryresults, file="breast_dop.csv")
+pdf("breast_dop.pdf")
 plot(dop)
 dev.off()
 

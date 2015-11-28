@@ -304,7 +304,6 @@ verbose=TRUE
                                                   "smokinggun", "smokinggun"),
                                                 colnames(all.doppels)[3:8], sep=".")
         }else{
-            browser()
             stop("Intermediate pruning off but no addCols shortcut available.")
         }
     }

@@ -20,20 +20,25 @@ esets <- esets[!names(esets) %in% c("GSE17536_eset", "GSE17537_eset")] #subserie
 table(table(unlist(lapply(esets, sampleNames))))
 
 save(esets, file="CRC_esets.rda", compress="bzip2")
-dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL, outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
-warnings()
-save(dop, file="crc_dop_1.0.rda")
+
+if(file.exists("crc_dop.rda")){
+  load("crc_dop.rda")
+}else{
+  dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL, outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
+  warnings()
+  save(dop, file="crc_dop.rda")
+}
 
 ##Look for smoking guns only:
 for (i in 1:length(esets))
     esets[[i]]$samplenames <- sampleNames(esets[[i]])
 dop.gun <- doppelgangR(esets, manual.smokingguns=c("alt_sample_name", "unique_patient_ID", "samplenames"),
                        phenoFinder.args=NULL, corFinder.args=NULL, impute.knn.args=NULL)
-save(dop.gun, file="crc_dopgun_1.0.rda")
-write.csv(summary(dop.gun), file="crc_dopgun_1.0.csv")
+save(dop.gun, file="crc_dopgun.rda")
+write.csv(summary(dop.gun), file="crc_dopgun.csv")
 
-load("crc_dop_1.0.rda")
-write.csv(dop@summaryresults, file="crc_dop_1.0.csv")
-pdf("CRC_dop_1.0.pdf")
+load("crc_dop.rda")
+write.csv(dop@summaryresults, file="crc_dop.csv")
+pdf("CRC_dop.pdf")
 plot(dop, skip.no.doppels=TRUE)
 dev.off()

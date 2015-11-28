@@ -2007,3 +2007,12 @@ st.mmle <- function(X, y, df, trace=FALSE)
         dp <- c(dp[1:(m+1)], shape=a$root, df=df)
         list(call=match.call(), dp=dp)
     }
+
+.checkSameEsets <- function(esets){
+    matrix.one <- exprs(esets[[1]]); dimnames(matrix.one) <- NULL
+    matrix.two <- exprs(esets[[2]]); dimnames(matrix.two) <- NULL
+    pdata.one <- pData(esets[[1]]); rownames(pdata.one) <- NULL
+    pdata.two <- pData(esets[[2]]); rownames(pdata.two) <- NULL
+    output <- identical(matrix.one, matrix.two) & identical(pdata.one, pdata.two)
+    return(output)
+}

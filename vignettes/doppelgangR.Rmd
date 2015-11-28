@@ -66,7 +66,7 @@ testesets <- lapply(testesets, function(X){
 
 Run doppelgangR with default arguments:
 ```{r rundopp, results="hide", message=FALSE, cache=TRUE}
-results1 <- doppelgangR(testesets, phenoFinder.args=NULL, cache=TRUE)
+results1 <- doppelgangR(testesets, phenoFinder.args=NULL)
 ```
 
 This creates an object of class \Rclass{DoppelGang}, which has print, summary, and plot methods.  Summary method output not shown here due to voluminous output:
@@ -439,7 +439,7 @@ Download pre-processed Affymetrix expression data for all NCI60 and CCLE:
 ```{r cell_line_load}
 download.path <- "."
 
-download.file("http://s3.amazonaws.com/cancerhub/celllines/NCI60_mrna.rds", file.path(download.path, "NCI60_mrna.rds"))
+download.file("http://s3.amazonaws.com/cancerhub/celllines/NCI60_mrna.rds",   file.path(download.path, "NCI60_mrna.rds"))
 download.file("http://s3.amazonaws.com/cancerhub/celllines/CCLE_mrna.rds", file.path(download.path, "CCLE_mrna.rds"))
 nci60.eset <- readRDS(file.path(download.path, "NCI60_mrna.rds"))
 ccle.eset <- readRDS(file.path(download.path, "CCLE_mrna.rds"))

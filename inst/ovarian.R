@@ -1,4 +1,4 @@
--library(curatedOvarianData)
+library(curatedOvarianData)
 library(Biobase)
 library(logging)
 library(BiocParallel)
@@ -16,7 +16,7 @@ table(table(unlist(lapply(esets, sampleNames))))
 library(doppelgangR)
 save(esets, file="ovarian_esets.rda")
 
-if(file.exists("ovarian_dop.rda")){
+if(!file.exists("ovarian_dop.rda")){
   dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
                    outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
   warnings()

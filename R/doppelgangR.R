@@ -5,7 +5,6 @@ doppelgangR <- structure(function
 separator=":",
 ### a delimitor to use between dataset names and sample names
 corFinder.args=list(separator=separator, use.ComBat=TRUE, method="pearson"),
-### a list of arguments to be passed to the corFinder function.
 phenoFinder.args=list(separator=separator, vectorDistFun=vectorWeightedDist),
 ### a list of arguments to be passed to the phenoFinder function.  If
 ### NULL, samples with similar phenotypes will not be searched for.
@@ -255,7 +254,6 @@ verbose=TRUE
     pheno.doppels <- wrapUp(output.full, "pheno.doppels")
     expr.doppels <- wrapUp(output.full, "expr.doppels")
     smokinggun.doppels <- wrapUp(output.full, "smokinggun.doppels")
-##    browser()  ##problem is that samples 1 and 1 from esets 1 and 2 get removed for expr.doppels and pheno.doppels
     addCols <- function(orig, add){
         newrows1 <- paste(add[, 1], add[, 2])
         newrows2 <- paste(add[, 2], add[, 1])
@@ -299,7 +297,7 @@ verbose=TRUE
             smokinggun.doppels <- smokinggun.doppels[!sub(".+:", "", smokinggun.doppels[, 1]) == sub(".+:", "", smokinggun.doppels[, 2]), ]
             rownames(smokinggun.doppels) <- NULL
         }
-        if(identical(expr.doppels[, 1:2], pheno.doppels[, 1:2]) &
+        if(!is.null(expr.doppels) & identical(expr.doppels[, 1:2], pheno.doppels[, 1:2]) &
            identical(expr.doppels[, 1:2], smokinggun.doppels[, 1:2])){
             all.doppels <- cbind(all.doppels, pheno.doppels[, 3:4], smokinggun.doppels[, 3:4])
             colnames(all.doppels)[3:8] <- paste(c("expr", "expr", "pheno", "pheno",

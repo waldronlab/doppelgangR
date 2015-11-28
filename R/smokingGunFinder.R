@@ -33,7 +33,7 @@ separator=":"
           smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] <- smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] + 1
         }
     }
-   if( identical(all.equal(pData(eset.pair[[1]]), pData(eset.pair[[2]]) ), TRUE)){
+   if( .checkSameEsets(eset.pair)){
         smokingmat[!upper.tri(smokingmat)] <- NA  ##NA for all but upper triangle.
     }
     return(smokingmat)

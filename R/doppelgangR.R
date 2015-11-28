@@ -39,6 +39,9 @@ intermediate.pruning=FALSE,
 cache.dir="cache",
 ### The name of a directory in which to cache or look up results to save
 ### re-calculating correlations.  Set to NULL for no caching.
+BPPARAM=bpparam(),
+### Argument for BiocParallel::bplapply(), by default will use all
+### cores of a multi-core machine
 verbose=TRUE
 ### Print progress information
  ){
@@ -91,11 +94,15 @@ verbose=TRUE
         if (verbose) message(paste("Working on datasets", names(esets)[i], "and", names(esets)[j]))
         ## Create a negative result dataframe that will be used when a similarity-finder
         ## (corFinder, phenoFinder, smokingGunFinder) is not called.
-        na.output <- matrix(0, nrow=ncol(esets[[i]]), ncol=ncol(esets[[j]]))
-        rownames(na.output) <- sampleNames(esets[[i]])
-        colnames(na.output) <- sampleNames(esets[[j]])
-        if(identical(i, j)){
+        if(eset.method | identical(i, j)){
+            na.output <- matrix(0, nrow=ncol(esets[[i]]), ncol=ncol(esets[[i]]))
+            rownames(na.output) <- sampleNames(esets[[i]])
+            colnames(na.output) <- rownames(na.output)
             na.output[!upper.tri(na.output)] <- NA
+        }else{
+            na.output <- matrix(0, nrow=ncol(esets[[i]]), ncol=ncol(esets[[j]]))
+            rownames(na.output) <- sampleNames(esets[[i]])
+            colnames(na.output) <- sampleNames(esets[[j]])
         }
         na.output <- outlierFinder(na.output, normal.upper.thresh=1)
         na.output$outlierFinder.res$similarity <- NA
@@ -232,7 +239,7 @@ verbose=TRUE
                 output3[["expr.doppels"]]$outlierFinder.res[keep.rows, ]
         }
         return(output3)
-    })
+    }, BPPARAM=BPPARAM)
     has.errors <- sapply(output.full, function(x) any(grep("error", class(x))))
     if(any(has.errors)){
         ds.errors <- ds.combns[has.errors]

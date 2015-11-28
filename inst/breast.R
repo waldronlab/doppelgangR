@@ -1,5 +1,4 @@
 library(BiocParallel)
-multicoreParam <- MulticoreParam()
 
 breast.packages <- c("breastCancerMAINZ", "breastCancerNKI", "breastCancerTRANSBIG", "breastCancerUNT", "breastCancerUPP", "breastCancerVDX")
 
@@ -72,7 +71,26 @@ save(dop.gun, file="breast_dopgun.rda")
 write.csv(summary(dop.gun), file="breast_dopgun.csv")
 
 write.csv(dop@summaryresults, file="breast_dop.csv")
+
 pdf("breast_dop.pdf")
 plot(dop)
 dev.off()
 
+library(Biobase)
+esets2 <- esets[c("UNT", "UPP")]
+esets2$UPP = esets2$UPP[, which(esets2$UPP$er==1)]
+unt.dops <- grep("^KIU", sub("UNT:", "", summary(dop)[, 1]), val=TRUE)
+keep = sort(na.omit(unique(c(which(sampleNames(esets2$UNT) %in% unt.dops), which(esets2$UNT$er==0)))))
+esets2$UNT <- esets2$UNT[, keep]
+doper <- doppelgangR(esets2, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
+                     outlierFinder.expr.args=list(bonf.prob = 1.0, transFun = atanh, tail = "upper"))
+
+doper.ids <- summary(doper)[, 1:2]
+doper.ids <- paste(doper.ids[, 1], doper.ids[, 2])
+
+dop.ids <- summary(dop)[, 1:2]
+dop.ids <- paste(dop.ids[, 1], dop.ids[, 2])
+dop.ids <- grep("^UNT", dop.ids, val=TRUE)
+lapply(esets, function(eset) table(eset$er))
+lapply(esets2, function(eset) table(eset$er))  #UNT is 32/72 ER+, UPP is all 213 ER+
+summary(dop.ids %in% doper.ids)  #all 32 ER+ doppelgangers are found, only the 5 ER- doppelgangers that were removed are gone.

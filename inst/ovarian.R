@@ -1,20 +1,21 @@
-library(curatedOvarianData)
 library(Biobase)
-library(logging)
-library(BiocParallel)
-multicoreParam <- MulticoreParam()
 
-source(system.file("extdata",
-    "patientselection_all.config",package="curatedOvarianData"))
-min.number.of.genes <- 2000
-source(system.file("extdata", "createEsetList.R", package =
-    "curatedOvarianData"))
-rm(list=ls(pattern="_eset"))
-
+if(file.exists("ovarian_esets.rda")){
+    load("ovarian_esets.rda")
+}else{
+    library(curatedOvarianData)
+    library(logging)
+    source(system.file("extdata",
+                       "patientselection_all.config",package="curatedOvarianData"))
+    min.number.of.genes <- 2000
+    source(system.file("extdata", "createEsetList.R", package =
+                       "curatedOvarianData"))
+    rm(list=ls(pattern="_eset"))
+    save(esets, file="ovarian_esets.rda")
+}
 table(table(unlist(lapply(esets, sampleNames))))
 
 library(doppelgangR)
-save(esets, file="ovarian_esets.rda")
 
 if(!file.exists("ovarian_dop.rda")){
   dop <- doppelgangR(esets, phenoFinder.args=NULL, smokingGunFinder.args=NULL,

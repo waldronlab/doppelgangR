@@ -256,6 +256,7 @@ checkIdentical(withoutpheno[, 1:4], withoutpheno3[, 1:4])
 checkIdentical(withoutpheno2[, 1:4], withoutpheno4[, 1:4])
 
 esets4 <- esets
-for (i in 1:length(esets4))
+ for (i in 1:length(esets4))
     pData(esets4[[i]]) <- pData(esets4[[i]])[1]
-## doppelgangR(esets4[[2]])
+doppelgangR(esets4[[1]])
+doppelgangR(esets4[[2]])

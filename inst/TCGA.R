@@ -35,12 +35,13 @@ if(file.exists(file.path(data.path, "tcga.esets.rda"))){
     tcga.esets <- list()
     for (i in 1:length(tcga.res)){
         tmp <- list()
-        tmp[["mrna"]] <- extract(tcga.res[[i]], "mRNA_Array")
-        tmp[["rnaseq"]] <- extract(tcga.res[[i]], "RNAseq_Gene")
-        tmp[["rnaseq2"]] <- extract(tcga.res[[i]], "RNAseq2_Gene_Norm")
-        pickplat <- 1+which.max(sapply(tmp[2:3], ncol))
+##        tmp[["mrna"]] <- try(extract(tcga.res[[i]], "mRNA_Array"))  #RNAseq and RNAseq2 only
+        tmp[["rnaseq"]] <- try(extract(tcga.res[[i]], "RNAseq_Gene"))
+        tmp[["rnaseq2"]] <- try(extract(tcga.res[[i]], "RNAseq2_Gene_Norm"))
+        tmp <- tmp[sapply(tmp, function(x) !is(x, "try-error"))]
+        pickplat <- which.max(sapply(tmp, ncol))
         print(paste(names(tcga.res)[i], ":", names(tmp)[pickplat]))
-        tcga.esets[[paste(names(tcga.res)[i], names(tmp)[pickplat])]] <- ExpressionSet(tmp[[pickplat]])
+        tcga.esets[[paste(names(tcga.res)[i], names(tmp)[pickplat])]] <- tmp[[pickplat]]
     }
     save(tcga.esets, file=file.path(data.path, "tcga.esets.rda"))
 }
@@ -80,8 +81,8 @@ structure(list(Study.Abbreviation = c("GBM", "OV", "LUSC", "LAML",
 "Stomach adenocarcinoma", "Uterine Corpus Endometrial Carcinoma",
 "Kidney renal papillary cell carcinoma", "Head and Neck squamous cell carcinoma",
 "Liver hepatocellular carcinoma", "Brain Lower Grade Glioma",
-"Bladder Urothelial Carcinoma", "Thyroid carcinoma", "Cervical squamous cell carcinoma and endocervical adenocarcinoma",
-"Prostate adenocarcinoma", "Pancreatic adenocarcinoma", "Lymphoid Neoplasm Diffuse Large B-cell Lymphoma",
+"Bladder Urothelial Carcinoma", "Thyroid carcinoma", "Cervical SCC and endocervical AC",
+"Prostate adenocarcinoma", "Pancreatic adenocarcinoma", "Diffuse Large B-cell Lymphoma",
 "Skin Cutaneous Melanoma", "Sarcoma", "Kidney Chromophobe", "Esophageal carcinoma ",
 "Uterine Carcinosarcoma", "Adrenocortical carcinoma", "Mesothelioma",
 "Pheochromocytoma and Paraganglioma", "Uveal Melanoma", "Cholangiocarcinoma",
@@ -99,28 +100,30 @@ rownames(suitability.table) <- 1:nrow(suitability.table)
 suitability.table$Study.Name[is.na(suitability.table$Study.Name )] <- "Colorectal adenocarcinoma"
 suitability.table$Study.Name <- tolower(suitability.table$Study.Name)
 
-library(pipeR)
-library(XML)
-library(stringr)
-url1 <- "http://cancergenome.nih.gov/publications/publicationguidelines"
-tabb <- readHTMLTable(url1, stringsAsFactors=FALSE)
-tt <- tabb[1][[1]]
-names(tt) <- c("disease", "restrict")
-tt$disease %>>% strsplit("\\(") %>>% sapply("[", 2) %>>%
-  gsub(pattern="\\)", replacement="", x=.) %>>% tolower -> tt$disease
-tt <- tt[complete.cases(tt),]
-tt[tt[,"disease"]=="coad, read",1] <- c("coad")
-tt <- rbind(tt[1:7,],c("read", NA),tt[-(1:7),])
-  for (i in 25:nrow(tt))
-tt$restrict[i] <- str_extract_all(tt$restrict, "[0-9]{2}/[0-9]{2}/[0-9]{4}")[[i]]
-tt$restrict <- ifelse(str_detect(tt$restrict, "No restrictions"), NA, tt$restrict)
-
-tt2 <- tt[match(suitability.table$cancertype, toupper(tt[, 1])), ]
-tt2$restrict[is.na(tt2$disease)] <- "unknown"
-tt2$restrict[is.na(tt2$restrict)] <- "unrestricted"
-suitability.table$embargoed <- tt2$restrict
-
-write.csv(suitability.table, file="suitability.table.csv")
+##Last publication restrictions in place until 12/18/2015
+# library(pipeR)
+# library(XML)
+# library(stringr)
+# url1 <- "http://cancergenome.nih.gov/publications/publicationguidelines"
+# tabb <- readHTMLTable(url1, stringsAsFactors=FALSE)
+# tt <- tabb[1][[1]]
+# names(tt) <- c("disease", "restrict")
+# tt$disease %>>% strsplit("\\(") %>>% sapply("[", 2) %>>%
+#   gsub(pattern="\\)", replacement="", x=.) %>>% tolower -> tt$disease
+# tt <- tt[complete.cases(tt),]
+# tt[tt[,"disease"]=="coad, read",1] <- c("coad")
+# tt <- rbind(tt[1:7,],c("read", NA),tt[-(1:7),])
+# imin <- which.max(which(is.na(tt[, 2])))
+# #for (i in imin:nrow(tt))
+# tt$restrict <- str_extract_all(tt$restrict, "[0-9]{2}/[0-9]{2}/[0-9]{4}")
+# tt$restrict <- ifelse(str_detect(tt$restrict, "No restrictions"), NA, tt$restrict)
+# 
+# tt2 <- tt[match(suitability.table$cancertype, toupper(tt[, 1])), ]
+# tt2$restrict[is.na(tt2$disease)] <- "unknown"
+# tt2$restrict[is.na(tt2$restrict)] <- "unrestricted"
+# suitability.table$embargoed <- tt2$restrict
+# 
+# write.csv(suitability.table, file="suitability.table.csv")
 
 library(xtable)
 sink("suitability.table.html")
@@ -142,12 +145,12 @@ for (i in match(suitability.table$cancertype, sub(" .+", "", names(cor.list)))){
 dev.off()
 
 # remove restricted 
-
-cor.list <- cor.list[-unlist(sapply(toupper(tt[!is.na(tt$restrict),1]), grep, names(cor.list)))]
-cor.list <- cor.list[!grepl("mrna$", names(cor.list))]
+#cor.list <- cor.list[-unlist(sapply(toupper(tt[!is.na(tt$restrict),1]), grep, names(cor.list)))]
+#cor.list <- cor.list[!grepl("mrna$", names(cor.list))]
 names(cor.list) <- gsub(" rnaseq2","", names(cor.list))
 names(cor.list) <- gsub(" rnaseq","", names(cor.list))
 names(cor.list) <- suitability.table$Study.Name[match(names(cor.list), suitability.table$cancertype)]
+#names(cor.list) <- sub("cervical squamous cell carcinoma and endocervical adenocarcinoma", "cervical squamous cell carcinoma \n endocervical adenocarcinoma", names(cor.list))
 
 d.f <- do.call(rbind, lapply(names(cor.list), function(i) data.frame(Cancer=i, COR=cor.list[[i]])))
 d.f$Cancer <- factor(d.f$Cancer, levels=names(cor.list)[order(sapply(cor.list, quantile, p=0.99),decreasing=TRUE)])

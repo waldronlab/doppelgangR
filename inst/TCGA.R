@@ -57,7 +57,7 @@ names(cor.list) <- names(tcga.esets)
 
 save(cor.list, file=file.path(data.path, "cor.list.rda"))
 
-#load("/scratch/lw391/doppelgangR/inst/cor.list.rda")
+load(file.path(data.path, "cor.list.rda"))
 
 ztrans.list <- lapply(cor.list, atanh)
 
@@ -141,6 +141,19 @@ for (i in match(suitability.table$cancertype, sub(" .+", "", names(cor.list)))){
     abline(v=quant999, col="red", lw=2); abline(v=0.95, col="black", lw=2)
     legend("topleft", pch=-1, col=c("black", "red"), bty="n",
            lw=2, legend=c("PCC=0.95", "99.9 percentile"))
+}
+dev.off()
+
+bimods <- c("PAAD rnaseq2", "COADREAD rnaseq2", "UCEC rnaseq2", "KICH rnaseq2", "TGCT rnaseq2", "ESCA rnaseq", "HNSC rnaseq2", "LGG rnaseq2", "THYM rnaseq2", "STAD rnaseq", "GBM rnaseq2")
+pdf("TCGA_PairwisePearson_bimodal.pdf", width=7.5, height=9)
+par(mfrow=c(4,3))
+j <- 0
+bimods2 <- sub(" .+", "", bimods)
+st <- suitability.table[match(bimods2, suitability.table$cancertype), ]
+for (i in match(bimods, names(cor.list))){
+  j <- j+1
+  hist(cor.list[[i]], breaks="FD", xlab="PCC", xlim=c(0, 1),
+       main=paste(names(cor.list)[i], "\n", st$Study.Name[j]))
 }
 dev.off()
 

@@ -1,0 +1,16 @@
+# Remove tracking 
+.Rhistory
+.RData
+.Ruserdata
+
+# RStudio files
+*.Rproj
+.Rproj.user
+
+# Cache files
+cache/
+
+# Vim files
+*~
+*.swp
+*.vim

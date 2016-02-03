@@ -84,7 +84,7 @@ plot(results1)
 To create a data.frame of potential doppelgangers that you can write
 to file then open in a spreadsheet to examine in detail, use the
 summary method:
-```{r }
+```{r}
 res.df <- summary(results1)
 dim(res.df)
 ```

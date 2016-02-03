@@ -8,3 +8,7 @@
 ^.*\.html$
 ^.*/cache/
 ^\..+
+^.*\.Rproj$
+^\.Rproj\.user$
+.gitignore
+.travis.yml

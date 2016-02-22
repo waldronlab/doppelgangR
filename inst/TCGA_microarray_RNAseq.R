@@ -49,6 +49,7 @@ if(file.exists(file.path(data.path, "tcga.microarray_RNAseq.rda"))){
     save(eset.list, file=file.path(data.path, "tcga.microarray_RNAseq.rda"))
 }
 
+
 library(doppelgangR)
 if(file.exists("doppelgangR.microarray_RNAseq.rda")){
   load("doppelgangR.microarray_RNAseq.rda")
@@ -56,7 +57,9 @@ if(file.exists("doppelgangR.microarray_RNAseq.rda")){
   doppelgangR.microarray_RNAseq <- list()
   for (i in 1:length(eset.list)){
     print(names(eset.list)[i])
-    doppelgangR.microarray_RNAseq[[names(eset.list)[i]]] = doppelgangR(esets=eset.list[[i]], phenoFinder.args = NULL, smokingGunFinder.args = NULL)
+    eset.pair = eset.list[[i]]
+    exprs(eset.pair[[2]]) = log(exprs(eset.pair[[2]]) + 1)
+    doppelgangR.microarray_RNAseq[[names(eset.list)[i]]] = doppelgangR(esets=eset.pair, phenoFinder.args = NULL, smokingGunFinder.args = NULL)
   }
   save( doppelgangR.microarray_RNAseq, file="doppelgangR.microarray_RNAseq.rda")
 }

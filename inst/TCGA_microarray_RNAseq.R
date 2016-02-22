@@ -8,23 +8,22 @@ all.dates <- getFirehoseRunningDates()
 all.datasets <- getFirehoseDatasets()
 
 data.path <- "."
-data.file <- file.path(data.path, "TCGA.rda")
-
-if(file.exists(data.file)){
-    load(data.file)
-}else{
-    tcga.res <- list()
-    for (i in 1:length(all.datasets)){
-        (ds.name <- all.datasets[i])
-        if(!ds.name %in% names(tcga.res)){
-            res <- try(getFirehoseData(ds.name, runDate=all.dates[1], RNAseq_Gene=TRUE, RNAseq2_Gene_Norm=TRUE, mRNA_Array=TRUE))
-        }
-        if(!is(res, "try-error")){
-            tcga.res[[ds.name]] <- res
-        }
-    }
-    save(tcga.res, file=data.file)
-}
+# data.file <- file.path(data.path, "TCGA.rda")
+# if(file.exists(data.file)){
+#     load(data.file)
+# }else{
+#     tcga.res <- list()
+#     for (i in 1:length(all.datasets)){
+#         (ds.name <- all.datasets[i])
+#         if(!ds.name %in% names(tcga.res)){
+#             res <- try(getFirehoseData(ds.name, runDate=all.dates[1], RNAseq_Gene=TRUE, RNAseq2_Gene_Norm=TRUE, mRNA_Array=TRUE))
+#         }
+#         if(!is(res, "try-error")){
+#             tcga.res[[ds.name]] <- res
+#         }
+#     }
+#     save(tcga.res, file=data.file)
+# }
 
 
 library(Biobase)
@@ -57,7 +56,7 @@ if(file.exists("doppelgangR.microarray_RNAseq.rda")){
   doppelgangR.microarray_RNAseq <- list()
   for (i in 1:length(eset.list)){
     print(names(eset.list)[i])
-    doppelgangR.microarray_RNAseq[[names(eset.list)[i]]] = doppelgangR(eset.list[[i]])
+    doppelgangR.microarray_RNAseq[[names(eset.list)[i]]] = doppelgangR(esets=eset.list[[i]], phenoFinder.args = NULL, smokingGunFinder.args = NULL)
   }
   save( doppelgangR.microarray_RNAseq, file="doppelgangR.microarray_RNAseq.rda")
 }

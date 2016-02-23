@@ -123,7 +123,7 @@ suitability.table$Study.Name <- tolower(suitability.table$Study.Name)
 # tt2$restrict[is.na(tt2$restrict)] <- "unrestricted"
 # suitability.table$embargoed <- tt2$restrict
 # 
-# write.csv(suitability.table, file="suitability.table.csv")
+write.csv(suitability.table, file="suitability.table.csv")
 
 library(xtable)
 sink("suitability.table.html")

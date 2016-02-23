@@ -1,3 +1,6 @@
+## TCGA.R should be run first, as this script uses its product suitability.table.csv.
+
+
 if( !require(RTCGAToolbox) ){
     library(devtools)
     install_github("LiNk-NY/RTCGAToolbox")
@@ -52,6 +55,12 @@ if(file.exists(file.path(data.path, "tcga.microarray_RNAseq.rda"))){
     save(eset.list, file=file.path(data.path, "tcga.microarray_RNAseq.rda"))
 }
 
+
+
+tcga.remove <- read.delim(system.file("extdata", "TCGA_remove.txt",
+                                      package="doppelgangR"), as.is=TRUE)[, 1]
+tcga.remove <- tolower(tcga.remove)
+eset.list$OV$microarray <- eset.list$OV$microarray[, !make.names(substr(sampleNames(eset.list$OV$microarray), 1, 12)) %in% tcga.remove]
 
 library(doppelgangR)
 if(file.exists("doppelgangR.microarray_RNAseq.rda")){
@@ -124,6 +133,20 @@ for (i in 1:length(doppelgangR.microarray_RNAseq)){
 }
 names(res) <- names(doppelgangR.microarray_RNAseq)
 dev.off()
+
+pdf("microarray_RNAseq_doppelgangerout.pdf", width=9, height=3)
+par(mfrow=c(1, 3))
+for (i in 1:length(doppelgangR.microarray_RNAseq)){
+  plot(doppelgangR.microarray_RNAseq[[i]])
+}
+dev.off()
+
+suitability.table <- read.csv("suitability.table.csv", row.names=1, as.is=TRUE)
+suitability.table$AUC = NA
+rocvec <- sapply(res, function(x) x[[1]])
+suitability.table$AUC[match(names(rocvec), suitability.table$cancertype)] <- rocvec
+write.csv(suitability.table[, c("cancertype", "Study.Name", "quantile999", "AUC")], file="TCGA_microarray_RNAseq.csv")
+
 
 tcgacodes <-
 structure(list(Study.Abbreviation = c("GBM", "OV", "LUSC", "LAML",

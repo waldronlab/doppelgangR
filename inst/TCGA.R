@@ -43,11 +43,11 @@ if(file.exists(file.path(data.path, "tcga.esets.rda"))){
         print(paste(names(tcga.res)[i], ":", names(tmp)[pickplat]))
         tcga.esets[[paste(names(tcga.res)[i], names(tmp)[pickplat])]] <- tmp[[pickplat]]
     }
+    # use only primary tumors
+    tcga.esets <- lapply(tcga.esets, function(x) x[,substr(sampleNames(x),14,15) %in% c( "01", "03", "09" )] )
     save(tcga.esets, file=file.path(data.path, "tcga.esets.rda"))
 }
 
-# use only primary tumors
-tcga.esets <- lapply(tcga.esets, function(x) x[,substr(sampleNames(x),14,15) %in% c( "01", "03", "09" )] )
 
 cor.list <- lapply(tcga.esets, function(eset){
     output <- cor(exprs(eset))

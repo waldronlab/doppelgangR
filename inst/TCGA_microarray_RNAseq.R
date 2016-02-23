@@ -8,22 +8,22 @@ all.dates <- getFirehoseRunningDates()
 all.datasets <- getFirehoseDatasets()
 
 data.path <- "."
-# data.file <- file.path(data.path, "TCGA.rda")
-# if(file.exists(data.file)){
-#     load(data.file)
-# }else{
-#     tcga.res <- list()
-#     for (i in 1:length(all.datasets)){
-#         (ds.name <- all.datasets[i])
-#         if(!ds.name %in% names(tcga.res)){
-#             res <- try(getFirehoseData(ds.name, runDate=all.dates[1], RNAseq_Gene=TRUE, RNAseq2_Gene_Norm=TRUE, mRNA_Array=TRUE))
-#         }
-#         if(!is(res, "try-error")){
-#             tcga.res[[ds.name]] <- res
-#         }
-#     }
-#     save(tcga.res, file=data.file)
-# }
+data.file <- file.path(data.path, "TCGA.rda")
+if(file.exists(data.file)){
+    load(data.file)
+}else{
+    tcga.res <- list()
+    for (i in 1:length(all.datasets)){
+        (ds.name <- all.datasets[i])
+        if(!ds.name %in% names(tcga.res)){
+            res <- try(getFirehoseData(ds.name, runDate=all.dates[1], RNAseq_Gene=TRUE, RNAseq2_Gene_Norm=TRUE, mRNA_Array=TRUE))
+        }
+        if(!is(res, "try-error")){
+            tcga.res[[ds.name]] <- res
+        }
+    }
+    save(tcga.res, file=data.file)
+}
 
 
 library(Biobase)
@@ -44,8 +44,8 @@ if(file.exists(file.path(data.path, "tcga.microarray_RNAseq.rda"))){
       print(paste(names(tcga.res)[i], ":", names(RNAseq)[pickplat]))
       eset.list[[names(tcga.res)[i]]] = list()
       ## use only primary tumors
-      arraydat = arraydat[,substr(sampleNames(arraydat),14,15) %in% c( "01", "03", "09" )] )
-      seqdat = [RNAseq[[pickplat]],substr(sampleNames(RNAseq[[pickplat]]),14,15) %in% c( "01", "03", "09" )] )
+      arraydat = arraydat[, substr(sampleNames(arraydat),14,15) %in% c( "01", "03", "09" )]
+      seqdat = RNAseq[[pickplat]][ ,substr(sampleNames(RNAseq[[pickplat]]),14,15) %in% c( "01", "03", "09" )]
       eset.list[[ names(tcga.res)[i] ]][["microarray"]] = arraydat
       eset.list[[ names(tcga.res)[i] ]][[paste(names(tcga.res)[i], names(RNAseq)[pickplat])]] <- seqdat
     }

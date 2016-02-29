@@ -1,11 +1,11 @@
 Package: doppelgangR
-Maintainer: Levi Waldron <levi.waldron@hunter.cuny.edu>
+Maintainer: Levi Waldron <lwaldron.research@gmail.com>
 Depends: R (>= 3.2), Biobase, BiocParallel
 Suggests: BiocStyle, knitr, rmarkdown, curatedOvarianData, ROCR, pROC, RUnit, simulatorZ
 Imports: sva, impute, digest, mnormt, methods
-Author: Levi Waldron and Markus Riester
-Version: 0.19
-Date: 2016-02-03
+Author: Levi Waldron, Markus Riester, Marcel Ramos
+Version: 0.20
+Date: 2016-02-29
 License: GPL (>=2.0)
 Title: Identify likely duplicate samples from genomic or meta-data
 Description: The main function is doppelgangR(), which takes as minimal

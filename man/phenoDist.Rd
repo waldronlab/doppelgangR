@@ -17,7 +17,7 @@ various combinations of vectors and matrices/dataframes.}
 unspecified), or between all pairs of rows between x and y (if
 both are provided).}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 

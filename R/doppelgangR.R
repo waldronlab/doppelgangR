@@ -5,6 +5,7 @@ doppelgangR <- structure(function
 separator=":",
 ### a delimitor to use between dataset names and sample names
 corFinder.args=list(separator=separator, use.ComBat=TRUE, method="pearson"),
+### a list of arguments to be passed to the corFinder function.
 phenoFinder.args=list(separator=separator, vectorDistFun=vectorWeightedDist),
 ### a list of arguments to be passed to the phenoFinder function.  If
 ### NULL, samples with similar phenotypes will not be searched for.

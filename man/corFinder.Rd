@@ -19,7 +19,7 @@ data between the two datasets.}
 
 \value{Returns a matrix of sample-wise Pearson Correlations.}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 

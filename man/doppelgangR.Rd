@@ -2,15 +2,16 @@
 \alias{doppelgangR}
 \title{doppelgangR}
 \description{Identify samples with suspiciously high correlations and phenotype similarities}
-\usage{doppelgangR(esets, separator = ":", corFinder.args = list(separator = separator,
-    use.ComBat = TRUE, method = "pearson"), phenoFinder.args = list(separator = separator,
-    vectorDistFun = vectorWeightedDist), outlierFinder.expr.args = list(bonf.prob = 0.5,
-    transFun = atanh, tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99,
-    bonf.prob = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I),
-    impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8,
-        maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL,
-    automatic.smokingguns = FALSE, within.datasets.only = FALSE,
-    intermediate.pruning = FALSE, cache.dir = "cache", verbose = TRUE)}
+\usage{doppelgangR(esets, separator = ":", corFinder.args = list(separator = separator, 
+    use.ComBat = TRUE, method = "pearson"), phenoFinder.args = list(separator = separator, 
+    vectorDistFun = vectorWeightedDist), outlierFinder.expr.args = list(bonf.prob = 0.5, 
+    transFun = atanh, tail = "upper"), outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, 
+    bonf.prob = NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I), 
+    impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, 
+        maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL, 
+    automatic.smokingguns = FALSE, within.datasets.only = FALSE, 
+    intermediate.pruning = FALSE, cache.dir = "cache", BPPARAM = bpparam(), 
+    verbose = TRUE)}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}
   \item{separator}{a delimitor to use between dataset names and sample names}
@@ -39,12 +40,14 @@ phenotype doppelgangers will have missing values for the
 expression and smoking gun similarity).}
   \item{cache.dir}{The name of a directory in which to cache or look up results to save
 re-calculating correlations.  Set to NULL for no caching.}
+  \item{BPPARAM}{Argument for BiocParallel::bplapply(), by default will use all
+cores of a multi-core machine}
   \item{verbose}{Print progress information}
 }
 
 \value{Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 

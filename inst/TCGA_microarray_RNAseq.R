@@ -63,17 +63,17 @@ tcga.remove <- tolower(tcga.remove)
 eset.list$OV$microarray <- eset.list$OV$microarray[, !make.names(substr(sampleNames(eset.list$OV$microarray), 1, 12)) %in% tcga.remove]
 
 library(doppelgangR)
-if(file.exists("doppelgangR.microarray_RNAseq.rda")){
-  load("doppelgangR.microarray_RNAseq.rda")
+if(file.exists("doppelgangR.microarray_RNAseq_nolog2.rda")){
+  load("doppelgangR.microarray_RNAseq_nolog2.rda")
 }else{
   doppelgangR.microarray_RNAseq <- list()
   for (i in 1:length(eset.list)){
     print(names(eset.list)[i])
     eset.pair = eset.list[[i]]
-    exprs(eset.pair[[2]]) = log(exprs(eset.pair[[2]]) + 1)
+#    exprs(eset.pair[[2]]) = log(exprs(eset.pair[[2]]) + 1)
     doppelgangR.microarray_RNAseq[[names(eset.list)[i]]] = doppelgangR(esets=eset.pair, phenoFinder.args = NULL, smokingGunFinder.args = NULL)
   }
-  save( doppelgangR.microarray_RNAseq, file="doppelgangR.microarray_RNAseq.rda")
+  save( doppelgangR.microarray_RNAseq, file="doppelgangR.microarray_RNAseq_nolog2.rda")
 }
 
 doppelmelt <- function(obj, ds1, ds2){
@@ -121,7 +121,7 @@ plotROC <- function(pred, labels, plot = TRUE, na.rm = TRUE, colorize = FALSE, a
   invisible(list(auc,auc.ci,best))
 }
 
-pdf("microarray_RNAseq.pdf", width=8, height=4)
+pdf("microarray_RNAseq_nolog2.pdf", width=8, height=4)
 par(mfrow=c(1, 2))
 res <- list()
 for (i in 1:length(doppelgangR.microarray_RNAseq)){
@@ -134,7 +134,7 @@ for (i in 1:length(doppelgangR.microarray_RNAseq)){
 names(res) <- names(doppelgangR.microarray_RNAseq)
 dev.off()
 
-pdf("microarray_RNAseq_doppelgangerout.pdf", width=9, height=3)
+pdf("microarray_RNAseq_doppelgangerout_nolog2.pdf", width=9, height=3)
 par(mfrow=c(1, 3))
 for (i in 1:length(doppelgangR.microarray_RNAseq)){
   plot(doppelgangR.microarray_RNAseq[[i]])
@@ -145,28 +145,5 @@ suitability.table <- read.csv("suitability.table.csv", row.names=1, as.is=TRUE)
 suitability.table$AUC = NA
 rocvec <- sapply(res, function(x) x[[1]])
 suitability.table$AUC[match(names(rocvec), suitability.table$cancertype)] <- rocvec
-write.csv(suitability.table[, c("cancertype", "Study.Name", "quantile999", "AUC")], file="TCGA_microarray_RNAseq.csv")
+write.csv(suitability.table[, c("cancertype", "Study.Name", "quantile999", "AUC")], file="TCGA_microarray_RNAseq_nolog2.csv")
 
-
-tcgacodes <-
-structure(list(Study.Abbreviation = c("GBM", "OV", "LUSC", "LAML",
-"COAD", "KIRC", "LUAD", "READ", "BRCA", "STAD", "UCEC", "KIRP",
-"HNSC", "LIHC", "LGG", "BLCA", "THCA", "CESC", "PRAD", "PAAD",
-"DLBC", "SKCM", "SARC", "KICH", "ESCA", "UCS", "ACC", "MESO",
-"PCPG", "UVM", "CHOL", "TGCT", "THYM"), Study.Name = c("Glioblastoma multiforme",
-"Ovarian serous cystadenocarcinoma", "Lung squamous cell carcinoma",
-"Acute Myeloid Leukemia", "Colon adenocarcinoma", "Kidney renal clear cell carcinoma",
-"Lung adenocarcinoma", "Rectum adenocarcinoma", "Breast invasive carcinoma",
-"Stomach adenocarcinoma", "Uterine Corpus Endometrial Carcinoma",
-"Kidney renal papillary cell carcinoma", "Head and Neck squamous cell carcinoma",
-"Liver hepatocellular carcinoma", "Brain Lower Grade Glioma",
-"Bladder Urothelial Carcinoma", "Thyroid carcinoma", "Cervical SCC and endocervical AC",
-"Prostate adenocarcinoma", "Pancreatic adenocarcinoma", "Diffuse Large B-cell Lymphoma",
-"Skin Cutaneous Melanoma", "Sarcoma", "Kidney Chromophobe", "Esophageal carcinoma ",
-"Uterine Carcinosarcoma", "Adrenocortical carcinoma", "Mesothelioma",
-"Pheochromocytoma and Paraganglioma", "Uveal Melanoma", "Cholangiocarcinoma",
-"Testicular Germ Cell Tumors", "Thymoma")), .Names = c("Study.Abbreviation",
-"Study.Name"), row.names = c(2L, 10L, 24L, 26L, 29L, 33L, 35L,
-43L, 48L, 49L, 50L, 52L, 55L, 56L, 79L, 87L, 88L, 89L, 92L, 107L,
-136L, 180L, 218L, 226L, 254L, 302L, 304L, 353L, 366L, 416L, 427L,
-429L, 430L), class = "data.frame")

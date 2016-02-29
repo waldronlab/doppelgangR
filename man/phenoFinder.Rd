@@ -18,7 +18,7 @@ samples come from which dataset.}
 
 \value{A matrix of similarities between the phenotypes of pairs of samples.}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 

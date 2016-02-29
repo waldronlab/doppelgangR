@@ -50,14 +50,14 @@ if(file.exists(file.path(data.path, "tcga.esets.rda"))){
 
 
 cor.list <- lapply(tcga.esets, function(eset){
-    output <- cor(exprs(eset))
+    output <- cor(log2(1+exprs(eset)))
     output[upper.tri(output)]
 })
 names(cor.list) <- names(tcga.esets)
 
-save(cor.list, file=file.path(data.path, "cor.list.rda"))
+save(cor.list, file=file.path(data.path, "cor.list.log2.rda"))
 
-load(file.path(data.path, "cor.list.rda"))
+load(file.path(data.path, "cor.list.log2.rda"))
 
 ztrans.list <- lapply(cor.list, atanh)
 
@@ -123,15 +123,15 @@ suitability.table$Study.Name <- tolower(suitability.table$Study.Name)
 # tt2$restrict[is.na(tt2$restrict)] <- "unrestricted"
 # suitability.table$embargoed <- tt2$restrict
 # 
-write.csv(suitability.table, file="suitability.table.csv")
+write.csv(suitability.table, file="suitability.table.log2.csv")
 
 library(xtable)
-sink("suitability.table.html")
+sink("suitability.table.log2.html")
 print(xtable(suitability.table), type="html")
 sink()
 
 
-pdf("TCGA_PairwisePearson.pdf")
+pdf("TCGA_PairwisePearson.log2.pdf")
 j <- 0
 for (i in match(suitability.table$cancertype, sub(" .+", "", names(cor.list)))){
     j <- j+1
@@ -145,7 +145,7 @@ for (i in match(suitability.table$cancertype, sub(" .+", "", names(cor.list)))){
 dev.off()
 
 bimods <- c("PAAD rnaseq2", "COADREAD rnaseq2", "UCEC rnaseq2", "KICH rnaseq2", "TGCT rnaseq2", "ESCA rnaseq", "HNSC rnaseq2", "LGG rnaseq2", "THYM rnaseq2", "STAD rnaseq", "GBM rnaseq2")
-pdf("TCGA_PairwisePearson_bimodal.pdf", width=7.5, height=9)
+pdf("TCGA_PairwisePearson_bimodal.log2.pdf", width=7.5, height=9)
 par(mfrow=c(4,3))
 j <- 0
 bimods2 <- sub(" .+", "", bimods)
@@ -169,7 +169,7 @@ d.f <- do.call(rbind, lapply(names(cor.list), function(i) data.frame(Cancer=i, C
 d.f$Cancer <- factor(d.f$Cancer, levels=names(cor.list)[order(sapply(cor.list, quantile, p=0.99),decreasing=TRUE)])
 
 library(ggplot2)
-pdf("tcgacor.pdf", width=12,height=6)
+pdf("tcgacor.log2.pdf", width=12,height=6)
 ggplot(d.f, aes(Cancer,COR))+geom_violin()+theme_classic()+theme(axis.text.x = element_text(angle = 45, hjust = 1))+xlab("")+ylab("Pairwise Pearson Correlation")
 dev.off()
 

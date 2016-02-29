@@ -16,9 +16,18 @@ that are NA in either vector.}
 \value{Returns a numeric value, the Hamming Distance (the number of
 non-equal values between x and y).}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 
 
-
+\examples{
+(mat <- matrix(c(paste0("A", 1:5), paste0("A", 5:1)), nrow = 2, byrow = TRUE))
+stopifnot(vectorHammingDist(mat, mat, 1, 2) == 0.8)
+stopifnot(vectorHammingDist(mat, mat, 1, 1) == 0)
+mat[1, 1] <- NA
+stopifnot(vectorHammingDist(mat, mat, 1, 2) == 0.75)
+stopifnot(vectorHammingDist(mat, mat, 1, 1) == 0)
+mat[1, 3] <- NA
+stopifnot(vectorHammingDist(mat, mat, 1, 2) == 1)
+}

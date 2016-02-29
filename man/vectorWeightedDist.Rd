@@ -17,7 +17,7 @@ the matches and mismatches in two random patients.}
 \value{Returns a numeric value, the log of the probability of observing the
 matches in x and y}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 

@@ -27,7 +27,7 @@ likely duplicates.  If specified, this over-rides bonf.prob.}
 
 \value{Returns either NULL or a dataframe with three columns: sample1, sample2, and similarity.}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 

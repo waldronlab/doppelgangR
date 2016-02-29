@@ -19,7 +19,7 @@ data between the two datasets.}
 
 \value{Returns a matrix of sample-wise Pearson Correlations.}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 \examples{
 m1 <- matrix(rnorm(1100), ncol=11,

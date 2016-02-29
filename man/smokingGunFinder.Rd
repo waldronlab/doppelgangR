@@ -21,7 +21,7 @@ added to sample names to keep track of dataset of origin.}
 1, non-matches have value zero.  Value for a sample against itself
 is NA.}
 
-\author{Levi Waldron and Markus Riester}
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 

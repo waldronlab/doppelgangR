@@ -10,7 +10,7 @@
     impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8,
         maxp = 1500, rng.seed = 362436069), manual.smokingguns = NULL,
     automatic.smokingguns = FALSE, within.datasets.only = FALSE,
-    intermediate.pruning = FALSE, cache.dir = "cache", verbose = TRUE)}
+    intermediate.pruning = FALSE, cache.dir = "cache", BPPARAM = bpparam(), verbose = TRUE)}
 \arguments{
   \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic data to be analyzed.}
   \item{separator}{a delimitor to use between dataset names and sample names}
@@ -39,6 +39,7 @@ phenotype doppelgangers will have missing values for the
 expression and smoking gun similarity).}
   \item{cache.dir}{The name of a directory in which to cache or look up results to save
 re-calculating correlations.  Set to NULL for no caching.}
+  \item{BPPARAM}{Arguments for BiocParallel::bplapply function, use all cores available by default.}
   \item{verbose}{Print progress information}
 }
 

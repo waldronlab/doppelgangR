@@ -541,11 +541,11 @@ sn.dev.gh <- function(cp, X, y, trace=FALSE, hessian=FALSE)
     score[m+2] <- score.l <- n*Ds.Z/s.Z-sum(z*Dz)+sum(p1*(z+lambda*Dz))
     Dg.Dl <-1.5*(4-pi)*E.Z^2*(DE.Z*s.Z-E.Z*Ds.Z)/s.Z^4
     R <- E.Z/s.Z
-    T <- sqrt(2/pi-(1-2/pi)*R^2)
-    Dl.Dg <- 2*(T/(T*R)^2+(1-2/pi)/T^3)/(3*(4-pi))
+    Te <- sqrt(2/pi-(1-2/pi)*R^2)
+    Dl.Dg <- 2*(Te/(Te*R)^2+(1-2/pi)/Te^3)/(3*(4-pi))
     R. <- 2/(3*R^2 * (4-pi))
-    T. <- (-R)*R.*(1-2/pi)/T
-    DDl.Dg <- (-2/(3*(4-pi))) * (T./(R*T)^2+2*R./(T*R^3)+3*(1-2/pi)*T./T^4)
+    T. <- (-R)*R.*(1-2/pi)/Te
+    DDl.Dg <- (-2/(3*(4-pi))) * (T./(R*Te)^2+2*R./(Te*R^3)+3*(1-2/pi)*T./Te^4)
     score[m+2] <- score[m+2]/Dg.Dl  # convert deriv wrt lamda to gamma1
     gradient <- (-2)*score
     if(hessian){

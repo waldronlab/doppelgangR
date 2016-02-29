@@ -20,7 +20,24 @@ samples come from which dataset.}
 
 \author{Levi Waldron and Markus Riester}
 
+\examples{
+example("corFinder")
 
+## Create pData datasets
+m.pdata <- matrix(letters[sample(1:26, size=110, replace=TRUE)], ncol=10)
+n.pdata <- matrix(letters[sample(1:26, size=100, replace=TRUE)], ncol=10)
 
+## Induce phenotype doppelgangers
+n.pdata[10, ] <- m.pdata[10, ]
 
+n.eset$id <- toupper(colnames(n1))
+m.eset$id <- toupper(colnames(m1))
+pData(m.eset) <- data.frame(c(pData(m.eset), data.frame(m.pdata)), stringsAsFactors = FALSE)
+
+n.eset$id[4] <- "gotcha"
+m.eset$id[5] <- "gotcha"
+pData(n.eset) <- data.frame(c(pData(n.eset), data.frame(n.pdata)))
+
+phenoFinder(esets)
+}
 

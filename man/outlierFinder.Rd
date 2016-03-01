@@ -29,13 +29,8 @@ likely duplicates.  If specified, this over-rides bonf.prob.}
 
 \author{Levi Waldron, Markus Riester, Marcel Ramos}
 
-
 \examples{
-library(proxy)
-## Create similarity matrix
-mat2 <- cor(as.matrix(cbind(mtcars[, 1:4], disp2 = mtcars$disp)))
-mat2 <- as.matrix(as.simil(mat2))
-outlierFinder(mat2, bonf.prob = 0.02)
+example("corFinder")
+outlierFinder(esets2, bonf.prob = 0.05)
 }
-
 

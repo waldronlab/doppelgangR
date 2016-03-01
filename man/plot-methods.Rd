@@ -49,6 +49,7 @@ results1 <- doppelgangR(testesets,
                         corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
 plot(results1)
 }
+
 \author{Levi Waldron}
 \section{Methods}{
 \describe{

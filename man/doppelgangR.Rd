@@ -53,27 +53,14 @@ cores of a multi-core machine}
 
 
 \examples{
-        library(curatedOvarianData)
-        data(GSE32062.GPL6480_eset)
-        data(GSE32063_eset)
-        data(GSE12470_eset)
-        data(GSE17260_eset)
-        testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
-                          JapaneseB=GSE32063_eset,
-                          Yoshihara2009=GSE12470_eset,
-                          Yoshihara2010=GSE17260_eset)
-        testesets <- lapply(testesets, function(X){
-            ## standardize the sample ids to improve matching based on clinical annotation
-            X$alt_sample_name <- paste(X$sample_type, gsub("[^0-9]", "", X$alt_sample_name), sep="_")
-            pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
-            X <- X[, 1:20]  ##speed computations
-            return(X) })
-        results1 <- doppelgangR(testesets, cache.dir=NULL)
-        results1
-        plot(results1)
-        summary(results1)
-    ## Set phenoFinder.args=NULL to ignore similar phenotypes, and
-    ## turn off ComBat batch correction:
+example("phenoFinder")
+
+results2 <- doppelgangR(esets2, cache.dir = NULL)
+results2
+plot(results2)
+summary(results2)
+## Set phenoFinder.args=NULL to ignore similar phenotypes, and
+## turn off ComBat batch correction:
 ##    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
 ##    summary(results2)
 }

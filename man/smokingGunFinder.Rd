@@ -23,7 +23,9 @@ is NA.}
 
 \author{Levi Waldron, Markus Riester, Marcel Ramos}
 
+\examples{
+example("phenoFinder")
 
-
-
+smokingGunFinder(esets2, "days_to_death")
+}
 

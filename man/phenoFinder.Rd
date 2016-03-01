@@ -21,23 +21,19 @@ samples come from which dataset.}
 \author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 \examples{
-example("corFinder")
+library(curatedOvarianData)
+data(GSE32063_eset)
+data(GSE17260_eset)
+esets2 <- list(JapaneseB=GSE32063_eset,
+                Yoshihara2010=GSE17260_eset)
 
-## Create pData datasets
-m.pdata <- matrix(letters[sample(1:26, size=110, replace=TRUE)], ncol=10)
-n.pdata <- matrix(letters[sample(1:26, size=100, replace=TRUE)], ncol=10)
+esets2 <- lapply(esets2, function(X){
+    ## standardize the sample ids to improve matching based on clinical annotation
+    X$alt_sample_name <- paste(X$sample_type, gsub("[^0-9]", "", X$alt_sample_name), sep="_")
+    pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
+    X <- X[, 1:20]  ##speed computations
+    return(X) })
 
-## Induce phenotype doppelgangers
-n.pdata[10, ] <- m.pdata[10, ]
-
-n.eset$id <- toupper(colnames(n1))
-m.eset$id <- toupper(colnames(m1))
-pData(m.eset) <- data.frame(c(pData(m.eset), data.frame(m.pdata)), stringsAsFactors = FALSE)
-
-n.eset$id[4] <- "gotcha"
-m.eset$id[5] <- "gotcha"
-pData(n.eset) <- data.frame(c(pData(n.eset), data.frame(n.pdata)))
-
-phenoFinder(esets)
+phenoFinder(esets2)
 }
 

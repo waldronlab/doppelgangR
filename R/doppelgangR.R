@@ -40,7 +40,7 @@ intermediate.pruning=FALSE,
 cache.dir="cache",
 ### The name of a directory in which to cache or look up results to save
 ### re-calculating correlations.  Set to NULL for no caching.
-BPPARAM = bpparam(),
+BPPARAM = BiocParallel::bpparam(),
 ### Argument for BiocParallel::bplapply(), by default will use all
 ### cores of a multi-core machine
 verbose=TRUE

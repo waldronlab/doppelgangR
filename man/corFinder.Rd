@@ -22,24 +22,9 @@ data between the two datasets.}
 \author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 \examples{
-m1 <- matrix(rnorm(1100), ncol=11,
-             dimnames = list(make.names(1:100),
-                             paste0("m", 1:11)))
+example("phenoFinder")
 
-n1 <- matrix(rnorm(1000), ncol=10,
-             dimnames = list(make.names(1:100),
-                             paste0("n", 1:10)))
-
-m1[, 1] <- n1[, 1] + rnorm(100, sd=0.25)
-m1[, 2] <- m1[, 3] + rnorm(100, sd=0.25)
-n1[, 2] <- n1[, 3] + rnorm(100, sd=0.25)
-n1[, 4] <- m1[, 6] + rnorm(100, sd=0.25)
-
-m.eset <- ExpressionSet(assayData=m1)
-n.eset <- ExpressionSet(assayData=n1)
-
-esets <- list(m=m.eset, n=n.eset)
-corFinder(esets)
+corFinder(esets2)
 }
 
 

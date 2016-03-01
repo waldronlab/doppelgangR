@@ -45,7 +45,7 @@ vectorDistFun=vectorWeightedDist,
 }
 
 
-.discretizeDataFrame <- function(X, bins=10) {
+.discretizeDataFrame <- function(X, bins) {
 
     .discretizeRow <- function(x) {
         if (length(levels(as.factor(x))) > bins)

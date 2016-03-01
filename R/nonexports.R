@@ -1726,9 +1726,9 @@ st.SFscore <- function(shape, df, z, trace=FALSE)
     }
     J <- function(x,shape,df){
         u <- x*sqrt((df+1)/(x^2+df))
-        t <- dt(shape*u, df=df+1)
-        T <- pt(shape*u, df=df+1)
-        ((df+1)*shape*u^3*t/((df+2)*(1+(shape*u)^2/(df+1)))+(t*u/T)^2)
+        tee <- dt(shape*u, df=df+1)
+        Tee <- pt(shape*u, df=df+1)
+        ((df+1)*shape*u^3*tee/((df+2)*(1+(shape*u)^2/(df+1)))+(tee*u/Tee)^2)
     }
     EJ <- integrate(function(x, shape=shape, df=df)
                     J(x,shape=shape, df=df) * dst(x,0,1,shape,df),
@@ -1801,8 +1801,8 @@ sn.Einfo <- function(dp=NULL, cp=NULL, n=1, x=NULL)
     gamma1<-cp[p+2]
     D  <- diag(p+2)
     R  <- E.z/s.z
-    T  <- sqrt(2/pi-(1-2/pi)*R^2)
-    Da.Dg <- 2*(T/(T*R)^2+(1-2/pi)/T^3)/(3*(4-pi))
+    Tee  <- sqrt(2/pi-(1-2/pi)*R^2)
+    Da.Dg <- 2*(Tee/(Tee*R)^2+(1-2/pi)/Tee^3)/(3*(4-pi))
     DE.z <- sqrt(2/pi)/(1+alpha^2)^1.5
     Ds.z <- (-E.z/s.z)*DE.z
     D[1,p+1] <- (-R)

@@ -46,11 +46,11 @@ vectorDistFun=vectorWeightedDist,
 
 
 .discretizeDataFrame <- function(X, bins=10) {
-    
+
     .discretizeRow <- function(x) {
         if (length(levels(as.factor(x))) > bins)
             return(cut(x, breaks=bins))
-        as.factor(x)    
+        as.factor(x)
     }
     idx <- sapply(X, is.numeric)
     if (sum(idx)==0) return(X)

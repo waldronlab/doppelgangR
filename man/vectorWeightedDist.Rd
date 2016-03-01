@@ -20,6 +20,11 @@ matches in x and y}
 \author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
-
+\examples{
+mymat1 <- matrix(rnorm(20), ncol = 5)
+mymat1[1, 4] <- NA
+mymat2 <- matrix(rnorm(20), ncol = 5)
+vectorWeightedDist(mymat1, mymat2, 1, 2)
+}
 
 

@@ -1,13 +1,13 @@
 \name{outlierFinder}
 \alias{outlierFinder}
-\title{##Identifies outliers in a similarity matrix.}
+\title{Identifies outliers in a similarity matrix.}
 \description{By default uses the
 Fisher z-transform for Pearson correlation (atanh), and
 identifies outliers as those above the quantile of a skew-t
 distribution with mean and standard deviation estimated from the
 z-transformed matrix.  The quantile is calculated from the
 Bonferroni-corrected cumulative probability of the upper tail.}
-\usage{outlierFinder(similarity.mat, bonf.prob = 0.05, transFun = atanh, 
+\usage{outlierFinder(similarity.mat, bonf.prob = 0.05, transFun = atanh,
     normal.upper.thresh = NULL, tail = "upper")}
 \arguments{
   \item{similarity.mat}{A matrix of similarities - larger values mean more similar.}
@@ -30,6 +30,12 @@ likely duplicates.  If specified, this over-rides bonf.prob.}
 \author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
-
+\examples{
+library(proxy)
+## Create similarity matrix
+mat2 <- cor(as.matrix(cbind(mtcars[, 1:4], disp2 = mtcars$disp)))
+mat2 <- as.matrix(as.simil(mat2))
+outlierFinder(mat2, bonf.prob = 0.02)
+}
 
 

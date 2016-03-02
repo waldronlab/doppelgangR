@@ -47,8 +47,9 @@ cores of a multi-core machine}
 
 \value{Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.}
 
-\author{Levi Waldron, Markus Riester, Marcel Ramos}
+\seealso{?BiocParallel::`BiocParallelParam-class`}
 
+\author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 
 

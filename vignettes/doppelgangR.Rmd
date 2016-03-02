@@ -4,11 +4,85 @@ author: "Levi Waldron"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 package: "`r pkg_ver('BiocStyle')`"
 vignette: >
+  %\VignetteIndexEntry{doppelgangR vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-output: html_document
 output:
   BiocStyle::html_document:
   toc: true
 ---
 
+```{r, echo=FALSE, results='hide', eval=FALSE}
+library(knitr)
+opts_knit$set(cache=TRUE)
+```
+
+# Introduction
+
+`r BiocStyle::Biocpkg("doppelgangR")` is a package for identifying duplicate samples
+within or between datasets of transcriptome profiles. It is intended for microarray and RNA-seq gene expression profiles where biological replicates are ordinarily more distinct than technical replicates, as is the case for cancer types with "noisy" genomes. It is intended for cases where per-gene summaries are available but full genotypes are not, which is typical of public databases such as the Gene Expression Omnibus.
+
+## Basic usage of the `doppelgangR` function
+
+```{r, echo=FALSE, message=FALSE}
+library(doppelgangR)
+```
+
+### Case Study: Batch correction in Japanese datasets
+
+We load for datasets by Yoshihara __et al.__ that have been curated
+in `curatedOvarianData`:
+
+```{r, message = FALSE}
+library(curatedOvarianData)
+data(GSE32062.GPL6480_eset)
+data(GSE17260_eset)
+```
+
+The `doppelgangR` function requires a list of
+`ExpressionSet` objects as input, which we create here:
+
+```{r testesets}
+testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
+                  Yoshihara2010=GSE17260_eset)
+```
+
+We curate the alt\_sample\_name metadata simply by removing non-digits,
+which then can be matched across studies:
+
+```{r curateids}
+testesets <- lapply(testesets, function(X){
+    # standardize the sample ids to improve matching based on clinical annotation
+    sampleNames(X) <- make.names(paste(X$sample_type,
+        gsub("\\D","",X$alt_sample_name), sep="_"))
+    X$alt_sample_name <- sampleNames(X)
+    pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
+    X })
+```
+
+Run `doppelgangR` with default arguments:
+
+```{r rundopp, results="hide", message=FALSE, cache=TRUE}
+results1 <- doppelgangR(testesets, phenoFinder.args=NULL)
+```
+
+This creates an object of class `DoppelGang`, which has print, summary, and plot methods.  Summary method output not shown here due to voluminous output:
+
+```{r summarizedop, results='hide'}
+summary(results1)
+```
+
+Plot creates a histogram of sample pairwise correlations within and between each study:
+
+```{r plotdop, fig.cap="Doppelgangers identified on the basis of similar expression profiles.  The vertical red lines indicate samples that were flagged."}
+par(mfrow=c(2,2), las=1)
+plot(results1)
+```
+
+## BPPARAM argument in the `doppelgangR` function
+
+There are options for using multiple processing cores for running the `doppelgangR` function. This functionality is imported from the `BiocParallel` dependecy. Please see "?BiocParallel::\`BiocParallelParam-class\`" documentation. 
+
+```{r}
+results2 <- doppelgangR(testesets, BPPARAM = MulticoreParam(workers = 8))
+```

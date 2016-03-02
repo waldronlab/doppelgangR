@@ -27,13 +27,16 @@ data(GSE17260_eset)
 esets2 <- list(JapaneseB=GSE32063_eset,
                 Yoshihara2010=GSE17260_eset)
 
+## standardize the sample ids to improve matching based on clinical annotation
 esets2 <- lapply(esets2, function(X){
-    ## standardize the sample ids to improve matching based on clinical annotation
     X$alt_sample_name <- paste(X$sample_type, gsub("[^0-9]", "", X$alt_sample_name), sep="_")
+
+## Removal of columns that cannot possibly match also helps duplicated patients to stand out
     pData(X) <- pData(X)[, !grepl("uncurated_author_metadata", colnames(pData(X)))]
     X <- X[, 1:20]  ##speed computations
     return(X) })
 
-phenoFinder(esets2)
+## See first six samples in both rows and columns
+phenoFinder(esets2)[1:6, 1:6]
 }
 

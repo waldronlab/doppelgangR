@@ -30,7 +30,9 @@ likely duplicates.  If specified, this over-rides bonf.prob.}
 \author{Levi Waldron, Markus Riester, Marcel Ramos}
 
 \examples{
-example("corFinder")
-outlierFinder(esets2, bonf.prob = 0.05)
+library(curatedOvarianData)
+data(GSE32063_eset)
+cormat <- cor(exprs(GSE32063_eset))
+outlierFinder(cormat, bonf.prob = 0.05)
 }
 

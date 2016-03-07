@@ -28,13 +28,17 @@ library(doppelgangR)
 
 The `doppelgangR()` function identifies duplicates in three different ways:
 
-* **"expression"** doppelgangers have highly similar expression profiles, which are identified by default by having higher Pearson correlation than expected based on an empirical distribution of Pearson correlations between biological replicates. The type of correlation, and default use of ComBat batch correction, can be changed using the "corFinder.args" argument.
+* **"expression"** doppelgängers have highly similar expression profiles, which are identified by default by having higher Pearson correlation than expected based on an empirical distribution of Pearson correlations between biological replicates. The type of correlation, and default use of ComBat batch correction, can be changed using the "corFinder.args" argument.
 
-* **"phenotype"** doppelgangers have highly similar clinical or phenotype data, as contained in the phenoData slot of the `ExpressionSet`. In order to identify duplicates this way, it is required to curate the phenoData of each ExpressionSet they have identical column names, and encode phenotypes in the same way.  For example, if each dataset provides information on age, this column of the phenoData could be called "age" in every dataset, and encoded as an integer number of years.  If the phenoData slots are NULL then this type of checking will automatically be turned off.  If they are not NULL but are also not curated, you should turn off phenotype checking by setting `phenoFinder.args=NULL`.
+* **"phenotype"** doppelgängers have highly similar clinical or phenotype data, as contained in the phenoData slot of the `ExpressionSet`. In order to identify duplicates this way, it is required to curate the phenoData of each ExpressionSet they have identical column names, and encode phenotypes in the same way.  For example, if each dataset provides information on age, this column of the phenoData could be called "age" in every dataset, and encoded as an integer number of years.  If the phenoData slots are NULL then this type of checking will automatically be turned off.  If they are not NULL but are also not curated, you should turn off phenotype checking by setting `phenoFinder.args=NULL`.
 
-* **"smoking gun"** doppelgangers have the same value for an identifier that should be unique. You can enable this type of check by setting the argument "manual.smokingguns" to the names of columns containing supposedly unique identifiers, or setting "automatic.smokingguns" to TRUE, and the function will assume any column containing unique values within the column should also be unique across datasets.
+* **"smoking gun"** doppelgängers have the same value for an identifier that should be unique. You can enable this type of check by setting the argument "manual.smokingguns" to the names of columns containing supposedly unique identifiers, or setting "automatic.smokingguns" to TRUE, and the function will assume any column containing unique values within the column should also be unique across datasets.
 
-This vignette focuses on the "expression" type of doppelganger.
+This vignette focuses on the "expression" type of doppelgänger.
+
+# Data types
+
+Identification of doppelgängers is effective for both microarray and **log-transformed** RNA-seq data, and even for matching samples that have been profiled by microarray and RNA-seq.
 
 # Case Study: Batch correction in Japanese datasets
 
@@ -69,7 +73,7 @@ summary(results1)
 
 Plot creates a histogram of sample pairwise correlations within and between each study:
 
-```{r plotdop, fig.cap="Doppelgangers identified on the basis of similar expression profiles.  The vertical red lines indicate samples that were flagged."}
+```{r plotdop, fig.cap="Doppelgängers identified on the basis of similar expression profiles.  The vertical red lines indicate samples that were flagged."}
 par(mfrow=c(2,2), las=1)
 plot(results1)
 ```

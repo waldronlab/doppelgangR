@@ -8,4 +8,5 @@ duplicate profiles for cancer types where profiles are sufficiently
 distinct.  It is intended for use when nucleotide-level sequence data
 are unavailable, and is is effective even for specimens where
 duplicated samples are profiled by different microarray technologies,
-or by a combination of microarray and RNA sequencing.
+or by a combination of microarray and log-transformed RNA-seq data.
+

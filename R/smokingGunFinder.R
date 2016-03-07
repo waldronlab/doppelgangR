@@ -15,36 +15,37 @@ smokingGunFinder <-
  ### a function to apply to IDs before comparing.  By default apply no transformation.
  separator = ":"
  ### Separator between dataset name and sample name.  Dataset names are
- ### added to sample names to keep track of dataset of origin.) {
- if (!is(eset.pair, "list") | length(eset.pair) != 2)
-   stop("eset.pair should be a list of two ExpressionSets")
- smokingmat <-
-   matrix(0,
-          nrow = ncol(eset.pair[[1]]),
-          ncol = ncol(eset.pair[[2]]))
- rownames(smokingmat) <- sampleNames(eset.pair[[1]])
- colnames(smokingmat) <- sampleNames(eset.pair[[2]])
- for (x in smokingguns) {
-   if (!(x %in% colnames(pData(eset.pair[[1]]))) |
-       !(x %in% colnames(pData(eset.pair[[2]]))))
-     next
-   pdat.vec1 <- transFun(pData(eset.pair[[1]])[, x])
-   pdat.vec2 <- transFun(pData(eset.pair[[2]])[, x])
-   for (i in 1:length(pdat.vec1)) {
-     if (is.na(pdat.vec1[i]))
-       next
-     matches <- pdat.vec2 %in% pdat.vec1[i]
-     matches[is.na(pdat.vec2)] <- FALSE
-     smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] <-
-       smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] + 1
-   }
- }
- if (.checkSameEsets(eset.pair)) {
-   smokingmat[!upper.tri(smokingmat)] <-
-     NA  ##NA for all but upper triangle.
- }
- return(smokingmat)
- ### Returns an adjacency matrix for samples where matches have value
- ### 1, non-matches have value zero.  Value for a sample against itself
- ### is NA.
- }
+ ### added to sample names to keep track of dataset of origin.
+) {
+  if (!is(eset.pair, "list") | length(eset.pair) != 2)
+    stop("eset.pair should be a list of two ExpressionSets")
+  smokingmat <-
+    matrix(0,
+           nrow = ncol(eset.pair[[1]]),
+           ncol = ncol(eset.pair[[2]]))
+  rownames(smokingmat) <- sampleNames(eset.pair[[1]])
+  colnames(smokingmat) <- sampleNames(eset.pair[[2]])
+  for (x in smokingguns) {
+    if (!(x %in% colnames(pData(eset.pair[[1]]))) |
+        !(x %in% colnames(pData(eset.pair[[2]]))))
+      next
+    pdat.vec1 <- transFun(pData(eset.pair[[1]])[, x])
+    pdat.vec2 <- transFun(pData(eset.pair[[2]])[, x])
+    for (i in 1:length(pdat.vec1)) {
+      if (is.na(pdat.vec1[i]))
+        next
+      matches <- pdat.vec2 %in% pdat.vec1[i]
+      matches[is.na(pdat.vec2)] <- FALSE
+      smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] <-
+        smokingmat[i, pdat.vec2 %in% pdat.vec1[i]] + 1
+    }
+  }
+  if (.checkSameEsets(eset.pair)) {
+    smokingmat[!upper.tri(smokingmat)] <-
+      NA  ##NA for all but upper triangle.
+  }
+  return(smokingmat)
+  ### Returns an adjacency matrix for samples where matches have value
+  ### 1, non-matches have value zero.  Value for a sample against itself
+  ### is NA.
+}

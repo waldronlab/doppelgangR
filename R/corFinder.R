@@ -15,20 +15,21 @@ corFinder <-
  ### Use the sva::ComBat function for batch correction of the expr()
  ### data between the two datasets.
  ...
- ### Extra arguments passed to the cor() function.) {
- if (!is(eset.pair, "list") || length(eset.pair) != 2)
-   stop("eset.pair should be a list of two ExpressionSets")
- if (!.checkSameEsets(eset.pair)) {
-   matrix.pair <- .getMatrixPair(eset.pair, use.ComBat)
-   cormat <- cor(matrix.pair[[1]], matrix.pair[[2]], ...)
- } else{
-   matrix.one <- exprs(eset.pair[[1]])
-   cormat <- cor(matrix.one, ...)
-   cormat[!upper.tri(cormat)] <- NA  ##NA for diagonal
- }
- return(cormat)
- ###   Returns a matrix of sample-wise Pearson Correlations.
- }
+ ### Extra arguments passed to the cor() function. 
+){
+  if (!is(eset.pair, "list") || length(eset.pair) != 2)
+    stop("eset.pair should be a list of two ExpressionSets")
+  if (!.checkSameEsets(eset.pair)) {
+    matrix.pair <- .getMatrixPair(eset.pair, use.ComBat)
+    cormat <- cor(matrix.pair[[1]], matrix.pair[[2]], ...)
+  } else{
+    matrix.one <- exprs(eset.pair[[1]])
+    cormat <- cor(matrix.one, ...)
+    cormat[!upper.tri(cormat)] <- NA  ##NA for diagonal
+  }
+  return(cormat)
+  ###   Returns a matrix of sample-wise Pearson Correlations.
+}
 
 .getMatrixPair <- function(eset.pair, use.ComBat) {
   genes.intersect <-

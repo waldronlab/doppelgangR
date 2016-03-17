@@ -1,0 +1,12 @@
+Whole-genome analysis of cancer specimens is commonplace and
+investigators frequently share or re-use specimens in later studies.
+Duplicate expression profiles in public databases will impact
+re-analysis if left undetected, a so-called “doppelgänger” effect. The
+doppelgangR package uses batch correction and outlier detection among
+pairwise expression profile correlations to accurately identify
+duplicate profiles for cancer types where profiles are sufficiently
+distinct.  It is intended for use when nucleotide-level sequence data
+are unavailable, and is is effective even for specimens where
+duplicated samples are profiled by different microarray technologies,
+or by a combination of microarray and log-transformed RNA-seq data.
+

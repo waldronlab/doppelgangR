@@ -1,0 +1,124 @@
+---
+title: "doppelgangR"
+author: "Levi Waldron"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+package: "`r pkg_ver('doppelgangR')`"
+vignette: >
+  %\VignetteIndexEntry{doppelgangR vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document:
+  toc: true
+---
+
+```{r, echo=FALSE, results='hide', eval=FALSE}
+library(knitr)
+opts_knit$set(cache=TRUE)
+```
+
+# Introduction
+
+`r BiocStyle::Biocpkg("doppelgangR")` is a package for identifying duplicate samples
+within or between datasets of transcriptome profiles. It is intended for microarray and RNA-seq gene expression profiles where biological replicates are ordinarily more distinct than technical replicates, as is the case for cancer types with "noisy" genomes. It is intended for cases where per-gene summaries are available but full genotypes are not, which is typical of public databases such as the Gene Expression Omnibus.
+
+```{r, echo=FALSE, message=FALSE}
+library(doppelgangR)
+```
+
+The `doppelgangR()` function identifies duplicates in three different ways:
+
+* **"expression"** doppelgängers have highly similar expression profiles, which are identified by default by having higher Pearson correlation than expected based on an empirical distribution of Pearson correlations between biological replicates. The type of correlation, and default use of ComBat batch correction, can be changed using the "corFinder.args" argument.
+
+* **"phenotype"** doppelgängers have highly similar clinical or phenotype data, as contained in the phenoData slot of the `ExpressionSet`. In order to identify duplicates this way, it is required to curate the phenoData of each ExpressionSet they have identical column names, and encode phenotypes in the same way.  For example, if each dataset provides information on age, this column of the phenoData could be called "age" in every dataset, and encoded as an integer number of years.  If the phenoData slots are NULL then this type of checking will automatically be turned off.  If they are not NULL but are also not curated, you should turn off phenotype checking by setting `phenoFinder.args=NULL`.
+
+* **"smoking gun"** doppelgängers have the same value for an identifier that should be unique. You can enable this type of check by setting the argument "manual.smokingguns" to the names of columns containing supposedly unique identifiers, or setting "automatic.smokingguns" to TRUE, and the function will assume any column containing unique values within the column should also be unique across datasets.
+
+This vignette focuses on the "expression" type of doppelgänger.
+
+# Data types
+
+Identification of doppelgängers is effective for both microarray and **log-transformed** RNA-seq data, and even for matching samples that have been profiled by microarray and RNA-seq.
+
+# Case Study: Batch correction in Japanese datasets
+
+We load for datasets by Yoshihara __et al.__ that have been curated
+in `r BiocStyle::Biocexptpkg("curatedOvarianData")`.  These are objects of class `ExpressionSet`.
+
+```{r, message = FALSE}
+library(curatedOvarianData)
+data(GSE32062.GPL6480_eset)
+data(GSE17260_eset)
+```
+
+The `doppelgangR` function requires a list of
+`ExpressionSet` objects as input, which we create here:
+
+```{r testesets}
+testesets <- list(JapaneseA=GSE32062.GPL6480_eset,
+                  Yoshihara2010=GSE17260_eset)
+```
+
+Now run `doppelgangR` with default arguments, except for setting `phenoFinder.args=NULL`, which turns off checking for similar clinical data in the `phenoData` slot of the ExpressionSet objects:
+
+```{r rundopp, results="hide", message=FALSE, cache=TRUE}
+results1 <- doppelgangR(testesets, phenoFinder.args=NULL)
+```
+
+This creates an object of class `DoppelGang`, which has print, summary, and plot methods.  Summary method output not shown here due to voluminous output:
+
+```{r summarizedop, results='hide'}
+summary(results1)
+```
+
+Plot creates a histogram of sample pairwise correlations within and between each study:
+
+```{r plotdop, fig.cap="Doppelgängers identified on the basis of similar expression profiles.  The vertical red lines indicate samples that were flagged."}
+par(mfrow=c(2,2), las=1)
+plot(results1)
+```
+
+One of these histograms can be drawn using the plot.pair argument:
+
+```{r}
+plot(results1, plot.pair=c("JapaneseA", "JapaneseA"))
+```
+
+# Important options
+
+## Changing sensitivity
+
+If after inspecting the histograms, you see that some visible outliers were not caught, or non-outliers exceeded the sensitivity threshold, you can change the default sensitivity using the argument:
+
+`outlierFinder.expr.args = list(bonf.prob = 0.5, transFun = atanh, tail = "upper")`
+
+The default 0.5 is a reasonable but arbitrary trade-off between sensitivity and specificity which we have found to often select dataset pairs containing duplicates, but to often not find *all* the duplicate samples.  Sensitivity can be increased by changing the bonf.prob argument, *i.e.*:
+
+```{r rundopp2, results="hide", message=FALSE, eval=FALSE}
+results1 <- doppelgangR(testesets, 
+        outlierFinder.expr.args = list(bonf.prob = 1.0, transFun = atanh, 
+                                       tail = "upper"))
+```
+
+## Use of the ExpressionSet
+
+The `doppelgangR()` function takes as its main argument a list of `ExpressionSet` objects.  If you just have matrices, you can easily convert these to the `ExpressionSet` objects, for example:
+
+```{r}
+mat <- matrix(1:4, ncol=2)
+library(Biobase)
+eset <- ExpressionSet(mat)
+class(eset)
+```
+
+## Parallelizing
+
+The `doppelgangR()` function checks all pairwise combinations of datasets in a list of `ExpressionSet` objects, and these dataset pairs can be checked in parallel using multiple processing cores using the BPPARAM argument. This functionality is imported from the \Biocpkg("BiocParallel") package. Please see "?BiocParallel::\`BiocParallelParam-class\`" documentation. 
+
+```{r, eval=FALSE}
+results2 <- doppelgangR(testesets, BPPARAM = MulticoreParam(workers = 8))
+```
+
+## Caching
+
+By default, the `doppelgangR()` function caches intermediate results to make re-running with different arguments faster.  Turn caching off by setting the argument `cache.dir=NULL`.

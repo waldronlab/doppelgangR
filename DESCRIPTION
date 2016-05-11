@@ -6,7 +6,7 @@ Suggests: BiocStyle, knitr, rmarkdown, curatedOvarianData, ROCR, pROC,
 Imports: sva, impute, digest, mnormt, methods, grDevices, graphics,
         stats, utils
 Author: Levi Waldron, Markus Riester, Marcel Ramos
-Version: 1.1.0
+Version: 1.1.1
 Date: 2016-03-14
 License: GPL (>=2.0)
 Title: Identify likely duplicate samples from genomic or meta-data

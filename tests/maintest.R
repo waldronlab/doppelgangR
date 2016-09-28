@@ -27,19 +27,22 @@ n1[, 5] <- m1[, 4] + rnorm(100, sd=0.25); ncor <- ncor+1
 ##
 ##m:10 and n:10 are phenotype doppelgangers:
 m.pdata <- matrix(letters[sample(1:26, size=110, replace=TRUE)], ncol=10)
+rownames(m.pdata) <- colnames(m1)
 n.pdata <- matrix(letters[sample(1:26, size=100, replace=TRUE)], ncol=10)
 n.pdata[10, ] <- m.pdata[10, ]; npheno <- npheno+1
+rownames(n.pdata) <- colnames(n1)
+
+
+
 ##Create ExpressionSets
-m.eset <- ExpressionSet(assayData=m1)
+m.eset <- ExpressionSet(assayData=m1, phenoData=AnnotatedDataFrame(data.frame(m.pdata)))
 m.eset$id <- toupper(colnames(m1))
-pData(m.eset) <- data.frame(c(pData(m.eset), data.frame(m.pdata)))
 ##
-n.eset <- ExpressionSet(assayData=n1)
+n.eset <- ExpressionSet(assayData=n1, phenoData=AnnotatedDataFrame(data.frame(n.pdata)))
 n.eset$id <- toupper(colnames(n1))
 ##m5 and n4 are "smoking gun" doppelgangers:
 n.eset$id[4] <- "gotcha"
 m.eset$id[5] <- "gotcha"
-pData(n.eset) <- data.frame(c(pData(n.eset), data.frame(n.pdata)))
 nsmoking <- nsmoking+1
 ##
 esets <- list(m=m.eset, n=n.eset)
@@ -50,13 +53,13 @@ esets <- list(m=m.eset, n=n.eset)
 res1 <- doppelgangR(esets, manual.smokingguns="id", automatic.smokingguns=FALSE, cache.dir=NULL)
 df1 <- summary(res1)
 
-checkIdentical(df1[df1$sample1=="m:1" & df1$sample2=="n:1", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:2" & df1$sample2=="m:3", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:6" & df1$sample2=="n:4", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="n:2" & df1$sample2=="n:3", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:6" & df1$sample2=="n:4", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:10" & df1$sample2=="n:10", "pheno.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:5" & df1$sample2=="n:4", "smokinggun.doppel"], TRUE)
+checkIdentical(df1[df1$sample1=="m:m1" & df1$sample2=="n:n1", "expr.doppel"], TRUE)
+checkIdentical(df1[df1$sample1=="m:m2" & df1$sample2=="m:m3", "expr.doppel"], TRUE)
+checkIdentical(df1[df1$sample1=="m:m6" & df1$sample2=="n:n4", "expr.doppel"], TRUE)
+checkIdentical(df1[df1$sample1=="n:n2" & df1$sample2=="n:n3", "expr.doppel"], TRUE)
+checkIdentical(df1[df1$sample1=="m:m6" & df1$sample2=="n:n4", "expr.doppel"], TRUE)
+checkIdentical(df1[df1$sample1=="m:m10" & df1$sample2=="n:n10", "pheno.doppel"], TRUE)
+checkIdentical(df1[df1$sample1=="m:m5" & df1$sample2=="n:n4", "smokinggun.doppel"], TRUE)
 checkEquals(nrow(df1), ncor+npheno+nsmoking)
 checkEquals(sum(df1$expr.doppel), ncor)
 checkEquals(sum(df1$pheno.doppel), npheno)
@@ -127,6 +130,10 @@ cat("\n")
 cat("Check caching, with a third ExpressionSet that is almost identical to the first: \n")
 ##------------------------------------------
 esets2 <- c(esets, esets[[1]])
+#newmat <- exprs(esets[[1]])
+#newmat <- newmat + rnorm(nrow(newmat) * ncol(newmat), sd=0.1)
+#ExpressionSet(assayData=exprs(esets[[1]]), phenoData=phenoData(esets[[1]]))
+
 names(esets2)[3] <- "o"
 exprs(esets2[[3]]) <- exprs(esets2[[3]]) + rnorm(nrow(esets2[[3]]) * ncol(esets2[[3]]), sd=0.1)
 esets2[[3]]$X10 <- "a"
@@ -145,7 +152,7 @@ for (i in 1:2){
 
 df6b <- summary(res6)
 df6b <- df6b[grepl("^[mo]", df6b$sample1) & grepl("^[mo]", df6b$sample2), ]
-checkIdentical(df6b[df6b$sample1=="o:X2" & df6b$sample2=="o:X3", "expr.doppel"], TRUE)
+checkIdentical(df6b[df6b$sample1=="o:Xm2" & df6b$sample2=="o:Xm3", "expr.doppel"], TRUE)
 df6b <- df6b[-1:-2, ]
 ##checkTrue(all(df6b$expr.doppel))  ## not a bug, but a shortcoming in the outlier detection that these are not all identified as expression doppelgangers.
 checkTrue(all(df6b$pheno.doppel))
@@ -212,28 +219,21 @@ cat("\n")
 cat("Smoking guns only with cache=TRUE: \n")
 ##------------------------------------------
 dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id")
-checkEquals(summary(dop)[, 1], "m:5")
-checkEquals(summary(dop)[, 2], "n:4")
+checkEquals(summary(dop)[, 1], "m:m5")
+checkEquals(summary(dop)[, 2], "n:n4")
 
 
 ##------------------------------------------
 cat("\n")
 cat("Identical ExpressionSets:\n")
 ##------------------------------------------
-# Test not passing, comment out
-# df1 <- summary(doppelgangR(esets[[1]], cache.dir=NULL))
-# checkTrue(df1$sample1 == 3)
-# checkTrue(df1$sample2 == 2)
+df1 <- summary(doppelgangR(esets[[1]], cache.dir=NULL))
+checkTrue(df1$sample1 == "m2")
+checkTrue(df1$sample2 == "m3")
 ##
-# df2 <- summary(doppelgangR(esets[[2]], cache.dir=NULL))
-# checkTrue(all(df2$sample1 == c(3, 9)))
-# checkTrue(all(df2$sample2 == c(2, 8)))
-##
-# df3 <- summary(doppelgangR(list(ExpressionSet1=esets[[1]], ExpressionSet2=esets[[1]]), cache.dir=NULL))
-# checkTrue(nrow(df1) * 4 + ncol(esets[[1]]) == nrow(df3))
-##
-# df4 <- summary(doppelgangR(list(ExpressionSet1=esets[[2]], ExpressionSet2=esets[[2]]), cache.dir=NULL, outlierFinder.expr.args = list(bonf.prob = 2, transFun = atanh, tail = "upper")))
-# checkTrue(nrow(df2) * 4 + ncol(esets[[2]]) == nrow(df4))
+df2 <- summary(doppelgangR(esets[[2]], cache.dir=NULL))
+checkTrue(all(df2$sample1 == "n2"))
+checkTrue(all(df2$sample2 == "n3"))
 ##
 df5 <- summary(doppelgangR(list(eset1=esets[[1]], eset2=esets[[2]]), cache.dir=NULL))
 df6 <- summary(doppelgangR(esets, cache.dir=NULL))
@@ -261,3 +261,4 @@ esets4 <- esets
     pData(esets4[[i]]) <- pData(esets4[[i]])[1]
 doppelgangR(esets4[[1]])
 doppelgangR(esets4[[2]])
+

@@ -1,33 +1,23 @@
 Package: doppelgangR
 Maintainer: Levi Waldron <lwaldron.research@gmail.com>
 Depends: R (>= 3.3), Biobase, BiocParallel
-Suggests:
-    BiocStyle,
-    knitr,
-    rmarkdown,
-    curatedOvarianData,
-    ROCR,
-    pROC,
-    RUnit,
-    simulatorZ,
-    proxy,
-Imports:
-    sva,
-    impute,
-    digest,
-    mnormt,
-    methods
+Suggests: BiocStyle, knitr, rmarkdown, curatedOvarianData, ROCR, pROC,
+        RUnit, simulatorZ, proxy
+Imports: sva, impute, digest, mnormt, methods, grDevices, graphics,
+        stats, utils
 Author: Levi Waldron, Markus Riester, Marcel Ramos
-Version: 0.99.0
-Date: 2016-03-07
+Version: 1.1.3
+Date: 2016-09-28
 License: GPL (>=2.0)
 Title: Identify likely duplicate samples from genomic or meta-data
 Description: The main function is doppelgangR(), which takes as minimal
-   input a list of ExpressionSet object, and searches all list pairs for
-   duplicated samples.  The search is based on the genomic data (exprs(eset)),
-   phenotype/clinical data (pData(eset)), and "smoking guns" - supposedly unique
-   identifiers found in pData(eset).
+        input a list of ExpressionSet object, and searches all list
+        pairs for duplicated samples.  The search is based on the
+        genomic data (exprs(eset)), phenotype/clinical data
+        (pData(eset)), and "smoking guns" - supposedly unique
+        identifiers found in pData(eset).
 URL: https://github.com/lwaldron/doppelgangR
 BugReports: https://github.com/lwaldron/doppelgangR/issues
-VignetteBuilder: rmarkdown
+VignetteBuilder: knitr
 biocViews: RNASeq, Microarray, GeneExpression, QualityControl
+NeedsCompilation: no

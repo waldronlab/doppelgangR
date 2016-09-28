@@ -92,7 +92,7 @@ If after inspecting the histograms, you see that some visible outliers were not 
 
 `outlierFinder.expr.args = list(bonf.prob = 0.5, transFun = atanh, tail = "upper")`
 
-The default 0.5 is a reasonable but arbitrary trade-off between sensitivity and specificity that , which we have found to often select dataset pairs containing duplicates, but to often not find *all* the duplicate samples.  Sensitivity can be increased by changing the bonf.prob argument, *i.e.*:
+The default 0.5 is a reasonable but arbitrary trade-off between sensitivity and specificity which we have found to often select dataset pairs containing duplicates, but to often not find *all* the duplicate samples.  Sensitivity can be increased by changing the bonf.prob argument, *i.e.*:
 
 ```{r rundopp2, results="hide", message=FALSE, eval=FALSE}
 results1 <- doppelgangR(testesets, 
@@ -111,7 +111,7 @@ eset <- ExpressionSet(mat)
 class(eset)
 ```
 
-## Parallizing
+## Parallelizing
 
 The `doppelgangR()` function checks all pairwise combinations of datasets in a list of `ExpressionSet` objects, and these dataset pairs can be checked in parallel using multiple processing cores using the BPPARAM argument. This functionality is imported from the \Biocpkg("BiocParallel") package. Please see "?BiocParallel::\`BiocParallelParam-class\`" documentation. 
 

@@ -80,7 +80,7 @@ phenoDist <-
       return(cut(x, breaks = bins))
     as.factor(x)
   }
-  idx <- sapply(X, is.numeric)
+  idx <- apply(X, 2L, is.numeric)
   if (sum(idx) == 0)
     return(X)
   X[, idx] <-

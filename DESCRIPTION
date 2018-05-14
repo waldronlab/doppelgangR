@@ -1,23 +1,46 @@
 Package: doppelgangR
-Maintainer: Levi Waldron <lwaldron.research@gmail.com>
-Depends: R (>= 3.3), Biobase, BiocParallel
-Suggests: BiocStyle, knitr, rmarkdown, curatedOvarianData, ROCR, pROC,
-        RUnit, simulatorZ, proxy
-Imports: sva, impute, digest, mnormt, methods, grDevices, graphics,
-        stats, utils
-Author: Levi Waldron, Markus Riester, Marcel Ramos
-Version: 1.9.0
-Date: 2017-04-25
-License: GPL (>=2.0)
 Title: Identify likely duplicate samples from genomic or meta-data
+Version: 1.1.4
+Authors@R: c(person("Levi", "Waldron", email = "lwaldron.research@gmail.com",
+    role = c("aut", "cre")),
+    person("Markus", "Reister", email = "markus.riester@novartis.com",
+    role = c("aut", "ctb")),
+    person("Marcel", "Ramos", email = "marcel.ramos@roswellpark.org",
+    role = "ctb"))
 Description: The main function is doppelgangR(), which takes as minimal
-        input a list of ExpressionSet object, and searches all list
-        pairs for duplicated samples.  The search is based on the
-        genomic data (exprs(eset)), phenotype/clinical data
-        (pData(eset)), and "smoking guns" - supposedly unique
-        identifiers found in pData(eset).
+    input a list of ExpressionSet object, and searches all list
+    pairs for duplicated samples.  The search is based on the
+    genomic data (exprs(eset)), phenotype/clinical data
+    (pData(eset)), and "smoking guns" - supposedly unique
+    identifiers found in pData(eset).
+Depends:
+    R (>= 3.5.0),
+    Biobase,
+    BiocParallel
+Imports:
+    sva,
+    impute,
+    digest,
+    mnormt,
+    methods,
+    grDevices,
+    graphics,
+    stats,
+    utils
+Suggests:
+    BiocStyle,
+    knitr,
+    rmarkdown,
+    curatedOvarianData,
+    ROCR,
+    pROC,
+    RUnit,
+    simulatorZ,
+    proxy
+biocViews: RNASeq, Microarray, GeneExpression, QualityControl
+License: GPL (>=2.0)
+Encoding: UTF-8
 URL: https://github.com/lwaldron/doppelgangR
 BugReports: https://github.com/lwaldron/doppelgangR/issues
 VignetteBuilder: knitr
-biocViews: RNASeq, Microarray, GeneExpression, QualityControl
-NeedsCompilation: no
+

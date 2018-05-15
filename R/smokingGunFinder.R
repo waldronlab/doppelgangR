@@ -1,3 +1,30 @@
+#' Find doppelgangers based on "smoking gun" phenotypes - those that should be
+#' unique to each patient.
+#' 
+#' Checks all pairwise combinations of samples for values of the "smoking" gun
+#' phenotypes that are identical.
+#' 
+#' 
+#' @param eset.pair a list of ExpressionSets, with two elements.  If the two
+#' elements are identical, the function will check for duplicate IDs within one
+#' element. If not identical, it will check for duplicate IDs between elements.
+#' @param smokingguns phenoData column names found in multiple elements of
+#' eset.pair that may contain "smoking guns" such as identifiers that should be
+#' unique to each sample.
+#' @param transFun a function to apply to IDs before comparing.  By default
+#' apply no transformation.
+#' @param separator Separator between dataset name and sample name.  Dataset
+#' names are added to sample names to keep track of dataset of origin.
+#' @return Returns an adjacency matrix for samples where matches have value 1,
+#' non-matches have value zero.  Value for a sample against itself is NA.
+#' @author Levi Waldron, Markus Riester, Marcel Ramos
+#' @examples
+#' 
+#' example("phenoFinder")
+#' 
+#' smokingGunFinder(esets2, "days_to_death")
+#' 
+#' @export smokingGunFinder
 smokingGunFinder <-
   function  #Find doppelgangers based on "smoking gun" phenotypes - those that should be unique to each patient.
 ### Checks all pairwise combinations of samples for values of the

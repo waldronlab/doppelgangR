@@ -30,11 +30,11 @@
 #' @author Fabio Da Col, Marcel Ramos
 #' 
 #' @export colFinder
-colFinder <- function(summex.list, ...){
-  if(!is(summex.list, "list") | length(summex.list) != 2){
-    stop("list should be a list of length 2")
-  }
-  if(!identical(colnames(colData(summex.list[[1]])), colnames(colData(summex.list[[2]])))){
+colFinder <- function(summex.list, ...) {
+    if (!is(summex.list, "list") | length(summex.list) != 2)
+        stop("list should be a list of length 2")
+
+  if (!identical(colnames(colData(summex.list[[1]])), colnames(colData(summex.list[[2]])))) {
     stop(
       "Slots of list must have identical column names, e.g.
       identical(colnames(colData(summex.list[[1]])), colnames(colData(summex.list[[2]])))"

@@ -1,3 +1,28 @@
+#' Calculate pair-wise correlations between samples using the expr() slots of a
+#' list of two ExpressionSets.
+#' 
+#' This function acts as a wrapper around ComBat (sva package) and cor(), to
+#' calculate pairwise correlations within one or between two ExpressionSets.
+#' 
+#' 
+#' @param eset.pair a list of ExpressionSets, with two elements.  If the two
+#' elements are identical, return the correlation matrix for pairs of samples
+#' in the first element.  If not identical, return pairs between the two
+#' elements.
+#' @param separator Separator between dataset name and sample name.  Dataset
+#' names are added to sample names to keep track of dataset of origin.
+#' @param use.ComBat Use the sva::ComBat function for batch correction of the
+#' expr() data between the two datasets.
+#' @param \dots Extra arguments passed to the cor() function.
+#' @return Returns a matrix of sample-wise Pearson Correlations.
+#' @author Levi Waldron, Markus Riester, Marcel Ramos
+#' @examples
+#' 
+#' example("phenoFinder")
+#' 
+#' corFinder(esets2)
+#' 
+#' @export corFinder
 corFinder <-
   function  # Calculate pair-wise correlations between samples using the expr() slots of a list of two ExpressionSets.
 ### This function acts as a wrapper around ComBat (sva package) and

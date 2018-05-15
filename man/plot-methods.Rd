@@ -66,7 +66,8 @@ c("TCGA.13.2060", "TCGA.24.2290", "TCGA.25.2392", "TCGA.25.2404",
 keep.tcga <- unique(c(keep.tcga, sampleNames(TCGA_eset)[1:200]))
 testesets <- list(Bonome08=GSE26712_eset, TCGA=TCGA_eset[, keep.tcga])
 results1 <- doppelgangR(testesets,
-                        corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
+    corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL,
+    cache.dir=NULL)
 plot(results1)
 }
 \author{

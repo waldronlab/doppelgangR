@@ -1,26 +1,24 @@
-.checkSameSets <- function(sets){
-  matrix.one <- assay(sets[[1]])
-  dimnames(matrix.one) <- NULL
-  matrix.two <- assay(sets[[2]])
-  dimnames(matrix.two) <- NULL
-  coldata.one <- colData(sets[[1]])
-  rownames(coldata.one) <- NULL
-  coldata.two <- colData(sets[[2]])
-  rownames(coldata.two) <- NULL
-  output <- 
-    identical(matrix.one, matrix.two) &&
-    identical(coldata.one, coldata.two)
-  return(output)
+.checkSameSets <- function(sets) {
+    matrix.one <- SummarizedExperiment::assay(sets[[1]])
+    dimnames(matrix.one) <- NULL
+    matrix.two <- SummarizedExperiment::assay(sets[[2]])
+    dimnames(matrix.two) <- NULL
+    coldata.one <- SummarizedExperiment::colData(sets[[1]])
+    rownames(coldata.one) <- NULL
+    coldata.two <- SummarizedExperiment::colData(sets[[2]])
+    rownames(coldata.two) <- NULL
+
+    identical(matrix.one, matrix.two) && identical(coldata.one, coldata.two)
 }
 
 #' Calculate pairwise similarities of colData between samples for a list
 #' containing two DataFrame
-#' 
+#'
 #' This function acts as a wrapper to colData to handle cases of one
 #' DataFrame, a list of two identical DataFrame, or a list of two
 #' different DataFrame
-#' 
-#' 
+#'
+#'
 #' @param summex.list input: a list of DataFrame with two elements, or a
 #' DataFrame. If the two elements are identical, return the correlation
 #' matrix for pairs of samples in the first element.  If not identical, return
@@ -28,7 +26,7 @@
 #' @param \dots Extra arguments passed on to colFinder
 #' @return A matrix of similarities between the colData of pairs of samples.
 #' @author Fabio Da Col, Marcel Ramos
-#' 
+#'
 #' @export colFinder
 colFinder <- function(summex.list, ...) {
     if (!is(summex.list, "list") | length(summex.list) != 2)
@@ -47,7 +45,7 @@ colFinder <- function(summex.list, ...) {
     !all(is.na(x))
   })
   keep.col <- keep.col[names(keep.col) %in% colnames(matrix.one)]
-  matrix.one <- 
+  matrix.one <-
     subset(matrix.one, select = match(names(keep.col), colnames(matrix.one)))
   matrix.one <- subset(matrix.one, select = keep.col)
   if(.checkSameSets(summex.list)){

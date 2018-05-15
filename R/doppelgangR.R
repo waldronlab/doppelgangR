@@ -1,9 +1,9 @@
 #' doppelgangR
-#' 
+#'
 #' Identify samples with suspiciously high correlations and phenotype
 #' similarities
-#' 
-#' 
+#'
+#'
 #' @param esets a list of ExpressionSets, containing the numeric and phenotypic
 #' data to be analyzed.
 #' @param separator a delimitor to use between dataset names and sample names
@@ -44,18 +44,20 @@
 #' @author Levi Waldron, Markus Riester, Marcel Ramos
 #' @seealso ?BiocParallel::`BiocParallelParam-class`
 #' @examples
-#' 
+#'
 #' example("phenoFinder")
-#' 
+#'
 #' results2 <- doppelgangR(esets2, cache.dir = NULL)
 #' results2
 #' plot(results2)
 #' summary(results2)
 #' ## Set phenoFinder.args=NULL to ignore similar phenotypes, and
 #' ## turn off ComBat batch correction:
-#' ##    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
+#' ##    results2 <- doppelgangR(testesets,
+#' ##    corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL,
+#' ##    cache.dir=NULL)
 #' ##    summary(results2)
-#' 
+#'
 #' @export doppelgangR
 doppelgangR <- structure(
   function

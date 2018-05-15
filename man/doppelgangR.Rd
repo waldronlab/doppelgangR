@@ -86,7 +86,9 @@ plot(results2)
 summary(results2)
 ## Set phenoFinder.args=NULL to ignore similar phenotypes, and
 ## turn off ComBat batch correction:
-##    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
+##    results2 <- doppelgangR(testesets,
+##    corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL,
+##    cache.dir=NULL)
 ##    summary(results2)
 
 }

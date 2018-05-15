@@ -1,8 +1,8 @@
 #' DoppelGang S4 class
-#' 
+#'
 #' S4 class containing results of doppelgangR() function.
-#' 
-#' 
+#'
+#'
 #' @name DoppelGang-class
 #' @aliases DoppelGang-class DoppelGang
 #' @docType class
@@ -31,7 +31,7 @@ setGeneric("plot")
 setMethod("summary", signature(object = "DoppelGang"),
           function(object)
             object@summaryresults)
- 
+
 #' @name DoppelGang-class
 #' @aliases show,DoppelGang-method
 #' @export
@@ -64,12 +64,12 @@ setMethod("print", signature(x = "DoppelGang"),
 
 #' Histograms of all pairwise sample correlations, showing identified
 #' doppelgangers.
-#' 
+#'
 #' Identified doppelgangers are shown with a red vertical line overlaid on a
 #' histogram of pairwise sample correlations.  One plot is made per pair of
 #' datasets.
-#' 
-#' 
+#'
+#'
 #' @name plot-methods
 #' @aliases plot-methods plot,DoppelGang plot,DoppelGang-method
 #' plot,DoppelGang,ANY-method plot.DoppelGang plot.doppelgangR
@@ -88,7 +88,7 @@ setMethod("print", signature(x = "DoppelGang"),
 #' @author Levi Waldron
 #' @keywords methods
 #' @examples
-#' 
+#'
 #' library(curatedOvarianData)
 #' data(TCGA_eset)
 #' data(GSE26712_eset)
@@ -113,7 +113,8 @@ setMethod("print", signature(x = "DoppelGang"),
 #' keep.tcga <- unique(c(keep.tcga, sampleNames(TCGA_eset)[1:200]))
 #' testesets <- list(Bonome08=GSE26712_eset, TCGA=TCGA_eset[, keep.tcga])
 #' results1 <- doppelgangR(testesets,
-#'                         corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
+#'     corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL,
+#'     cache.dir=NULL)
 #' plot(results1)
 #' @export
 setMethod("plot", signature(x = "DoppelGang"),

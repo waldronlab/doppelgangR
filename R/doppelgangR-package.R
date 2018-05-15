@@ -1,12 +1,12 @@
 
 #' Identify likely duplicate samples from genomic or meta-data
-#' 
+#'
 #' The main function is doppelgangR(), which takes as minimal input a list of
 #' ExpressionSet object, and searches all list pairs for duplicated samples.
 #' The search is based on the genomic data (exprs(eset)), phenotype/clinical
 #' data (pData(eset)), and "smoking guns" - supposedly unique identifiers found
 #' in pData(eset).
-#' 
+#'
 #' @importFrom Biobase exprs featureNames sampleNames pData "sampleNames<-"
 #' "exprs<-" "pData<-"
 #' @importFrom BiocParallel bplapply bpparam
@@ -24,11 +24,12 @@
 #'           resid rnorm runif uniroot var
 #'           weighted.mean
 #' @importFrom utils combn
-#' 
+#' @importFrom SummarizedExperiment assay colData
+#'
 #' @name doppelgangR-package
 #' @aliases NULL doppelgangR-package
 #' @docType package
 #' @author Levi Waldron, Markus Riester, Marcel Ramos
-#' 
+#'
 #' @keywords package
 "_PACKAGE"

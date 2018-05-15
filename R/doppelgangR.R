@@ -1,3 +1,62 @@
+#' doppelgangR
+#' 
+#' Identify samples with suspiciously high correlations and phenotype
+#' similarities
+#' 
+#' 
+#' @param esets a list of ExpressionSets, containing the numeric and phenotypic
+#' data to be analyzed.
+#' @param separator a delimitor to use between dataset names and sample names
+#' @param corFinder.args a list of arguments to be passed to the corFinder
+#' function.
+#' @param phenoFinder.args a list of arguments to be passed to the phenoFinder
+#' function.  If NULL, samples with similar phenotypes will not be searched
+#' for.
+#' @param outlierFinder.expr.args a list of arguments to be passed to
+#' outlierFinder when called for expression data
+#' @param outlierFinder.pheno.args a list of arguments to be passed to
+#' outlierFinder when called for phenotype data
+#' @param smokingGunFinder.args a list of arguments to be passed to
+#' smokingGunFinder
+#' @param impute.knn.args a list of arguments to be passed to
+#' impute::impute.knn.  Set to NULL to do no knn imputation.
+#' @param manual.smokingguns a character vector of phenoData columns that, if
+#' identical, will be considered evidence of duplication
+#' @param automatic.smokingguns automatically look for "smoking guns."  If
+#' TRUE, look for phenotype variables that are unique to each patient in
+#' dataset 1, also unique to each patient in dataset 2, but contain exact
+#' matches between datasets 1 and 2.
+#' @param within.datasets.only If TRUE, only search within each dataset for
+#' doppelgangers.
+#' @param intermediate.pruning The default setting FALSE will result in output
+#' with no missing values, but uses extra memory because all results from the
+#' expression, phenotype, and smoking gun doppelganger searches must be saved
+#' until the end.  Setting this to TRUE will save memory for very large
+#' searches, but distance metrics will only be available if that value was
+#' identified as a doppelganger (for example, phenotype doppelgangers will have
+#' missing values for the expression and smoking gun similarity).
+#' @param cache.dir The name of a directory in which to cache or look up
+#' results to save re-calculating correlations.  Set to NULL for no caching.
+#' @param BPPARAM Argument for BiocParallel::bplapply(), by default will use
+#' all cores of a multi-core machine
+#' @param verbose Print progress information
+#' @return Returns an object of S4-class "DoppelGang".  See ?DoppelGang-class.
+#' @author Levi Waldron, Markus Riester, Marcel Ramos
+#' @seealso ?BiocParallel::`BiocParallelParam-class`
+#' @examples
+#' 
+#' example("phenoFinder")
+#' 
+#' results2 <- doppelgangR(esets2, cache.dir = NULL)
+#' results2
+#' plot(results2)
+#' summary(results2)
+#' ## Set phenoFinder.args=NULL to ignore similar phenotypes, and
+#' ## turn off ComBat batch correction:
+#' ##    results2 <- doppelgangR(testesets, corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL, cache.dir=NULL)
+#' ##    summary(results2)
+#' 
+#' @export doppelgangR
 doppelgangR <- structure(
   function
   ### Identify samples with suspiciously high correlations and phenotype similarities

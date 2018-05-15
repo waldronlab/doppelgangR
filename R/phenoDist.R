@@ -1,5 +1,34 @@
-
-
+#' Calculate distance between two vectors, rows of one matrix/dataframe, or
+#' rows of two matrices/dataframes.
+#' 
+#' This function does some simple looping to allow x and y to be various
+#' combinations of vectors and matrices/dataframes.
+#' 
+#' 
+#' @param x A vector, matrix or dataframe
+#' @param y NULL, a vector, matrix, or dataframe.  If x is a vector, y must
+#' also be specified.
+#' @param bins discretize continuous fields in the specified number of bins
+#' @param vectorDistFun A function of two vectors that returns the distance
+#' between those vectors.
+#' @param \dots Extra arguments passed on to vectorDistFun
+#' @return a matrix of distances between pairs of rows of x (if y is
+#' unspecified), or between all pairs of rows between x and y (if both are
+#' provided).
+#' @author Levi Waldron, Markus Riester, Marcel Ramos
+#' @examples
+#' 
+#' example("phenoFinder")
+#' 
+#' pdat1 <- pData(esets2[[1]])
+#' pdat2 <- pData(esets2[[2]])
+#' 
+#' ## Use phenoDist() to calculate a weighted distance matrix
+#' distmat <- phenoDist(as.matrix(pdat1), as.matrix(pdat2))
+#' ## Note outliers with identical clinical data, these are probably the same patients:
+#' graphics::boxplot(distmat)
+#' 
+#' @export phenoDist
 phenoDist <-
   structure(
     function #Calculate distance between two vectors, rows of one matrix/dataframe, or rows of two matrices/dataframes.

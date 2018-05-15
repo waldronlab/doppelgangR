@@ -43,4 +43,4 @@ Encoding: UTF-8
 URL: https://github.com/lwaldron/doppelgangR
 BugReports: https://github.com/lwaldron/doppelgangR/issues
 VignetteBuilder: knitr
-
+RoxygenNote: 6.0.1

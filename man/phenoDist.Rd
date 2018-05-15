@@ -41,6 +41,32 @@ distmat <- phenoDist(as.matrix(pdat1), as.matrix(pdat2))
 ## Note outliers with identical clinical data, these are probably the same patients:
 graphics::boxplot(distmat)
 
+\dontrun{
+   library(curatedOvarianData)
+   data(GSE32063_eset)
+   data(GSE17260_eset)
+   pdat1 <- pData(GSE32063_eset)
+   pdat2 <- pData(GSE17260_eset)
+   ## Curation of the alternative sample identifiers makes duplicates stand out more:
+   pdat1$alt_sample_name <-
+     paste(pdat1$sample_type,
+           gsub("[^0-9]", "", pdat1$alt_sample_name),
+           sep = "_")
+   pdat2$alt_sample_name <-
+     paste(pdat2$sample_type,
+           gsub("[^0-9]", "", pdat2$alt_sample_name),
+           sep = "_")
+   ## Removal of columns that cannot possibly match also helps duplicated patients to stand out
+   pdat1 <-
+     pdat1[,!grepl("uncurated_author_metadata", colnames(pdat1))]
+   pdat2 <-
+     pdat2[,!grepl("uncurated_author_metadata", colnames(pdat2))]
+   ## Use phenoDist() to calculate a weighted distance matrix
+   distmat <- phenoDist(as.matrix(pdat1), as.matrix(pdat2))
+   ## Note outliers with identical clinical data, these are probably the same patients:
+   graphics::boxplot(distmat)
+}
+
 }
 \author{
 Levi Waldron, Markus Riester, Marcel Ramos

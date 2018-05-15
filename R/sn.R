@@ -74,7 +74,8 @@ dst <-
       2 * pdf * cdf / scale
   }
 
-
+#' @export
+#' @name dst
 rst <-
   function (n = 1,
             location = 0,
@@ -100,6 +101,8 @@ rst <-
     return(y)
   }
 
+#' @export
+#' @name dst
 pst <-
   function (x,
             location = 0,
@@ -155,6 +158,8 @@ pst <-
     }
   }
 
+#' @export
+#' @name dst
 qst <- function (p,
                  location = 0,
                  scale = 1,
@@ -205,86 +210,6 @@ qst <- function (p,
   x <- replace(x, one, Inf)
   return(as.numeric(location + scale * x))
 }
-
-st.mle <- function(X,
-                   y,
-                   freq,
-                   start,
-                   fixed.df = NA,
-                   trace = FALSE,
-                   algorithm = c("nlminb", "Nelder-Mead", "BFGS", "CG", "SANN"),
-                   control = list())
-{
-  y.name  <- deparse(substitute(y))
-  y <- data.matrix(y)
-  if (missing(X))
-    X <- matrix(1, nrow = length(y), ncol = 1)
-  dimnames(y)[[2]] <- list(y.name)
-  if (missing(start)) {
-    cp0 <- sn.mle(
-      X = X,
-      y = y,
-      plot.it = FALSE,
-      trace = trace
-    )$cp
-    m <- length(cp0) - 2
-    cp0[m + 2] <- cp0[m + 2] * 0.9
-    mle0 <- cp.to.dp(cp0)
-    start <- list(
-      beta = mle0[1:m],
-      Omega = matrix(mle0[m + 1] ^ 2, 1, 1),
-      alpha = mle0[m + 2],
-      df = 10
-    )
-  }
-  else {
-    m <- length(start) - 3
-    if (m < 1)
-      stop("bad start vector")
-    start <-
-      list(
-        beta = start[1:m],
-        Omega = matrix(start[m + 1] ^ 2, 1, 1),
-        alpha = start[m + 2],
-        df = start[m + 3]
-      )
-  }
-  fit <-
-    mst.mle(
-      X,
-      y,
-      freq,
-      start = start,
-      fixed.df = fixed.df,
-      trace = trace,
-      algorithm = algorithm,
-      control = control
-    )
-  mle <- list()
-  mle$call <- match.call()
-  dp <- fit$dp
-  se <- fit$se
-  p  <- length(dp$beta)
-  dp.names <- c(if (p == 1)
-    "location"
-    else
-      dimnames(dp$beta)[[1]],
-    "scale", "shape", "df")
-  mle$dp  <-
-    c(dp$beta, sqrt(as.vector(dp$Omega)), dp$alpha, dp$df)
-  names(mle$dp) <- dp.names
-  mle$se <- if (all(is.na(se)))
-    NA
-  else
-    c(se$beta, mle$dp[p + 1] * se$internal[p + 1],
-      se$alpha, dp$df * se$internal[p + 3])
-  mle$logL <- fit$logL
-  mle$algorithm <- fit$algorithm
-  mle
-}
-
-
-
 
 #' Maximum likelihood estimation for a (multivariate) skew-t distribution
 #' 
@@ -556,3 +481,83 @@ mst.mle <-
       algorithm = opt
     )
   }
+
+#' @export
+#' @name mst.mle
+st.mle <- function(X,
+                   y,
+                   freq,
+                   start,
+                   fixed.df = NA,
+                   trace = FALSE,
+                   algorithm = c("nlminb", "Nelder-Mead", "BFGS", "CG", "SANN"),
+                   control = list())
+{
+  y.name  <- deparse(substitute(y))
+  y <- data.matrix(y)
+  if (missing(X))
+    X <- matrix(1, nrow = length(y), ncol = 1)
+  dimnames(y)[[2]] <- list(y.name)
+  if (missing(start)) {
+    cp0 <- sn.mle(
+      X = X,
+      y = y,
+      plot.it = FALSE,
+      trace = trace
+    )$cp
+    m <- length(cp0) - 2
+    cp0[m + 2] <- cp0[m + 2] * 0.9
+    mle0 <- cp.to.dp(cp0)
+    start <- list(
+      beta = mle0[1:m],
+      Omega = matrix(mle0[m + 1] ^ 2, 1, 1),
+      alpha = mle0[m + 2],
+      df = 10
+    )
+  }
+  else {
+    m <- length(start) - 3
+    if (m < 1)
+      stop("bad start vector")
+    start <-
+      list(
+        beta = start[1:m],
+        Omega = matrix(start[m + 1] ^ 2, 1, 1),
+        alpha = start[m + 2],
+        df = start[m + 3]
+      )
+  }
+  fit <-
+    mst.mle(
+      X,
+      y,
+      freq,
+      start = start,
+      fixed.df = fixed.df,
+      trace = trace,
+      algorithm = algorithm,
+      control = control
+    )
+  mle <- list()
+  mle$call <- match.call()
+  dp <- fit$dp
+  se <- fit$se
+  p  <- length(dp$beta)
+  dp.names <- c(if (p == 1)
+    "location"
+    else
+      dimnames(dp$beta)[[1]],
+    "scale", "shape", "df")
+  mle$dp  <-
+    c(dp$beta, sqrt(as.vector(dp$Omega)), dp$alpha, dp$df)
+  names(mle$dp) <- dp.names
+  mle$se <- if (all(is.na(se)))
+    NA
+  else
+    c(se$beta, mle$dp[p + 1] * se$internal[p + 1],
+      se$alpha, dp$df * se$internal[p + 3])
+  mle$logL <- fit$logL
+  mle$algorithm <- fit$algorithm
+  mle
+}
+

@@ -8,6 +8,7 @@
 #' @docType class
 #' @section Objects from the Class: Objects can be created by calls of the form
 #' \code{new(DoppelGang ...)}
+#' @param x,object A DoppelGang class object
 #' @author Levi Waldron and Markus Riester
 #' @seealso \code{\link{plot,DoppelGang-method}}
 #' @export
@@ -23,39 +24,16 @@ setClass(
 setGeneric("print")
 setGeneric("summary")
 setGeneric("plot")
-#setGeneric("show")
 
-#' Summarizes a DoppelGang object
-#' 
-#' Summarizes the @summaryresults slot of a DoppelGang object.
-#' 
-#' 
-#' @name summary-methods
-#' @aliases summary-methods summary,DoppelGang-method
-#' @docType methods
-#' @section Methods: \describe{ \item{list("signature(object =
-#' \"DoppelGang\")")}{ Summarizes the @summaryresults slot of a DoppelGang
-#' object.  } }
-#' @keywords methods
+#' @name DoppelGang-class
+#' @aliases summary,DoppelGang-method
 #' @export
 setMethod("summary", signature(object = "DoppelGang"),
           function(object)
             object@summaryresults)
-
-#' Show a DoppelGang object
-#' 
-#' Formats a summary of the DoppelGang object.
-#' 
-#' 
-#' @name show-methods
-#' @aliases show-methods show,DoppelGang-method
-#' @docType methods
-#' @section Methods:
-#' 
-#' \item{\code{signature(object = \"DoppelGang\")}}
-#' { Summaryizes the @@summaryresults slot of a DoppelGang object } 
-#' 
-#' @keywords methods
+ 
+#' @name DoppelGang-class
+#' @aliases show,DoppelGang-method
 #' @export
 setMethod("show", signature(object = "DoppelGang"),
           function(object) {
@@ -77,21 +55,8 @@ setMethod("show", signature(object = "DoppelGang"),
             cat (" \n ")
           })
 
-#' Print a DoppelGang object
-#' 
-#' Prints the @summaryresults slot of a DoppelGang object.
-#' 
-#' 
-#' @name print-methods
-#' @aliases print-methods print,DoppelGang-method
-#' @docType methods
-#' @section Methods: \describe{
-#' 
-#' \item{list("signature(x = \"DoppelGang\")")}{ Prints the @summaryresults
-#' slot of a DoppelGang object. }
-#' 
-#' }
-#' @keywords methods
+#' @name DoppelGang-class
+#' @aliases print,DoppelGang-method
 #' @export
 setMethod("print", signature(x = "DoppelGang"),
           function(x)

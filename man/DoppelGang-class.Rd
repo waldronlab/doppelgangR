@@ -4,7 +4,23 @@
 \name{DoppelGang-class}
 \alias{DoppelGang-class}
 \alias{DoppelGang}
+\alias{DoppelGang-class}
+\alias{summary,DoppelGang-method}
+\alias{DoppelGang-class}
+\alias{show,DoppelGang-method}
+\alias{DoppelGang-class}
+\alias{print,DoppelGang-method}
 \title{DoppelGang S4 class}
+\usage{
+\S4method{summary}{DoppelGang}(object)
+
+\S4method{show}{DoppelGang}(object)
+
+\S4method{print}{DoppelGang}(x)
+}
+\arguments{
+\item{x, object}{A DoppelGang class object}
+}
 \description{
 S4 class containing results of doppelgangR() function.
 }

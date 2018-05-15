@@ -3,9 +3,15 @@
 \name{mst.mle}
 \alias{mst.mle}
 \alias{st.mle}
+\alias{mst.mle}
+\alias{st.mle}
 \title{Maximum likelihood estimation for a (multivariate) skew-t distribution}
 \usage{
 mst.mle(X, y, freq, start, fixed.df = NA, trace = FALSE,
+  algorithm = c("nlminb", "Nelder-Mead", "BFGS", "CG", "SANN"),
+  control = list())
+
+st.mle(X, y, freq, start, fixed.df = NA, trace = FALSE,
   algorithm = c("nlminb", "Nelder-Mead", "BFGS", "CG", "SANN"),
   control = list())
 }

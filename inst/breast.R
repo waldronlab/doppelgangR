@@ -4,14 +4,14 @@ breast.packages <- c("breastCancerMAINZ", "breastCancerNKI", "breastCancerTRANSB
 
 other.packages <- "WGCNA"
 
-if (!require(BiocInstaller))
-    stop("You need to install Bioconductor, which includes BiocInstaller.")
+if (!require(BiocManager))
+    stop("You need to install BiocManager from CRAN")
 
 
 for (pkg in breast.packages){
     if(!require(package=pkg, character.only=TRUE)){
         print(paste("Need to install", pkg))
-        biocLite(pkg, suppressUpdates=TRUE, suppressAutoUpdate=TRUE, ask=FALSE)
+        install(pkg, update=FALSE)
     }
 }
 
@@ -19,7 +19,7 @@ for (pkg in breast.packages){
 for (pkg in other.packages){
     if(!require(package=pkg, character.only=TRUE)){
         print(paste("Need to install", pkg))
-        biocLite(pkg, suppressUpdates=TRUE, suppressAutoUpdate=TRUE, ask=FALSE)
+        install(pkg, update=FALSE)
     }
 }
 

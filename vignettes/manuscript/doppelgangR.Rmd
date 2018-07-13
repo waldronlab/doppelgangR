@@ -309,10 +309,10 @@ legend("bottomright", lty=1:3, bty="n", cex=0.7,
 \subsection{Using Spearman correlation}
 
 ```{r rundoptcgaspearman, results="hide", message=FALSE, echo=FALSE, cache=TRUE}
-tcgaout.spearman.batch <- doppelgangR(tcgaov.esets, 
+tcgaout.spearman.batch <- doppelgangR(tcgaov.esets,
                 corFinder.args = list(use.ComBat = TRUE, method = "spearman"),
                 phenoFinder.args=NULL, smokingGunFinder.args=NULL)
-tcgaout.spearman.nobatch <- doppelgangR(tcgaov.esets, 
+tcgaout.spearman.nobatch <- doppelgangR(tcgaov.esets,
                 corFinder.args = list(use.ComBat = FALSE, method = "spearman"),
                 phenoFinder.args=NULL, smokingGunFinder.args=NULL)
 ```
@@ -366,20 +366,20 @@ breast.packages <- c("breastCancerMAINZ", "breastCancerNKI",
 ##
 other.packages <- "WGCNA"
 ##
-if (!require(BiocInstaller))
-    stop("You need to install Bioconductor, which includes BiocInstaller.")
+if (!require(BiocManager))
+    stop("You need to install Bioconductor, which includes BiocManager")
 ##
 for (pkg in breast.packages){
     if(!require(package=pkg, character.only=TRUE)){
         print(paste("Need to install", pkg))
-        biocLite(pkg, suppressUpdates=TRUE, suppressAutoUpdate=TRUE, ask=FALSE)
+        install(pkg, update=FALSE)
     }
 }
 ##
 for (pkg in other.packages){
     if(!require(package=pkg, character.only=TRUE)){
         print(paste("Need to install", pkg))
-        biocLite(pkg, suppressUpdates=TRUE, suppressAutoUpdate=TRUE, ask=FALSE)
+        install(pkg, update=FALSE)
     }
 }
 ##

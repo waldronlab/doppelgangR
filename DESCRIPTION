@@ -1,6 +1,6 @@
 Package: doppelgangR
 Title: Identify likely duplicate samples from genomic or meta-data
-Version: 1.11.0
+Version: 1.11.1
 Authors@R: c(person("Levi", "Waldron", email = "lwaldron.research@gmail.com",
     role = c("aut", "cre")),
     person("Markus", "Reister", email = "markus.riester@novartis.com",
@@ -38,7 +38,7 @@ Suggests:
     RUnit,
     simulatorZ,
     proxy
-biocViews: RNASeq, Microarray, GeneExpression, QualityControl
+biocViews: ImmunoOncology, RNASeq, Microarray, GeneExpression, QualityControl
 License: GPL (>=2.0)
 Encoding: UTF-8
 URL: https://github.com/lwaldron/doppelgangR

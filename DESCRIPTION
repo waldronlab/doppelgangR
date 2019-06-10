@@ -34,7 +34,7 @@ Suggests:
     rmarkdown,
     curatedOvarianData,
     ROCR,
-    pROC,
+    pROC (>= 1.15.0),
     RUnit,
     simulatorZ,
     proxy

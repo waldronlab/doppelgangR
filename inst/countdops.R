@@ -201,7 +201,7 @@ plotROC <- function(pred, labels, plot = TRUE, na.rm = TRUE, colorize = FALSE, .
     roc.obj <- roc(labels, pred)
     auc.ci <- ci(roc.obj)
     significant <- ifelse(ci(roc.obj, conf.level=0.9)[1] > 0.5, "*", "")
-    best <- coords(roc.obj,x="best")
+    best <- coords(roc.obj,x="best", transpose = FALSE)
     if (plot) {
         plot(perf.rocr, colorize = colorize, cex.lab = 1.3, ...)
         text(0, 0.9, paste("AUC = ", round(auc, digits = 2), significant,

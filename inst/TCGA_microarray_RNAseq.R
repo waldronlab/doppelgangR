@@ -108,7 +108,7 @@ plotROC <- function(pred, labels, plot = TRUE, na.rm = TRUE, colorize = FALSE, a
   roc.obj <- roc(labels, pred)
   auc.ci <- ci(roc.obj)
   significant <- ifelse(ci(roc.obj, conf.level=0.9)[1] > 0.5, "*", "")
-  best <- coords(roc.obj,x="best")
+  best <- coords(roc.obj,x="best", transpose = FALSE)
   if (plot) {
     plot(perf.rocr, colorize = colorize, cex.lab = 1.3, bty="n", lty=1:length(perf.rocr),...)
     abline(a = 0, b = 1, lty = 2)

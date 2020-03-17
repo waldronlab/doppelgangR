@@ -68,71 +68,62 @@ expect_equal(sum(is.na(df1$pheno.similarity)), 0)
 expect_equal(sum(is.na(df1$smokinggun.similarity)), 0)
 expect_equal(df1$id, c("M2:M3", "N2:N3", "N8:N9", "M1:N1", "gotcha:gotcha", "M6:gotcha", "M4:N5", "M10:N10"))
 for (i in match(paste("X", 1:10, sep=""), colnames(df1))){
-    cat(paste("Checking column", i, "\n"))
-    expect_equal(all(grepl("[a-z]:[a-z]", df1[[i]])), TRUE)
+    lab <- paste("Checking column", i, "\n")
+    expect_equal(all(grepl("[a-z]:[a-z]", df1[[i]])), TRUE, label = lab)
 }
 
 ##------------------------------------------
-cat("\n")
-cat("Check without smoking guns: \n")
+## Check without smoking guns
 ##------------------------------------------
 res2 <- doppelgangR(esets, smokingGunFinder.args=NULL, cache.dir=NULL)
 df2 <- summary(res2)
 for (i in grep("pheno.similarity|smokinggun.similarity", colnames(df1), invert=TRUE)){
-    cat(paste("Checking column", i, "\n"))
-    expect_equal(df2[, i], df1[!df1$smokinggun.doppel, i])
+    lab <- paste("Check without smoking guns, column", i, "\n")
+    expect_equal(df2[, i], df1[!df1$smokinggun.doppel, i], label = lab)
 }
 
 
 ##------------------------------------------
-cat("\n")
-cat("Check without phenotype: \n")
+## Check without phenotype
 ##------------------------------------------
 res3 <- doppelgangR(esets, phenoFinder.args=NULL, manual.smokingguns="id", automatic.smokingguns=FALSE, cache.dir=NULL)
 df3 <- summary(res3)
 for (i in grep("pheno.similarity", colnames(df1), invert=TRUE)){
-    cat(paste("Checking column", i, "\n"))
-    expect_equal(df3[, i], df1[!df1$pheno.doppel, i])
+    lab <- paste("Check without phenotype column", i, "\n")
+    expect_equal(df3[, i], df1[!df1$pheno.doppel, i], label = lab)
 }
 
 ##------------------------------------------
-cat("\n")
-cat("Check without expression: \n")
+## Check without expression
 ##------------------------------------------
 res4 <- doppelgangR(esets, corFinder.args=NULL, manual.smokingguns="id", automatic.smokingguns=FALSE, cache.dir=NULL)
 df4 <- summary(res4)
 for (i in grep("expr.similarity", colnames(df1), invert=TRUE)){
-    cat(paste("Checking column", i, "\n"))
-    expect_equal(df4[, i], df1[!df1$expr.doppel, i])
+    lab <- paste("Check without expression column", i, "\n")
+    expect_equal(df4[, i], df1[!df1$expr.doppel, i], label = lab)
 }
 
 ##------------------------------------------
-cat("\n")
-cat("Check smoking guns only: \n")
+## Check smoking guns only
 ##------------------------------------------
 res4b <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id", automatic.smokingguns=FALSE, cache.dir=NULL)
 df4b <- summary(res4b); rownames(df4b) <- NULL
 df4b.compare <- df1[df1$smokinggun.doppel, ]; rownames(df4b.compare) <- NULL
-expect_identical(df4b.compare[, -3:-6], df4b[, -3:-6])  ##don't check expr and pheno columns
+##don't check expr and pheno columns
+expect_identical(df4b.compare[, -3:-6], df4b[, -3:-6], label = "Check smoking guns only")  
 
 
 ##------------------------------------------
-cat("\n")
-cat("Check pruning: \n")
+## Check pruning
 ##------------------------------------------
 res5 <- doppelgangR(esets, manual.smokingguns="id", automatic.smokingguns=FALSE, intermediate.pruning=TRUE, cache.dir=NULL)
 df5 <- summary(res5)
-expect_equal(df1, df5)
+expect_equal(df1, df5, label = "Check pruning")
 
 ##------------------------------------------
-cat("\n")
-cat("Check caching, with a third ExpressionSet that is almost identical to the first: \n")
+## Check caching, with a third ExpressionSet that is almost identical to the first
 ##------------------------------------------
 esets2 <- c(esets, esets[[1]])
-#newmat <- exprs(esets[[1]])
-#newmat <- newmat + rnorm(nrow(newmat) * ncol(newmat), sd=0.1)
-#ExpressionSet(assayData=exprs(esets[[1]]), phenoData=phenoData(esets[[1]]))
-
 names(esets2)[3] <- "o"
 exprs(esets2[[3]]) <- exprs(esets2[[3]]) + rnorm(nrow(esets2[[3]]) * ncol(esets2[[3]]), sd=0.1)
 esets2[[3]]$X10 <- "a"
@@ -146,7 +137,7 @@ for (i in 1:2){
     df6a <- summary(res6)
     df6a <- df6a[grepl("^[mn]", df6a$sample1) & grepl("^[mn]", df6a$sample2), ]
     rownames(df6a) <- 1:nrow(df6a)
-    expect_equal(df1, df6a)
+    expect_equal(df1, df6a, label = "Check caching, with a third ExpressionSet that is almost identical to the first")
 }
 
 df6b <- summary(res6)
@@ -183,81 +174,96 @@ expect_true(all(df7a$pheno.doppel == df7b$pheno.doppel))
 expect_true(all(df7a$smokinggun.doppel == df7b$smokinggun.doppel))
 
 ##------------------------------------------
-cat("\n")
-cat("Check corFinder function: \n")
+## Check corFinder function
 ##------------------------------------------
 cor1 <- corFinder(eset.pair=esets)
 cor2 <- corFinder(eset.pair=esets[c(2, 1)])
-expect_equal(cor1, t(cor2))
+expect_equal(cor1, t(cor2), label = "Check corFinder function")
 
 cor1 <- corFinder(eset.pair=esets, use.ComBat=FALSE)
 cor2 <- corFinder(eset.pair=esets[c(2, 1)], use.ComBat=FALSE)
-expect_equal(cor1, t(cor2))
+expect_equal(cor1, t(cor2), label = "Check corFinder function 2")
 
 cor1 <- corFinder(eset.pair=esets[c(1, 1)])
 cor2 <- corFinder(eset.pair=esets[c(1, 1)], use.ComBat=FALSE)
-expect_equal(cor1, cor2)
+expect_equal(cor1, cor2, label = "Check corFinder function 3")
 
 ##Check missing values:
 exprs(esets[[1]])[1:10, 1:5] <- NA
-doppelgangR(esets[1:2])
+expect_message(doppelgangR(esets[1:2]), regexp = "Finalizing", label = "check missing values 1")
 ## More missing values:
 exprs(esets[[1]])[1:10, 1:8] <- NA
-doppelgangR(esets[1:2])
+expect_warning(doppelgangR(esets[1:2]), regexp="10 rows with more than 50 % entries missing", label = "check missing values 2")
 ## More missing values:
 exprs(esets[[1]])[1:10, 1:11] <- NA
-doppelgangR(esets[1:2])
+expect_warning(doppelgangR(esets[1:2]), regexp="mean imputation used for these rows", label = "check missing values 3")
 ## infinite values:
 exprs(esets[[1]])[14, 1] <- -Inf
 exprs(esets[[1]])[15, 2] <- Inf
-obs <- tryCatch(doppelgangR(esets[1:2]), warning=conditionMessage)
-expect_identical("Replacing -+Inf with min/max expression values for dataset m", obs)
+expect_warning(doppelgangR(esets[1:2]), regexp="Inf with min/max expression values for dataset m", label = "check missing values 4")
 
 ##------------------------------------------
-cat("\n")
-cat("Smoking guns only with cache=TRUE: \n")
+## Smoking guns only with cache=TRUE
 ##------------------------------------------
-dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id")
-expect_equal(summary(dop)[, 1], "m:m5")
-expect_equal(summary(dop)[, 2], "n:n4")
+expect_warning(
+  dop <-
+    doppelgangR(
+      esets,
+      corFinder.args = NULL,
+      phenoFinder.args = NULL,
+      manual.smokingguns = "id"
+    ),
+  label = "Smoking guns only with cache=TRUE"
+)
+expect_equal(summary(dop)[, 1], "m:m5", label = "Smoking guns only with cache=TRUE 2")
+expect_equal(summary(dop)[, 2], "n:n4", label = "Smoking guns only with cache=TRUE 3")
 
 
 ##------------------------------------------
-cat("\n")
-cat("Identical ExpressionSets:\n")
+## Identical ExpressionSets
 ##------------------------------------------
-df1 <- summary(doppelgangR(esets[[1]], cache.dir=NULL))
-expect_true(df1$sample1 == "m2")
-expect_true(df1$sample2 == "m3")
+expect_warning(df1 <- summary(doppelgangR(esets[[1]], cache.dir=NULL)), label = "Identical ExpressionSets 1")
+expect_true(df1$sample1 == "m2", label = "Identical ExpressionSets 2")
+expect_true(df1$sample2 == "m3", label = "Identical ExpressionSets 3")
 ##
 df2 <- summary(doppelgangR(esets[[2]], cache.dir=NULL))
-expect_true(all(df2$sample1 == "n2"))
-expect_true(all(df2$sample2 == "n3"))
+expect_true(all(df2$sample1 == "n2"), label = "Identical ExpressionSets 4")
+expect_true(all(df2$sample2 == "n3"), label = "Identical ExpressionSets 4b")
 ##
-df5 <- summary(doppelgangR(list(eset1=esets[[1]], eset2=esets[[2]]), cache.dir=NULL))
-df6 <- summary(doppelgangR(esets, cache.dir=NULL))
-expect_identical(df5[, -1:-2], df6[, -1:-2])
-expect_identical(sub("eset2", "n", sub("eset1", "m", df5$sample1)), df6$sample1)
-expect_identical(sub("eset2", "n", sub("eset1", "m", df5$sample2)), df6$sample2)
+expect_warning(df5 <-
+                 summary(doppelgangR(
+                   list(eset1 = esets[[1]], eset2 = esets[[2]]), cache.dir = NULL
+                 )), label = "Identical ExpressionSets 5")
+expect_warning(df6 <-
+                 summary(doppelgangR(esets, cache.dir = NULL)), label = "Identical ExpressionSets 6")
+expect_identical(df5[, -1:-2], df6[, -1:-2], label = "Identical ExpressionSets 7")
+expect_identical(sub("eset2", "n", sub("eset1", "m", df5$sample1)), df6$sample1, label = "Identical ExpressionSets 8")
+expect_identical(sub("eset2", "n", sub("eset1", "m", df5$sample2)), df6$sample2, label = "Identical ExpressionSets 9")
 
 ## with zero-column pData:
-withpheno <- summary(doppelgangR(esets))
+expect_warning(withpheno <- summary(doppelgangR(esets)), label = "with zero-column pData")
 esets3 <- esets
 pData(esets3[[1]]) <- pData(esets3[[1]])[, 0]
-withoutpheno <- summary(doppelgangR(esets3))
+expect_warning(withoutpheno <-
+                 summary(doppelgangR(esets3)),
+               regexp = "m and n have different column names in phenoData",
+               label = "with zero-column pData 2")
 
 pData(esets3[[2]]) <- pData(esets3[[2]])[, 0]
-withoutpheno2 <- summary(doppelgangR(esets3))
+expect_warning(withoutpheno2 <-
+                 summary(doppelgangR(esets3)),
+               regexp = "with min/max expression values for dataset m",
+               label = "with zero-column pData 3")
 
 withoutpheno3 <- withoutpheno[!withoutpheno$pheno.doppel, ]
 withoutpheno4 <- withoutpheno2[!withoutpheno2$pheno.doppel, ]
 
-expect_identical(withoutpheno[, 1:4], withoutpheno3[, 1:4])
-expect_identical(withoutpheno2[, 1:4], withoutpheno4[, 1:4])
+expect_identical(withoutpheno[, 1:4], withoutpheno3[, 1:4], label = "with zero-column pData 4")
+expect_identical(withoutpheno2[, 1:4], withoutpheno4[, 1:4], label = "with zero-column pData 5")
 
 esets4 <- esets
  for (i in 1:length(esets4))
     pData(esets4[[i]]) <- pData(esets4[[i]])[1]
-expect_s4_class(doppelgangR(esets4[[1]]), "DoppelGang")
+expect_warning(doppelgangR(esets4[[1]]), label = "with zero-column pData 6")
 expect_s4_class(doppelgangR(esets4[[2]]), "DoppelGang")
 

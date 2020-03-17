@@ -1,4 +1,3 @@
-library(RUnit)
 library(Biobase)
 library(doppelgangR)
 
@@ -53,24 +52,24 @@ esets <- list(m=m.eset, n=n.eset)
 res1 <- doppelgangR(esets, manual.smokingguns="id", automatic.smokingguns=FALSE, cache.dir=NULL)
 df1 <- summary(res1)
 
-checkIdentical(df1[df1$sample1=="m:m1" & df1$sample2=="n:n1", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:m2" & df1$sample2=="m:m3", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:m6" & df1$sample2=="n:n4", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="n:n2" & df1$sample2=="n:n3", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:m6" & df1$sample2=="n:n4", "expr.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:m10" & df1$sample2=="n:n10", "pheno.doppel"], TRUE)
-checkIdentical(df1[df1$sample1=="m:m5" & df1$sample2=="n:n4", "smokinggun.doppel"], TRUE)
-checkEquals(nrow(df1), ncor+npheno+nsmoking)
-checkEquals(sum(df1$expr.doppel), ncor)
-checkEquals(sum(df1$pheno.doppel), npheno)
-checkEquals(sum(df1$smokinggun.doppel), nsmoking)
-checkEquals(sum(is.na(df1$expr.similarity)), 0)
-checkEquals(sum(is.na(df1$pheno.similarity)), 0)
-checkEquals(sum(is.na(df1$smokinggun.similarity)), 0)
-checkEquals(df1$id, c("M2:M3", "N2:N3", "N8:N9", "M1:N1", "gotcha:gotcha", "M6:gotcha", "M4:N5", "M10:N10"))
+expect_true(df1[df1$sample1=="m:m1" & df1$sample2=="n:n1", "expr.doppel"])
+expect_true(df1[df1$sample1=="m:m2" & df1$sample2=="m:m3", "expr.doppel"])
+expect_true(df1[df1$sample1=="m:m6" & df1$sample2=="n:n4", "expr.doppel"])
+expect_true(df1[df1$sample1=="n:n2" & df1$sample2=="n:n3", "expr.doppel"])
+expect_true(df1[df1$sample1=="m:m6" & df1$sample2=="n:n4", "expr.doppel"])
+expect_true(df1[df1$sample1=="m:m10" & df1$sample2=="n:n10", "pheno.doppel"])
+expect_true(df1[df1$sample1=="m:m5" & df1$sample2=="n:n4", "smokinggun.doppel"])
+expect_equal(nrow(df1), ncor+npheno+nsmoking)
+expect_equal(sum(df1$expr.doppel), ncor)
+expect_equal(sum(df1$pheno.doppel), npheno)
+expect_equal(sum(df1$smokinggun.doppel), nsmoking)
+expect_equal(sum(is.na(df1$expr.similarity)), 0)
+expect_equal(sum(is.na(df1$pheno.similarity)), 0)
+expect_equal(sum(is.na(df1$smokinggun.similarity)), 0)
+expect_equal(df1$id, c("M2:M3", "N2:N3", "N8:N9", "M1:N1", "gotcha:gotcha", "M6:gotcha", "M4:N5", "M10:N10"))
 for (i in match(paste("X", 1:10, sep=""), colnames(df1))){
     cat(paste("Checking column", i, "\n"))
-    checkEquals(all(grepl("[a-z]:[a-z]", df1[[i]])), TRUE)
+    expect_equal(all(grepl("[a-z]:[a-z]", df1[[i]])), TRUE)
 }
 
 ##------------------------------------------
@@ -81,7 +80,7 @@ res2 <- doppelgangR(esets, smokingGunFinder.args=NULL, cache.dir=NULL)
 df2 <- summary(res2)
 for (i in grep("pheno.similarity|smokinggun.similarity", colnames(df1), invert=TRUE)){
     cat(paste("Checking column", i, "\n"))
-    checkEquals(df2[, i], df1[!df1$smokinggun.doppel, i])
+    expect_equal(df2[, i], df1[!df1$smokinggun.doppel, i])
 }
 
 
@@ -93,7 +92,7 @@ res3 <- doppelgangR(esets, phenoFinder.args=NULL, manual.smokingguns="id", autom
 df3 <- summary(res3)
 for (i in grep("pheno.similarity", colnames(df1), invert=TRUE)){
     cat(paste("Checking column", i, "\n"))
-    checkEquals(df3[, i], df1[!df1$pheno.doppel, i])
+    expect_equal(df3[, i], df1[!df1$pheno.doppel, i])
 }
 
 ##------------------------------------------
@@ -104,7 +103,7 @@ res4 <- doppelgangR(esets, corFinder.args=NULL, manual.smokingguns="id", automat
 df4 <- summary(res4)
 for (i in grep("expr.similarity", colnames(df1), invert=TRUE)){
     cat(paste("Checking column", i, "\n"))
-    checkEquals(df4[, i], df1[!df1$expr.doppel, i])
+    expect_equal(df4[, i], df1[!df1$expr.doppel, i])
 }
 
 ##------------------------------------------
@@ -114,7 +113,7 @@ cat("Check smoking guns only: \n")
 res4b <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id", automatic.smokingguns=FALSE, cache.dir=NULL)
 df4b <- summary(res4b); rownames(df4b) <- NULL
 df4b.compare <- df1[df1$smokinggun.doppel, ]; rownames(df4b.compare) <- NULL
-checkIdentical(df4b.compare[, -3:-6], df4b[, -3:-6])  ##don't check expr and pheno columns
+expect_identical(df4b.compare[, -3:-6], df4b[, -3:-6])  ##don't check expr and pheno columns
 
 
 ##------------------------------------------
@@ -123,7 +122,7 @@ cat("Check pruning: \n")
 ##------------------------------------------
 res5 <- doppelgangR(esets, manual.smokingguns="id", automatic.smokingguns=FALSE, intermediate.pruning=TRUE, cache.dir=NULL)
 df5 <- summary(res5)
-checkEquals(df1, df5)
+expect_equal(df1, df5)
 
 ##------------------------------------------
 cat("\n")
@@ -147,16 +146,16 @@ for (i in 1:2){
     df6a <- summary(res6)
     df6a <- df6a[grepl("^[mn]", df6a$sample1) & grepl("^[mn]", df6a$sample2), ]
     rownames(df6a) <- 1:nrow(df6a)
-    checkEquals(df1, df6a)
+    expect_equal(df1, df6a)
 }
 
 df6b <- summary(res6)
 df6b <- df6b[grepl("^[mo]", df6b$sample1) & grepl("^[mo]", df6b$sample2), ]
-checkIdentical(df6b[df6b$sample1=="o:Xm2" & df6b$sample2=="o:Xm3", "expr.doppel"], TRUE)
+expect_identical(df6b[df6b$sample1=="o:Xm2" & df6b$sample2=="o:Xm3", "expr.doppel"], TRUE)
 df6b <- df6b[-1:-2, ]
-##checkTrue(all(df6b$expr.doppel))  ## not a bug, but a shortcoming in the outlier detection that these are not all identified as expression doppelgangers.
-checkTrue(all(df6b$pheno.doppel))
-checkTrue(all(df6b$smokinggun.doppel))
+##expect_true(all(df6b$expr.doppel))  ## not a bug, but a shortcoming in the outlier detection that these are not all identified as expression doppelgangers.
+expect_true(all(df6b$pheno.doppel))
+expect_true(all(df6b$smokinggun.doppel))
 
 
 res7 <- doppelgangR(esets2, phenoFinder.args=NULL, smokingGunFinder.args=NULL,
@@ -179,9 +178,9 @@ for (i in 1:nrow(df7a)){
 }
 df7a <- df7a[order(df7a$sample1, df7a$sample2), ]
 df7b <- df7b[order(df7b$sample1, df7b$sample2), ]
-checkTrue(all(df7a$expr.doppel == df7b$expr.doppel))
-checkTrue(all(df7a$pheno.doppel == df7b$pheno.doppel))
-checkTrue(all(df7a$smokinggun.doppel == df7b$smokinggun.doppel))
+expect_true(all(df7a$expr.doppel == df7b$expr.doppel))
+expect_true(all(df7a$pheno.doppel == df7b$pheno.doppel))
+expect_true(all(df7a$smokinggun.doppel == df7b$smokinggun.doppel))
 
 ##------------------------------------------
 cat("\n")
@@ -189,15 +188,15 @@ cat("Check corFinder function: \n")
 ##------------------------------------------
 cor1 <- corFinder(eset.pair=esets)
 cor2 <- corFinder(eset.pair=esets[c(2, 1)])
-checkEquals(cor1, t(cor2))
+expect_equal(cor1, t(cor2))
 
 cor1 <- corFinder(eset.pair=esets, use.ComBat=FALSE)
 cor2 <- corFinder(eset.pair=esets[c(2, 1)], use.ComBat=FALSE)
-checkEquals(cor1, t(cor2))
+expect_equal(cor1, t(cor2))
 
 cor1 <- corFinder(eset.pair=esets[c(1, 1)])
 cor2 <- corFinder(eset.pair=esets[c(1, 1)], use.ComBat=FALSE)
-checkEquals(cor1, cor2)
+expect_equal(cor1, cor2)
 
 ##Check missing values:
 exprs(esets[[1]])[1:10, 1:5] <- NA
@@ -212,15 +211,15 @@ doppelgangR(esets[1:2])
 exprs(esets[[1]])[14, 1] <- -Inf
 exprs(esets[[1]])[15, 2] <- Inf
 obs <- tryCatch(doppelgangR(esets[1:2]), warning=conditionMessage)
-checkIdentical("Replacing -+Inf with min/max expression values for dataset m", obs)
+expect_identical("Replacing -+Inf with min/max expression values for dataset m", obs)
 
 ##------------------------------------------
 cat("\n")
 cat("Smoking guns only with cache=TRUE: \n")
 ##------------------------------------------
 dop <- doppelgangR(esets, corFinder.args=NULL, phenoFinder.args=NULL, manual.smokingguns="id")
-checkEquals(summary(dop)[, 1], "m:m5")
-checkEquals(summary(dop)[, 2], "n:n4")
+expect_equal(summary(dop)[, 1], "m:m5")
+expect_equal(summary(dop)[, 2], "n:n4")
 
 
 ##------------------------------------------
@@ -228,18 +227,18 @@ cat("\n")
 cat("Identical ExpressionSets:\n")
 ##------------------------------------------
 df1 <- summary(doppelgangR(esets[[1]], cache.dir=NULL))
-checkTrue(df1$sample1 == "m2")
-checkTrue(df1$sample2 == "m3")
+expect_true(df1$sample1 == "m2")
+expect_true(df1$sample2 == "m3")
 ##
 df2 <- summary(doppelgangR(esets[[2]], cache.dir=NULL))
-checkTrue(all(df2$sample1 == "n2"))
-checkTrue(all(df2$sample2 == "n3"))
+expect_true(all(df2$sample1 == "n2"))
+expect_true(all(df2$sample2 == "n3"))
 ##
 df5 <- summary(doppelgangR(list(eset1=esets[[1]], eset2=esets[[2]]), cache.dir=NULL))
 df6 <- summary(doppelgangR(esets, cache.dir=NULL))
-checkIdentical(df5[, -1:-2], df6[, -1:-2])
-checkIdentical(sub("eset2", "n", sub("eset1", "m", df5$sample1)), df6$sample1)
-checkIdentical(sub("eset2", "n", sub("eset1", "m", df5$sample2)), df6$sample2)
+expect_identical(df5[, -1:-2], df6[, -1:-2])
+expect_identical(sub("eset2", "n", sub("eset1", "m", df5$sample1)), df6$sample1)
+expect_identical(sub("eset2", "n", sub("eset1", "m", df5$sample2)), df6$sample2)
 
 ## with zero-column pData:
 withpheno <- summary(doppelgangR(esets))
@@ -253,12 +252,12 @@ withoutpheno2 <- summary(doppelgangR(esets3))
 withoutpheno3 <- withoutpheno[!withoutpheno$pheno.doppel, ]
 withoutpheno4 <- withoutpheno2[!withoutpheno2$pheno.doppel, ]
 
-checkIdentical(withoutpheno[, 1:4], withoutpheno3[, 1:4])
-checkIdentical(withoutpheno2[, 1:4], withoutpheno4[, 1:4])
+expect_identical(withoutpheno[, 1:4], withoutpheno3[, 1:4])
+expect_identical(withoutpheno2[, 1:4], withoutpheno4[, 1:4])
 
 esets4 <- esets
  for (i in 1:length(esets4))
     pData(esets4[[i]]) <- pData(esets4[[i]])[1]
-doppelgangR(esets4[[1]])
-doppelgangR(esets4[[2]])
+expect_s4_class(doppelgangR(esets4[[1]]), "DoppelGang")
+expect_s4_class(doppelgangR(esets4[[2]]), "DoppelGang")
 

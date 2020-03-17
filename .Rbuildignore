@@ -1,0 +1,3 @@
+runinline.sh
+^.*\.Rproj$
+^\.Rproj\.user$

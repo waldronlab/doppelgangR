@@ -12,7 +12,7 @@
  ### If TRUE, include i, i elements.
 ) {
   bizarre.and.unlikely.separator = " as3a2s5df5hjnm4qwe2rxcvb "
-  if (class(x) == "matrix") {
+  if (is(x, "matrix")) {
     output.samples <- x
   } else if (is.vector(x) & is.vector(y)) {
     output.samples <-

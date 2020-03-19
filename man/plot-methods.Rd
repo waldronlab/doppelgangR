@@ -11,8 +11,7 @@
 \title{Histograms of all pairwise sample correlations, showing identified
 doppelgangers.}
 \usage{
-\S4method{plot}{DoppelGang,ANY}(x, skip.no.doppels = FALSE,
-  plot.pair = NULL, ...)
+\S4method{plot}{DoppelGang,ANY}(x, skip.no.doppels = FALSE, plot.pair = NULL, ...)
 }
 \arguments{
 \item{x}{An object of class \code{\link{DoppelGang}}}

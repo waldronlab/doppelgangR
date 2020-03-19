@@ -157,8 +157,8 @@ doppelgangR <- function
     ### The name of a directory in which to cache or look up results to save
     ### re-calculating correlations.  Set to NULL for no caching.
     BPPARAM = bpparam(),
-    ### Argument for BiocParallel::bplapply(), by default will use all
-    ### cores of a multi-core machine
+    ### Argument for BiocParallel::bplapply(), by default what is returned by BiocParallel::bpparam(), 
+    ### see ?BiocParallel::bpparam to change options.
     verbose = TRUE
     ### Print progress information
   ) {

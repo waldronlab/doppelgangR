@@ -5,23 +5,24 @@
 \alias{pst}
 \alias{qst}
 \alias{rst}
-\alias{dst}
-\alias{rst}
-\alias{dst}
-\alias{pst}
-\alias{dst}
-\alias{qst}
 \title{Skew-t Distribution}
 \usage{
-dst(x, location = 0, scale = 1, shape = 0, df = Inf, dp = NULL,
-  log = FALSE)
+dst(x, location = 0, scale = 1, shape = 0, df = Inf, dp = NULL, log = FALSE)
 
 rst(n = 1, location = 0, scale = 1, shape = 0, df = Inf, dp = NULL)
 
 pst(x, location = 0, scale = 1, shape = 0, df = Inf, dp = NULL, ...)
 
-qst(p, location = 0, scale = 1, shape = 0, df = Inf, tol = 1e-06,
-  dp = NULL, ...)
+qst(
+  p,
+  location = 0,
+  scale = 1,
+  shape = 0,
+  df = Inf,
+  tol = 1e-06,
+  dp = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{vector of quantiles. Missing values (\code{NA}s) are allowed.}

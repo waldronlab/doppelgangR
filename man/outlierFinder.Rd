@@ -4,8 +4,13 @@
 \alias{outlierFinder}
 \title{Identifies outliers in a similarity matrix.}
 \usage{
-outlierFinder(similarity.mat, bonf.prob = 0.05, transFun = atanh,
-  normal.upper.thresh = NULL, tail = "upper")
+outlierFinder(
+  similarity.mat,
+  bonf.prob = 0.05,
+  transFun = atanh,
+  normal.upper.thresh = NULL,
+  tail = "upper"
+)
 }
 \arguments{
 \item{similarity.mat}{A matrix of similarities - larger values mean more

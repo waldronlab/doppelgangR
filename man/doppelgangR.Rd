@@ -4,18 +4,25 @@
 \alias{doppelgangR}
 \title{doppelgangR}
 \usage{
-doppelgangR(esets, separator = ":", corFinder.args = list(separator =
-  separator, use.ComBat = TRUE, method = "pearson"),
-  phenoFinder.args = list(separator = separator, vectorDistFun =
-  vectorWeightedDist), outlierFinder.expr.args = list(bonf.prob = 0.5,
-  transFun = atanh, tail = "upper"),
-  outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, bonf.prob =
-  NULL, tail = "upper"), smokingGunFinder.args = list(transFun = I),
-  impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, maxp = 1500,
-  rng.seed = 362436069), manual.smokingguns = NULL,
-  automatic.smokingguns = FALSE, within.datasets.only = FALSE,
-  intermediate.pruning = FALSE, cache.dir = "cache", BPPARAM = bpparam(),
-  verbose = TRUE)
+doppelgangR(
+  esets,
+  separator = ":",
+  corFinder.args = list(separator = separator, use.ComBat = TRUE, method = "pearson"),
+  phenoFinder.args = list(separator = separator, vectorDistFun = vectorWeightedDist),
+  outlierFinder.expr.args = list(bonf.prob = 0.5, transFun = atanh, tail = "upper"),
+  outlierFinder.pheno.args = list(normal.upper.thresh = 0.99, bonf.prob = NULL, tail =
+    "upper"),
+  smokingGunFinder.args = list(transFun = I),
+  impute.knn.args = list(k = 10, rowmax = 0.5, colmax = 0.8, maxp = 1500, rng.seed =
+    362436069),
+  manual.smokingguns = NULL,
+  automatic.smokingguns = FALSE,
+  within.datasets.only = FALSE,
+  intermediate.pruning = FALSE,
+  cache.dir = "cache",
+  BPPARAM = bpparam(),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{esets}{a list of ExpressionSets, containing the numeric and phenotypic

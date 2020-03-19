@@ -4,11 +4,8 @@
 \name{DoppelGang-class}
 \alias{DoppelGang-class}
 \alias{DoppelGang}
-\alias{DoppelGang-class}
 \alias{summary,DoppelGang-method}
-\alias{DoppelGang-class}
 \alias{show,DoppelGang-method}
-\alias{DoppelGang-class}
 \alias{print,DoppelGang-method}
 \title{DoppelGang S4 class}
 \usage{

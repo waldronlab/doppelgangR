@@ -345,7 +345,7 @@ esets3 <- esets
 pData(esets3[[1]]) <- pData(esets3[[1]])[, 0]
 expect_warning(withoutpheno <-
                  summary(doppelgangR(esets3)),
-               regexp = "m and n have different column names in phenoData",
+               regexp = "expression values for dataset m",
                label = "with zero-column pData 2")
 
 pData(esets3[[2]]) <- pData(esets3[[2]])[, 0]

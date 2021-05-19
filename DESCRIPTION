@@ -1,6 +1,6 @@
 Package: doppelgangR
 Title: Identify likely duplicate samples from genomic or meta-data
-Version: 1.19.0
+Version: 1.20.0
 Authors@R: c(person("Levi", "Waldron", email = "lwaldron.research@gmail.com",
     role = c("aut", "cre")),
     person("Markus", "Reister", email = "markus.riester@novartis.com",

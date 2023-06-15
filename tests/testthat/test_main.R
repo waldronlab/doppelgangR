@@ -261,8 +261,8 @@ df7b <- df7[!has.o,]
 df7b <-
   df7b[(!grepl("^n", df7b$sample1) | !grepl("^n", df7b$sample2)),]
 for (i in 1:nrow(df7a)) {
-  df7a[i, 1:2] <- sort(df7a[i, 1:2])
-  df7b[i, 1:2] <- sort(df7b[i, 1:2])
+  df7a[i, 1:2] <- sort(as.character(df7a[i, 1:2]))
+  df7b[i, 1:2] <- sort(as.character(df7b[i, 1:2]))
 }
 df7a <- df7a[order(df7a$sample1, df7a$sample2),]
 df7b <- df7b[order(df7b$sample1, df7b$sample2),]
@@ -365,3 +365,4 @@ for (i in 1:length(esets4))
   pData(esets4[[i]]) <- pData(esets4[[i]])[1]
 expect_warning(doppelgangR(esets4[[1]]), label = "with zero-column pData 6")
 expect_s4_class(doppelgangR(esets4[[2]]), "DoppelGang")
+

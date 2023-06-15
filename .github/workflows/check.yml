@@ -4,8 +4,6 @@ on:
   push:
   pull_request:
 
-name: check-package
-
 jobs:
   checkDevel:
     runs-on: ubuntu-22.04

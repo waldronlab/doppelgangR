@@ -1,0 +1,7 @@
+title: doppelgangR
+url: https://waldronlab.github.io/doppelgangR
+
+template:
+  bootstrap: 5
+  params:
+    bootswatch: flatly

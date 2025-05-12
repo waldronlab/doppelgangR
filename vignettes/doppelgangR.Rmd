@@ -92,7 +92,7 @@ plot(results1)
 
 One of these histograms can be drawn using the plot.pair argument:
 
-```{r}
+```{r plotdop2, fig.cap="Pair plot of JapaneseA:JapaneseA Doppelgängers identified. The vertical red lines indicate samples that were flagged."}
 plot(results1, plot.pair=c("JapaneseA", "JapaneseA"))
 ```
 

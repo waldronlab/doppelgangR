@@ -5,7 +5,7 @@ Authors@R: c(person("Levi", "Waldron", email = "lwaldron.research@gmail.com",
     role = c("aut", "cre")),
     person("Markus", "Reister", email = "markus.riester@novartis.com",
     role = c("aut", "ctb")),
-    person("Marcel", "Ramos", email = "marcel.ramos@roswellpark.org",
+    person("Marcel", "Ramos", email = "marcel.ramos@sph.cuny.edu",
     role = "ctb"))
 Description: The main function is doppelgangR(), which takes as minimal
     input a list of ExpressionSet object, and searches all list

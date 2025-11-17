@@ -97,14 +97,11 @@ between each study:
 ``` r
 par(mfrow=c(2,2), las=1)
 plot(results1)
-#> Warning in int_abline(a = a, b = b, h = h, v = v, untf = untf, ...): partial argument match of 'lw' to 'lwd'
-#> Warning in int_abline(a = a, b = b, h = h, v = v, untf = untf, ...): partial argument match of 'lw' to 'lwd'
-#> Warning in int_abline(a = a, b = b, h = h, v = v, untf = untf, ...): partial argument match of 'lw' to 'lwd'
 ```
 
 <div class="figure">
 
-<img src="/home/mramos/gh/doppelgangR/README_files/figure-gfm/plotdop-1.png" alt="Doppelgängers identified on the basis of similar expression profiles. The vertical red lines indicate samples that were flagged." width="100%" />
+<img src="https://raw.githubusercontent.com/waldronlab/figures/refs/heads/devel/plotdop-1.png?token=GHSAT0AAAAAADOAOGYE6J2QRP54HL4XFORY2I3VLIA" alt="Doppelgängers identified on the basis of similar expression profiles. The vertical red lines indicate samples that were flagged." width="100%" />
 <p class="caption">
 
 Doppelgängers identified on the basis of similar expression profiles.
@@ -117,12 +114,11 @@ One of these histograms can be drawn using the plot.pair argument:
 
 ``` r
 plot(results1, plot.pair=c("JapaneseA", "JapaneseA"))
-#> Warning in int_abline(a = a, b = b, h = h, v = v, untf = untf, ...): partial argument match of 'lw' to 'lwd'
 ```
 
 <div class="figure">
 
-<img src="/home/mramos/gh/doppelgangR/README_files/figure-gfm/plotdop2-1.png" alt="Pair plot of JapaneseA:JapaneseA Doppelgängers identified. The vertical red lines indicate samples that were flagged." width="100%" />
+<img src="https://raw.githubusercontent.com/waldronlab/figures/refs/heads/devel/plotdop2-1.png?token=GHSAT0AAAAAADOAOGYFTY77UUIBHH744C7A2I3VNFA" alt="Pair plot of JapaneseA:JapaneseA Doppelgängers identified. The vertical red lines indicate samples that were flagged." width="100%" />
 <p class="caption">
 
 Pair plot of JapaneseA:JapaneseA Doppelgängers identified. The vertical

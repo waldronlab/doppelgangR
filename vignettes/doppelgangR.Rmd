@@ -34,6 +34,12 @@ opts_knit$set(cache=TRUE)
 `r BiocStyle::Biocpkg("doppelgangR")` is a package for identifying duplicate samples
 within or between datasets of transcriptome profiles. It is intended for microarray and RNA-seq gene expression profiles where biological replicates are ordinarily more distinct than technical replicates, as is the case for cancer types with "noisy" genomes. It is intended for cases where per-gene summaries are available but full genotypes are not, which is typical of public databases such as the Gene Expression Omnibus.
 
+Results from running `doppelgangR` on CRC, bladder, and ovarian
+[on Dropbox](httpss://www.dropbox.com/sh/or3l7oo96x1ilm8/AAD1MVQVnoS6H7OExoYwOovSa?dl=0).
+
+For the manuscript vignette, visit
+<https://github.com/waldronlab/doppelgangR_paper>.
+
 ```{r, echo=FALSE, message=FALSE}
 library(doppelgangR)
 ```

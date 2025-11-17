@@ -1,5 +1,5 @@
 ---
-title: "doppelgangR"
+title: "doppelgängR"
 author: "Levi Waldron"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 package: "`r pkg_ver('doppelgangR')`"
@@ -12,7 +12,7 @@ abstract: >
     investigators frequently share or re-use specimens in later studies.
     Duplicate expression profiles in public databases will impact
     re-analysis if left undetected, a so-called “doppelgänger” effect. The
-    doppelgangR package uses batch correction and outlier detection among
+    doppelgängR package uses batch correction and outlier detection among
     pairwise expression profile correlations to accurately identify
     duplicate profiles for cancer types where profiles are sufficiently
     distinct.  It is intended for use when nucleotide-level sequence data

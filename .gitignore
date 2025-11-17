@@ -10,9 +10,9 @@
 
 # Cache files
 cache/
-vignettes/*_cache/
-vignettes/*.html
-vignettes/*_files
+*_cache/
+*.html
+*_files/
 
 # Vim files
 *~

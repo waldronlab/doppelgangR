@@ -29,8 +29,9 @@ library(knitr)
 opts_knit$set(cache=TRUE)
 ```
 
-# Introduction
+# doppelgängR
 
+## Introduction
 
 `r BiocStyle::Biocpkg("doppelgangR")` is a package for identifying duplicate
 samples within or between datasets of transcriptome profiles. It is intended for

@@ -11,6 +11,8 @@
 # Cache files
 cache/
 vignettes/*_cache/
+vignettes/*.html
+vignettes/*_files
 
 # Vim files
 *~

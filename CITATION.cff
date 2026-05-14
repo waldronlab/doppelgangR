@@ -1,0 +1,66 @@
+# --------------------------------------------
+# CITATION file created with {cffr} R package
+# See also: https://docs.ropensci.org/cffr/
+# --------------------------------------------
+ 
+cff-version: 1.2.0
+message: 'To cite package "doppelgangR" in publications use:'
+type: software
+title: 'doppelgangR: Identify likely duplicate samples from genomic or meta-data'
+version: 1.41.0
+doi: 10.1093/jnci/djw146
+abstract: The main function is doppelgangR(), which takes as minimal input a list
+  of ExpressionSet object, and searches all list pairs for duplicated samples. The
+  search is based on the genomic data (exprs(eset)), phenotype/clinical data (pData(eset)),
+  and "smoking guns" - supposedly unique identifiers found in pData(eset).
+authors:
+- family-names: Waldron
+  given-names: Levi
+  email: lwaldron.research@gmail.com
+- family-names: Reister
+  given-names: Markus
+  email: markus.riester@novartis.com
+preferred-citation:
+  type: article
+  title: 'The Doppelganger Effect: Hidden Duplicates in Databases of Transcriptome
+    Profiles'
+  authors:
+  - family-names: Waldron
+    given-names: Levi
+    email: lwaldron.research@gmail.com
+  - family-names: Riester
+    given-names: Markus
+  - family-names: Ramos
+    given-names: Marcel
+  - family-names: Parmigiani
+    given-names: Giovanni
+  - family-names: Birrer
+    given-names: Michael
+  year: '2016'
+  volume: '108'
+  doi: 10.1093/jnci/djw146
+  journal: Journal of the National Cancer Institute
+  start: djw146
+repository: https://bioconductor.org/
+repository-code: https://github.com/lwaldron/doppelgangR
+url: https://waldronlab.github.io/doppelgangR
+date-released: '2025-05-12'
+contact:
+- family-names: Waldron
+  given-names: Levi
+  email: lwaldron.research@gmail.com
+keywords: bioconductor-package
+references:
+- type: manual
+  title: 'doppelgangR: Identify likely duplicate samples from genomic or meta-data'
+  authors:
+  - family-names: Waldron
+    given-names: Levi
+    email: lwaldron.research@gmail.com
+  - family-names: Reister
+    given-names: Markus
+    email: markus.riester@novartis.com
+  year: '2025'
+  notes: R package version 1.41.0
+  url: https://github.com/lwaldron/doppelgangR
+

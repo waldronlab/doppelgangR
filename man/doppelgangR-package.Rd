@@ -15,6 +15,7 @@ in pData(eset).
 Useful links:
 \itemize{
   \item \url{https://github.com/lwaldron/doppelgangR}
+  \item \url{https://waldronlab.github.io/doppelgangR}
   \item Report bugs at \url{https://github.com/lwaldron/doppelgangR/issues}
 }
 

@@ -2136,7 +2136,7 @@ mst.dev <-
       L. <- L * sqrt((1 + d / df) / (1 + Q / df))
     }
     dev <- (n * (logDet - 2 * const + d * logb(pi)) + DQ
-            - 2 * sum(freq * (log(2) + log.pt(L., df + d))))
+            - 2 * sum(freq * (log(2) + log_pt(L., df + d))))
     if (trace)
       cat("mst.dev: ", dev, "\n")
     dev
@@ -2179,7 +2179,7 @@ mst.dev.grad <-
     dlogft <- (-0.5) * (1 + d / df) / (1 + Q / df)
     dt.dL <- sf
     dt.dQ <- (-0.5) * L * sf / (Q + df)
-    logT. <- log.pt(t., df + d)
+    logT. <- log_pt(t., df + d)
     dlogT. <- exp(dt(t., df + d, log = TRUE) - logT.)
     u.freq <- u * freq
     Dbeta <- (
@@ -2227,7 +2227,7 @@ mst.dev.grad <-
           sqrt((df1 + d) / (Q + df1))
       else
         sqrt((1 + d / df1) / (1 + Q / df1))
-      logT.eps <- log.pt(L * sf1, df1 + d)
+      logT.eps <- log_pt(L * sf1, df1 + d)
       dlogT.ddf <- (logT.eps - logT.) / eps
       Ddf   <- sum((dlogft.ddf + dlogT.ddf) * freq)
       grad <- c(grad, -2 * Ddf * df0)
@@ -2421,7 +2421,7 @@ st.dev.fixed <- function(free.param,
   }
   dev <-
     (n * (logDet - 2 * const + logb(pi)) + (df + 1) * sum(freq * log1Q)
-     - 2 * sum(log(2) + log.pt(L * sqrt((
+     - 2 * sum(log(2) + log_pt(L * sqrt((
        df + 1
      ) / (
        Q + df
@@ -2902,7 +2902,7 @@ solvePD <- function(x)
 
 
 ##---
-log.pt <- function(x, df) {
+log_pt <- function(x, df) {
   ## fix for log(pt(...)) when it gives -Inf
   ## see Abramowitz & Stegun formulae 26.7.8 & 26.2.13)
   ## However, new releases of R (>=2.3) seem to have fixed the problem

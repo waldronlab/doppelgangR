@@ -41,5 +41,5 @@ URL: https://github.com/lwaldron/doppelgangR,
     https://waldronlab.github.io/doppelgangR
 BugReports: https://github.com/lwaldron/doppelgangR/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
 Date: 2025-05-12
+Config/roxygen2/version: 8.0.0

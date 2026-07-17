@@ -27,9 +27,7 @@
 #' distmat <- phenoDist(as.matrix(pdat1), as.matrix(pdat2))
 #' ## Note outliers with identical clinical data, these are probably the same patients:
 #' graphics::boxplot(distmat)
-#'
-#' \dontrun{
-#'    library(curatedOvarianData)
+#' if (require("curatedOvarianData", quietly = TRUE)) {
 #'    data(GSE32063_eset)
 #'    data(GSE17260_eset)
 #'    pdat1 <- pData(GSE32063_eset)

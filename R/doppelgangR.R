@@ -59,14 +59,12 @@
 #'
 #' ## Set phenoFinder.args=NULL to ignore similar phenotypes, and
 #' ## turn off ComBat batch correction:
-#'
-#' \dontrun{
+#' if (require("curatedOvarianData", quietly = TRUE)) {
 #' results2 <- doppelgangR(testesets,
 #' corFinder.args=list(use.ComBat=FALSE), phenoFinder.args=NULL,
 #'     cache.dir=NULL)
 #' summary(results2)
 #'
-#' library(curatedOvarianData)
 #' data(GSE32062.GPL6480_eset)
 #' data(GSE32063_eset)
 #' data(GSE12470_eset)

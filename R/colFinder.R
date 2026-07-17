@@ -27,6 +27,12 @@
 #' @return A matrix of similarities between the colData of pairs of samples.
 #' @author Fabio Da Col, Marcel Ramos
 #'
+#' @examples
+#' library(SummarizedExperiment)
+#' summex1 <- SummarizedExperiment(matrix(1:4, ncol=2), colData=DataFrame(a=1:2))
+#' summex2 <- SummarizedExperiment(matrix(5:8, ncol=2), colData=DataFrame(a=1:2))
+#' colFinder(list(summex1, summex2))
+#'
 #' @export colFinder
 colFinder <- function(summex.list, ...) {
     if (!is(summex.list, "list") | length(summex.list) != 2)

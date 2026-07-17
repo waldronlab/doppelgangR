@@ -18,6 +18,9 @@
 \arguments{
 \item{x, object}{A DoppelGang class object}
 }
+\value{
+An object of class \code{DoppelGang}
+}
 \description{
 S4 class containing results of doppelgangR() function.
 }

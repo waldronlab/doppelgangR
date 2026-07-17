@@ -37,17 +37,14 @@
 #' missing values for the expression and smoking gun similarity).
 #' @param cache.dir The name of a directory in which to cache or look up
 #' results to save re-calculating correlations.  Set to NULL for no caching.
-#' @param BPPARAM Argument for BiocParallel::bplapply(), by default will use
-#' all cores of a multi-core machine
 #' @param verbose Print progress information
+#' @param ... Passed to `doppelgangR` mainly for deprecation purposes (e.g. `BPPARAM`)
 #'
 #' @return Returns an object of S4-class "DoppelGang"
 #'
 #' @author Levi Waldron, Markus Riester, Marcel Ramos
 #'
 #' @seealso \link{DoppelGang-class}
-#' \link[BiocParallel]{BiocParallelParam-class}
-#'
 #' @examples
 #'
 #' example("phenoFinder")
@@ -155,17 +152,20 @@ doppelgangR <- function
     cache.dir = "cache",
     ### The name of a directory in which to cache or look up results to save
     ### re-calculating correlations.  Set to NULL for no caching.
-    BPPARAM = bpparam(),
-    ### Argument for BiocParallel::bplapply(), by default what is returned by BiocParallel::bpparam(), 
-    ### see ?BiocParallel::bpparam to change options.
-    verbose = TRUE
+    verbose = TRUE,
     ### Print progress information
+    ...
   ) {
     ##Save input args except for esets:
     input.argnames <- ls()[-match("esets", ls())]
     input.args <- lapply(input.argnames, function(x)
       get(x))
     names(input.args) <- input.argnames
+    
+    dots <- list(...)
+    if ("BPPARAM" %in% names(dots)) {
+      warning("The 'BPPARAM' argument is deprecated and ignored. 'doppelgangR' now uses the 'future' framework for parallelization. Please configure your parallel backend using 'future::plan()' instead.")
+    }
     if (is(esets, "ExpressionSet")) {
       esets <- list(ExpressionSet1 = esets, ExpressionSet2 = esets)
       eset.method <- TRUE
@@ -217,7 +217,7 @@ doppelgangR <- function
     if (!within.datasets.only)
       ds.combns <-
       c(ds.combns, combn(1:length(esets), 2, simplify = FALSE))
-    output.full <- bplapply(ds.combns, function(ij) {
+    output.full <- future_lapply(ds.combns, function(ij) {
       i <- ij[1]
       j <- ij[2]
       if (verbose)
@@ -403,7 +403,7 @@ doppelgangR <- function
           output3[["expr.doppels"]]$outlierFinder.res[keep.rows,]
       }
       return(output3)
-    }, BPPARAM = BPPARAM)
+    }, future.seed = TRUE)
     has.errors <-
       sapply(output.full, function(x)
         any(grep("error", class(x))))

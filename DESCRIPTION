@@ -15,9 +15,10 @@ Description: The main function is doppelgangR(), which takes as minimal
     identifiers found in pData(eset).
 Depends:
     R (>= 3.5.0),
-    Biobase,
-    BiocParallel
+    Biobase
 Imports:
+    future,
+    future.apply,
     sva,
     impute,
     digest,

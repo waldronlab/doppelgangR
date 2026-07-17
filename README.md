@@ -172,13 +172,14 @@ class(eset)
 
 The `doppelgangR()` function checks all pairwise combinations of
 datasets in a list of `ExpressionSet` objects, and these dataset pairs
-can be checked in parallel using multiple processing cores using the
-BPPARAM argument. This functionality is imported from the
-(“BiocParallel”) package. Please see
-“?BiocParallel::\`BiocParallelParam-class\`” documentation.
+can be checked in parallel using multiple processing cores. This
+functionality is imported from the "future" package. Please see
+the "future" package documentation to configure your parallel backend.
 
 ``` r
-results2 <- doppelgangR(testesets, BPPARAM = MulticoreParam(workers = 8))
+library(future)
+plan(multisession, workers = 8)
+results2 <- doppelgangR(testesets)
 ```
 
 ## Caching

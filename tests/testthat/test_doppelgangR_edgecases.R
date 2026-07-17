@@ -24,7 +24,7 @@ test_that("doppelgangR handles edge cases and error states correctly", {
   
   # Suppress the warning so it doesn't clutter output, but expect it to happen
   expect_warning(
-    res_no_genes <- doppelgangR(list(eset1, eset2), BPPARAM = BiocParallel::SerialParam()),
+    res_no_genes <- doppelgangR(list(eset1, eset2)),
     "have no featureNames in common"
   )
   
@@ -44,18 +44,18 @@ test_that("doppelgangR handles edge cases and error states correctly", {
   eset2_sg <- ExpressionSet(assayData = mat2_sg, phenoData = AnnotatedDataFrame(pdat2_sg))
   
   expect_error(
-    res_sg <- doppelgangR(list(eset1_sg, eset2_sg), automatic.smokingguns = TRUE, BPPARAM = BiocParallel::SerialParam()),
+    res_sg <- doppelgangR(list(eset1_sg, eset2_sg), automatic.smokingguns = TRUE),
     "Intermediate pruning off but no addCols shortcut available."
   )
   
   # Edge Case: single ExpressionSet with manual smoking gun (eset.method=TRUE)
   expect_error(
-    res_eset_method <- doppelgangR(eset1_sg, manual.smokingguns = "unique_id", BPPARAM = BiocParallel::SerialParam()),
+    res_eset_method <- doppelgangR(eset1_sg, manual.smokingguns = "unique_id"),
     "Intermediate pruning off but no addCols shortcut available."
   )
   
   # Test intermediate pruning with differently sized doppelganger sets
-  res_pruning <- doppelgangR(list(eset1_sg, eset2_sg), automatic.smokingguns = TRUE, intermediate.pruning = TRUE, BPPARAM = BiocParallel::SerialParam())
+  res_pruning <- doppelgangR(list(eset1_sg, eset2_sg), automatic.smokingguns = TRUE, intermediate.pruning = TRUE)
   expect_s4_class(res_pruning, "DoppelGang")
 
   # Test bplapply error handling (mocking a dataset error)
@@ -67,6 +67,6 @@ test_that("doppelgangR handles edge cases and error states correctly", {
   # Let's just create an eset with non-numeric matrix to throw an error
   eset_fail <- ExpressionSet(assayData = matrix("A", ncol=2, nrow=2), phenoData = AnnotatedDataFrame(data.frame(age=1:2)))
   expect_error(
-    doppelgangR(list(eset1_sg, eset_fail), BPPARAM = BiocParallel::SerialParam(stop.on.error = FALSE))
+    doppelgangR(list(eset1_sg, eset_fail))
   )
 })

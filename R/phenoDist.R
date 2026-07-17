@@ -59,21 +59,29 @@ phenoDist <- function(x, y = NULL, bins = 10,
         z <- vectorDistFun(matrix(x, nrow = 1), matrix(y, nrow = 1), 1, 1, ...)
     } else {
         x <- .discretizeDataFrame(x, bins)
+        col_freqs_x <- lapply(seq_len(ncol(x)), function(i) {
+            tab <- table(x[, i], useNA = "no")
+            tab / sum(tab)
+        })
         if (is.null(y)) {
             z <- matrix(0, nrow = nrow(x), ncol = nrow(x))
             for (k in 1:(nrow(x) - 1)) {
                 for (l in (k + 1):nrow(x)) {
-                    z[k, l] <- vectorDistFun(x, x, k, l, ...)
+                    z[k, l] <- vectorDistFun(x, x, k, l, col_freqs_x = col_freqs_x, col_freqs_y = col_freqs_x, ...)
                     z[l, k] <- z[k, l]
                 }
             }
             dimnames(z) <- list(rownames(x), rownames(x))
         } else {
             y <- .discretizeDataFrame(y, bins)
+            col_freqs_y <- lapply(seq_len(ncol(y)), function(i) {
+                tab <- table(y[, i], useNA = "no")
+                tab / sum(tab)
+            })
             z <- matrix(0, nrow = nrow(x), ncol = nrow(y))
             for (k in 1:(nrow(x))) {
                 for (l in 1:nrow(y)) {
-                    z[k, l] <- vectorDistFun(x, y, k, l, ...)
+                    z[k, l] <- vectorDistFun(x, y, k, l, col_freqs_x = col_freqs_x, col_freqs_y = col_freqs_y, ...)
                 }
             }
             dimnames(z) <- list(rownames(x), rownames(y))

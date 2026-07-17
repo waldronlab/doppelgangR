@@ -11,6 +11,13 @@
  diag = TRUE
  ### If TRUE, include i, i elements.
 ) {
+  if (is.vector(x) && !is.null(y) && is.vector(y) && bidirectional && diag) {
+    return(data.frame(
+      X1 = rep(x, times = length(y)),
+      X2 = rep(y, each = length(x)),
+      stringsAsFactors = FALSE
+    ))
+  }
   bizarre.and.unlikely.separator <- " as3a2s5df5hjnm4qwe2rxcvb "
   if (is(x, "matrix")) {
     output.samples <- x

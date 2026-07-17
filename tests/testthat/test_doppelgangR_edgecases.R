@@ -58,7 +58,7 @@ test_that("doppelgangR handles edge cases and error states correctly", {
   res_pruning <- doppelgangR(list(eset1_sg, eset2_sg), automatic.smokingguns = TRUE, intermediate.pruning = TRUE)
   expect_s4_class(res_pruning, "DoppelGang")
 
-  # Test bplapply error handling (mocking a dataset error)
+  # Test future error handling (mocking a dataset error)
   eset1_err <- eset1_sg
   exprs(eset1_err)[1, 1] <- NA 
   

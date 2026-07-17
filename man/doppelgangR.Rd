@@ -73,7 +73,7 @@ results to save re-calculating correlations.  Set to NULL for no caching.}
 
 \item{verbose}{Print progress information}
 
-\item{...}{Passed to `doppelgangR` mainly for deprecation purposes (e.g. `BPPARAM`)}
+\item{...}{Deprecated. Any arguments passed via \code{...} (e.g., \code{BPPARAM}) are ignored and will trigger a deprecation warning.}
 }
 \value{
 Returns an object of S4-class "DoppelGang"

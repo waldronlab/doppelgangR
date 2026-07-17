@@ -20,7 +20,7 @@ n.eset$id <- toupper(colnames(n1))
 esets <- list(m = m.eset, n = n.eset)
 
 test_that("DoppelGang class methods work (Normal Use)", {
-    res <- doppelgangR(esets)
+    res <- doppelgangR(esets, verbose = FALSE)
   
   # Correctness / Normal Use: Test class
   expect_s4_class(res, "DoppelGang")
@@ -50,7 +50,7 @@ test_that("DoppelGang class methods work (Normal Use)", {
 })
 
 test_that("DoppelGang plot method skip.no.doppels and plot.pair arguments work (Edge Cases)", {
-    res <- doppelgangR(esets)
+    res <- doppelgangR(esets, verbose = FALSE)
   
   tmp <- tempfile()
   pdf(tmp)

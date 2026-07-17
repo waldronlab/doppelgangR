@@ -38,7 +38,7 @@
 #' @param cache.dir The name of a directory in which to cache or look up
 #' results to save re-calculating correlations.  Set to NULL for no caching.
 #' @param verbose Print progress information
-#' @param ... Passed to `doppelgangR` mainly for deprecation purposes (e.g. `BPPARAM`)
+#' @param ... Deprecated. Any arguments passed via \code{...} (e.g., \code{BPPARAM}) are ignored and will trigger a deprecation warning.
 #'
 #' @return Returns an object of S4-class "DoppelGang"
 #'
@@ -156,15 +156,17 @@ doppelgangR <- function
     ### Print progress information
     ...
   ) {
-    ##Save input args except for esets:
-    input.argnames <- ls()[-match("esets", ls())]
-    input.args <- lapply(input.argnames, function(x)
-      get(x))
-    names(input.args) <- input.argnames
+    ##Save input args except for esets and ...:
+    input.argnames <- setdiff(ls(), c("esets", "..."))
+    input.args <- mget(input.argnames)
     
     dots <- list(...)
     if ("BPPARAM" %in% names(dots)) {
       warning("The 'BPPARAM' argument is deprecated and ignored. 'doppelgangR' now uses the 'future' framework for parallelization. Please configure your parallel backend using 'future::plan()' instead.")
+      dots$BPPARAM <- NULL
+    }
+    if (length(dots) > 0) {
+      stop("Unknown arguments passed via '...': ", paste(names(dots), collapse = ", "))
     }
     if (is(esets, "ExpressionSet")) {
       esets <- list(ExpressionSet1 = esets, ExpressionSet2 = esets)

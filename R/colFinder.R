@@ -52,7 +52,7 @@ colFinder <- function(summex.list, ...) {
     similarity.mat <- 1 - phenoDist(matrix.one, ...)
     similarity.mat[!upper.tri(similarity.mat)] <- NA
   }else{
-    matrix.two <- as.matrix(summex.list[[2]])
+    matrix.two <- as.matrix(colData(summex.list[[2]]))
     matrix.two <-
       matrix.two[, match(colnames(matrix.one), colnames(matrix.two)), drop = FALSE]
     if(is.null(rownames(matrix.two)))

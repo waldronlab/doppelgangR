@@ -168,6 +168,18 @@ doppelgangR <- function
     if (length(dots) > 0) {
       stop("Unknown arguments passed via '...': ", paste(names(dots), collapse = ", "))
     }
+    # Internally coerce any SummarizedExperiment inputs to ExpressionSet
+    if (is(esets, "SummarizedExperiment")) {
+      esets <- as(esets, "ExpressionSet")
+    } else if (is(esets, "list")) {
+      esets <- lapply(esets, function(x) {
+        if (is(x, "SummarizedExperiment")) {
+          as(x, "ExpressionSet")
+        } else {
+          x
+        }
+      })
+    }
     if (is(esets, "ExpressionSet")) {
       esets <- list(ExpressionSet1 = esets, ExpressionSet2 = esets)
       eset.method <- TRUE
@@ -178,7 +190,7 @@ doppelgangR <- function
       between.datasets.only <- FALSE
     }
     if (!is(esets, "list")) {
-      stop("esets must be an ExpressionSet or a list of ExpressionSets")
+      stop("esets must be an ExpressionSet, SummarizedExperiment, or a list of such objects")
     }
     input.args$esets.names <- names(esets)
     if (!is.null(cache.dir))

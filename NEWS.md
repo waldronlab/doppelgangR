@@ -1,5 +1,8 @@
 ## Changes in version 1.41.1
 
+### New Features
+* **SummarizedExperiment Support**: Added native, seamless support for `SummarizedExperiment` inputs (and lists containing them) in the main `doppelgangR()` function. The objects are automatically coerced to `ExpressionSet` internally using robust S4 coercion (`as(x, "ExpressionSet")`), enabling direct compatibility without manual type conversions.
+
 ### Migration to future Parallel Framework
 * Replaced `BiocParallel` package usage with the CRAN `future` and `future.apply` framework for parallel computing.
 * Removed `BPPARAM` parameter from `doppelgangR()` to align with `future` package best practices (enabling global backend configuration via `future::plan()`).

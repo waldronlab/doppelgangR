@@ -5,7 +5,11 @@ test_that("Internal nonexports math and plot functions run without error", {
   # Plotting functions
   x <- seq(-3, 3, length=10)
   y <- seq(-3, 3, length=10)
-  
+
+  tmp_pdf <- tempfile(fileext = ".pdf")
+  grDevices::pdf(tmp_pdf)
+  on.exit({ grDevices::dev.off(); unlink(tmp_pdf) }, add = TRUE)
+
   expect_error(doppelgangR:::dsn2.plot(x, y, dp=list(xi=c(0,0), Omega=diag(2), alpha=c(0,0))), NA)
   expect_error(doppelgangR:::dst2.plot(x, y, dp=list(xi=c(0,0), Omega=diag(2), alpha=c(0,0), df=5)), NA)
 

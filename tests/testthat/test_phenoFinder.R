@@ -41,8 +41,12 @@ test_that("phenoFinder logic handles inputs, errors, and missing column names", 
   expect_error(phenoFinder(list(eset1, eset_diff)), "pData slots of esets must have identical column names")
   
   # Edge Case: Missing rownames get filled with make.names(1:nrow)
-  rownames(pData(eset1)) <- NULL
-  rownames(pData(eset2)) <- NULL
+  pdat1_no_rownames <- pData(eset1)
+  rownames(pdat1_no_rownames) <- NULL
+  pData(eset1) <- pdat1_no_rownames
+  pdat2_no_rownames <- pData(eset2)
+  rownames(pdat2_no_rownames) <- NULL
+  pData(eset2) <- pdat2_no_rownames
   res_missing_rows <- phenoFinder(list(eset1, eset2))
   expect_true(is.matrix(res_missing_rows))
   expect_equal(rownames(res_missing_rows), c("X1", "X2", "X3"))

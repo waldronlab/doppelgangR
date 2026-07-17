@@ -11,6 +11,7 @@
 #' @param x,object A DoppelGang class object
 #' @author Levi Waldron and Markus Riester
 #' @seealso \code{\link{plot,DoppelGang-method}}
+#' @return An object of class \code{DoppelGang}
 #' @export
 setClass(
   Class = "DoppelGang",
@@ -71,8 +72,7 @@ setMethod("print", signature(x = "DoppelGang"),
 #'
 #'
 #' @name plot-methods
-#' @aliases plot-methods plot,DoppelGang plot,DoppelGang-method
-#' plot,DoppelGang,ANY-method plot.DoppelGang plot.doppelgangR
+#' @aliases plot-methods plot,DoppelGang plot,DoppelGang-method plot,DoppelGang,ANY-method plot.DoppelGang plot.doppelgangR
 #' @docType methods
 #' @param x An object of class \code{\link{DoppelGang}}
 #' @param skip.no.doppels (default FALSE) If TRUE, do not plot histograms where

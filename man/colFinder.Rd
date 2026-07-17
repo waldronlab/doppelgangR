@@ -23,6 +23,13 @@ This function acts as a wrapper to colData to handle cases of one
 DataFrame, a list of two identical DataFrame, or a list of two
 different DataFrame
 }
+\examples{
+library(SummarizedExperiment)
+summex1 <- SummarizedExperiment(matrix(1:4, ncol=2), colData=S4Vectors::DataFrame(a=1:2))
+summex2 <- SummarizedExperiment(matrix(5:8, ncol=2), colData=S4Vectors::DataFrame(a=1:2))
+colFinder(list(summex1, summex2))
+
+}
 \author{
 Fabio Da Col, Marcel Ramos
 }

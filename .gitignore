@@ -19,3 +19,5 @@ cache/
 *.swp
 *.vim
 
+.gemini/settings.json
+tests/testthat/Rplots.pdf

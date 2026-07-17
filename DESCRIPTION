@@ -34,7 +34,8 @@ Suggests:
     knitr,
     rmarkdown,
     curatedOvarianData,
-    testthat
+    testthat,
+    S4Vectors
 biocViews: ImmunoOncology, RNASeq, Microarray, GeneExpression, QualityControl
 License: GPL (>=2.0)
 Encoding: UTF-8

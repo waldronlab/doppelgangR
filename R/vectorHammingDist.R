@@ -33,5 +33,5 @@
 #' @export vectorHammingDist
 vectorHammingDist <- function(x, y, k, l) {
     z <- as.vector(x[k, ] != y[l, ])
-    sum(z, na.rm = TRUE) / length(na.omit(z))
+    sum(z, na.rm = TRUE) / sum(!is.na(z))
 }

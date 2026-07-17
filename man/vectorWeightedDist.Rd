@@ -5,7 +5,7 @@
 \title{Calculate a weighted distance between two vectors, using pairwise complete
 observations.}
 \usage{
-vectorWeightedDist(x, y, k, l)
+vectorWeightedDist(x, y, k, l, col_freqs_x = NULL, col_freqs_y = NULL)
 }
 \arguments{
 \item{x}{a matrix}
@@ -15,6 +15,10 @@ vectorWeightedDist(x, y, k, l)
 \item{k}{row in x to test for differences}
 
 \item{l}{row in y to test for differences}
+
+\item{col_freqs_x}{optional precomputed list of column value proportions for x (named numeric tables per column)}
+
+\item{col_freqs_y}{optional precomputed list of column value proportions for y (named numeric tables per column)}
 }
 \value{
 Returns a numeric value, the log of the probability of observing the

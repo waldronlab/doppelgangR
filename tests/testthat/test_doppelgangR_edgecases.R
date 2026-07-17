@@ -4,8 +4,8 @@ library(Biobase)
 test_that("doppelgangR handles edge cases and error states correctly", {
   set.seed(123)
   
-  # Error handling: Not a list or ExpressionSet
-  expect_error(doppelgangR(data.frame(x=1)), "esets must be an ExpressionSet or a list of ExpressionSets")
+  # Error handling: Not a list, ExpressionSet, or SummarizedExperiment
+  expect_error(doppelgangR(data.frame(x=1)), "esets must be an ExpressionSet, SummarizedExperiment, or a list of such objects")
   
   # Edge Case: No featureNames in common
   mat1 <- matrix(rnorm(30), ncol=3)
@@ -57,7 +57,7 @@ test_that("doppelgangR handles edge cases and error states correctly", {
   # Test intermediate pruning with differently sized doppelganger sets
   res_pruning <- doppelgangR(list(eset1_sg, eset2_sg), automatic.smokingguns = TRUE, intermediate.pruning = TRUE)
   expect_s4_class(res_pruning, "DoppelGang")
-
+ 
   # Test future error handling (mocking a dataset error)
   eset1_err <- eset1_sg
   exprs(eset1_err)[1, 1] <- NA 
@@ -72,4 +72,22 @@ test_that("doppelgangR handles edge cases and error states correctly", {
       "Caught simpleError"
     )
   )
+
+  # Test SummarizedExperiment input handling and coercion
+  if (requireNamespace("SummarizedExperiment", quietly = TRUE)) {
+    se_mat <- matrix(rnorm(50), ncol=5)
+    rownames(se_mat) <- paste0("Gene", 1:10)
+    colnames(se_mat) <- paste0("SampleSE", 1:5)
+    se_pdat <- S4Vectors::DataFrame(age = 1:5)
+    rownames(se_pdat) <- colnames(se_mat)
+    se <- SummarizedExperiment::SummarizedExperiment(assays = list(exprs = se_mat), colData = se_pdat)
+    
+    # Passing single SummarizedExperiment
+    res_se <- doppelgangR(se)
+    expect_s4_class(res_se, "DoppelGang")
+    
+    # Passing list of SummarizedExperiment and ExpressionSet
+    res_mix <- doppelgangR(list(se, eset1_sg))
+    expect_s4_class(res_mix, "DoppelGang")
+  }
 })

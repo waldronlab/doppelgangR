@@ -38,15 +38,15 @@ test_that("mst.mle works", {
   res <- st.mle(y = X[, 1])
   expect_type(res, "list")
   
-  # mst.mle is exported, so we can test it directly
-  res_mst <- mst.mle(y = X)
+  # mst.mle is exported, so we test it via doppelgangR::mst.mle()
+  res_mst <- doppelgangR::mst.mle(y = X)
   expect_type(res_mst, "list")
   
-  res_mst_fixed <- mst.mle(y = X, fixed.df = 5)
+  res_mst_fixed <- doppelgangR::mst.mle(y = X, fixed.df = 5)
   expect_type(res_mst_fixed, "list")
 
   # Test with freq
-  res_mst_w <- mst.mle(y = X, freq = rep(1, 100))
+  res_mst_w <- doppelgangR::mst.mle(y = X, freq = rep(1, 100))
   expect_type(res_mst_w, "list")
 })
 

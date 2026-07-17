@@ -24,9 +24,11 @@ output:
   toc: true
 ---
 
-```{r, echo=FALSE, results='hide', eval=FALSE}
+```{r setup, echo=FALSE, results='hide', message=FALSE}
 library(knitr)
 opts_knit$set(cache=TRUE)
+has_data <- requireNamespace("curatedOvarianData", quietly = TRUE)
+opts_chunk$set(eval = has_data)
 ```
 
 # doppelgängR
@@ -47,7 +49,7 @@ Results from running `doppelgangR` on CRC, bladder, and ovarian
 For the manuscript vignette, visit
 <https://github.com/waldronlab/doppelgangR_paper>.
 
-```{r, echo=FALSE, message=FALSE}
+```{r loadpkg, echo=FALSE, message=FALSE}
 library(doppelgangR)
 ```
 
@@ -90,7 +92,7 @@ profiled by microarray and RNA-seq.
 We load for datasets by Yoshihara __et al.__ that have been curated
 in `r BiocStyle::Biocexptpkg("curatedOvarianData")`.  These are objects of class `ExpressionSet`.
 
-```{r, message = FALSE}
+```{r loaddata, message = FALSE}
 library(curatedOvarianData)
 data(GSE32062.GPL6480_eset)
 data(GSE17260_eset)
@@ -147,7 +149,7 @@ If after inspecting the histograms, you see that some visible outliers were not
 caught, or non-outliers exceeded the sensitivity threshold, you can change the
 default sensitivity using the argument:
 
-```{r, eval=FALSE}
+```{r changesens, eval=FALSE}
 outlierFinder.expr.args =
     list(bonf.prob = 0.5, transFun = atanh, tail = "upper")
 ```
@@ -169,7 +171,7 @@ The `doppelgangR()` function takes as its main argument a list of
 `ExpressionSet` objects.  If you just have matrices, you can easily convert
 these to the `ExpressionSet` objects, for example:
 
-```{r}
+```{r makematrix}
 mat <- matrix(1:4, ncol=2)
 library(Biobase)
 eset <- ExpressionSet(mat)
@@ -184,7 +186,7 @@ parallel using multiple processing cores using the BPPARAM argument. This
 functionality is imported from the \Biocpkg("BiocParallel") package. Please see
 "?BiocParallel::\`BiocParallelParam-class\`" documentation. 
 
-```{r, eval=FALSE}
+```{r parallel, eval=FALSE}
 results2 <- doppelgangR(testesets, BPPARAM = MulticoreParam(workers = 8))
 ```
 
@@ -193,3 +195,9 @@ results2 <- doppelgangR(testesets, BPPARAM = MulticoreParam(workers = 8))
 By default, the `doppelgangR()` function caches intermediate results to make
 re-running with different arguments faster.  Turn caching off by setting the
 argument `cache.dir=NULL`.
+
+# Session Info
+
+```{r sessionInfo, eval=TRUE}
+sessionInfo()
+```

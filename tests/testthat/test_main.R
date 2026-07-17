@@ -67,7 +67,8 @@ res1 <-
     esets,
     manual.smokingguns = "id",
     automatic.smokingguns = FALSE,
-    cache.dir = NULL
+    cache.dir = NULL,
+    BPPARAM = BiocParallel::SerialParam()
   )
 df1 <- summary(res1)
 
@@ -116,7 +117,8 @@ for (i in match(paste("X", 1:10, sep = ""), colnames(df1))) {
 res2 <-
   doppelgangR(esets,
               smokingGunFinder.args = NULL,
-              cache.dir = NULL)
+              cache.dir = NULL,
+              BPPARAM = BiocParallel::SerialParam())
 df2 <- summary(res2)
 for (i in grep("pheno.similarity|smokinggun.similarity",
                colnames(df1),
@@ -135,7 +137,8 @@ res3 <-
     phenoFinder.args = NULL,
     manual.smokingguns = "id",
     automatic.smokingguns = FALSE,
-    cache.dir = NULL
+    cache.dir = NULL,
+    BPPARAM = BiocParallel::SerialParam()
   )
 df3 <- summary(res3)
 for (i in grep("pheno.similarity", colnames(df1), invert = TRUE)) {
@@ -152,7 +155,8 @@ res4 <-
     corFinder.args = NULL,
     manual.smokingguns = "id",
     automatic.smokingguns = FALSE,
-    cache.dir = NULL
+    cache.dir = NULL,
+    BPPARAM = BiocParallel::SerialParam()
   )
 df4 <- summary(res4)
 for (i in grep("expr.similarity", colnames(df1), invert = TRUE)) {
@@ -170,7 +174,8 @@ res4b <-
     phenoFinder.args = NULL,
     manual.smokingguns = "id",
     automatic.smokingguns = FALSE,
-    cache.dir = NULL
+    cache.dir = NULL,
+    BPPARAM = BiocParallel::SerialParam()
   )
 df4b <- summary(res4b)
 rownames(df4b) <- NULL
@@ -190,7 +195,8 @@ res5 <-
     manual.smokingguns = "id",
     automatic.smokingguns = FALSE,
     intermediate.pruning = TRUE,
-    cache.dir = NULL
+    cache.dir = NULL,
+    BPPARAM = BiocParallel::SerialParam()
   )
 df5 <- summary(res5)
 expect_equal(df1, df5, label = "Check pruning")
@@ -215,7 +221,8 @@ for (i in 1:2) {
       esets2,
       manual.smokingguns = "id",
       automatic.smokingguns = FALSE,
-      cache.dir = tmpcachedir
+      cache.dir = tmpcachedir,
+      BPPARAM = BiocParallel::SerialParam()
     )
   ##Make sure comparison of m to n is the same as res1:
   df6a <- summary(res6)
@@ -246,7 +253,8 @@ res7 <-
       transFun = atanh,
       tail = "upper"
     ),
-    cache.dir = NULL
+    cache.dir = NULL,
+    BPPARAM = BiocParallel::SerialParam()
   )
 df7 <- summary(res7)
 has.o <- grepl("^o", df7$sample1) | grepl("^o", df7$sample2)
@@ -287,17 +295,17 @@ expect_equal(cor1, cor2, label = "Check corFinder function 3")
 
 ##Check missing values:
 exprs(esets[[1]])[1:10, 1:5] <- NA
-expect_message(doppelgangR(esets[1:2]), regexp = "Finalizing", label = "check missing values 1")
+expect_message(doppelgangR(esets[1:2], BPPARAM = BiocParallel::SerialParam()), regexp = "Finalizing", label = "check missing values 1")
 ## More missing values:
 exprs(esets[[1]])[1:10, 1:8] <- NA
-expect_warning(doppelgangR(esets[1:2]), regexp = "10 rows with more than 50 % entries missing", label = "check missing values 2")
+expect_warning(doppelgangR(esets[1:2], BPPARAM = BiocParallel::SerialParam()), regexp = "10 rows with more than 50 % entries missing", label = "check missing values 2")
 ## More missing values:
 exprs(esets[[1]])[1:10, 1:11] <- NA
-expect_warning(doppelgangR(esets[1:2]), regexp = "mean imputation used for these rows", label = "check missing values 3")
+expect_warning(doppelgangR(esets[1:2], BPPARAM = BiocParallel::SerialParam()), regexp = "mean imputation used for these rows", label = "check missing values 3")
 ## infinite values:
 exprs(esets[[1]])[14, 1] <- -Inf
 exprs(esets[[1]])[15, 2] <- Inf
-expect_warning(doppelgangR(esets[1:2]), regexp = "Inf with min/max expression values for dataset m", label = "check missing values 4")
+expect_warning(doppelgangR(esets[1:2], BPPARAM = BiocParallel::SerialParam()), regexp = "Inf with min/max expression values for dataset m", label = "check missing values 4")
 
 ##------------------------------------------
 ## Smoking guns only with cache=TRUE
@@ -308,7 +316,8 @@ expect_warning(
       esets,
       corFinder.args = NULL,
       phenoFinder.args = NULL,
-      manual.smokingguns = "id"
+      manual.smokingguns = "id",
+      BPPARAM = BiocParallel::SerialParam()
     ),
   label = "Smoking guns only with cache=TRUE"
 )
@@ -320,37 +329,37 @@ expect_equal(summary(dop)[, 2], "n:n4", label = "Smoking guns only with cache=TR
 ## Identical ExpressionSets
 ##------------------------------------------
 expect_warning(df1 <-
-                 summary(doppelgangR(esets[[1]], cache.dir = NULL)), label = "Identical ExpressionSets 1")
+                 summary(doppelgangR(esets[[1]], cache.dir = NULL, BPPARAM = BiocParallel::SerialParam())), label = "Identical ExpressionSets 1")
 expect_true(df1$sample1 == "m2", label = "Identical ExpressionSets 2")
 expect_true(df1$sample2 == "m3", label = "Identical ExpressionSets 3")
 ##
-df2 <- summary(doppelgangR(esets[[2]], cache.dir = NULL))
+df2 <- summary(doppelgangR(esets[[2]], cache.dir = NULL, BPPARAM = BiocParallel::SerialParam()))
 expect_true(all(df2$sample1 == "n2"), label = "Identical ExpressionSets 4")
 expect_true(all(df2$sample2 == "n3"), label = "Identical ExpressionSets 4b")
 ##
 expect_warning(df5 <-
                  summary(doppelgangR(
-                   list(eset1 = esets[[1]], eset2 = esets[[2]]), cache.dir = NULL
+                   list(eset1 = esets[[1]], eset2 = esets[[2]]), cache.dir = NULL, BPPARAM = BiocParallel::SerialParam()
                  )), label = "Identical ExpressionSets 5")
 expect_warning(df6 <-
-                 summary(doppelgangR(esets, cache.dir = NULL)), label = "Identical ExpressionSets 6")
+                 summary(doppelgangR(esets, cache.dir = NULL, BPPARAM = BiocParallel::SerialParam())), label = "Identical ExpressionSets 6")
 expect_identical(df5[,-1:-2], df6[,-1:-2], label = "Identical ExpressionSets 7")
 expect_identical(sub("eset2", "n", sub("eset1", "m", df5$sample1)), df6$sample1, label = "Identical ExpressionSets 8")
 expect_identical(sub("eset2", "n", sub("eset1", "m", df5$sample2)), df6$sample2, label = "Identical ExpressionSets 9")
 
 ## with zero-column pData:
 expect_warning(withpheno <-
-                 summary(doppelgangR(esets)), label = "with zero-column pData")
+                 summary(doppelgangR(esets, BPPARAM = BiocParallel::SerialParam())), label = "with zero-column pData")
 esets3 <- esets
 pData(esets3[[1]]) <- pData(esets3[[1]])[, 0]
 expect_warning(withoutpheno <-
-                 summary(doppelgangR(esets3)),
+                 summary(doppelgangR(esets3, BPPARAM = BiocParallel::SerialParam())),
                regexp = "expression values for dataset m",
                label = "with zero-column pData 2")
 
 pData(esets3[[2]]) <- pData(esets3[[2]])[, 0]
 expect_warning(withoutpheno2 <-
-                 summary(doppelgangR(esets3)),
+                 summary(doppelgangR(esets3, BPPARAM = BiocParallel::SerialParam())),
                regexp = "with min/max expression values for dataset m",
                label = "with zero-column pData 3")
 
@@ -363,6 +372,6 @@ expect_identical(withoutpheno2[, 1:4], withoutpheno4[, 1:4], label = "with zero-
 esets4 <- esets
 for (i in 1:length(esets4))
   pData(esets4[[i]]) <- pData(esets4[[i]])[1]
-expect_warning(doppelgangR(esets4[[1]]), label = "with zero-column pData 6")
-expect_s4_class(doppelgangR(esets4[[2]]), "DoppelGang")
+expect_warning(doppelgangR(esets4[[1]], BPPARAM = BiocParallel::SerialParam()), label = "with zero-column pData 6")
+expect_s4_class(doppelgangR(esets4[[2]], BPPARAM = BiocParallel::SerialParam()), "DoppelGang")
 

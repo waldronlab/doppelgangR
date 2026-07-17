@@ -68,7 +68,7 @@ corFinder <-
     if (any(!is.finite(big.matrix))) {
       all.finite <- apply(big.matrix, 1, function(x)
         all(is.finite(x)))
-      big.matrix <- big.matrix[all.finite,]
+      big.matrix <- big.matrix[all.finite, , drop=FALSE]
       if (nrow(big.matrix) < 2)
         stop("Fewer than two genes without all finite values.")
     }

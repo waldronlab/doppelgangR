@@ -46,7 +46,7 @@ colFinder <- function(summex.list, ...) {
   }
   matrix.one <- as.matrix(colData(summex.list[[1]]))
   if(is.null(rownames(matrix.one)))
-    rownames(matrix.one) <- make.names(1:nrow(matrix.one))
+    rownames(matrix.one) <- make.names(seq_len(nrow(matrix.one)))
   keep.col <- apply(matrix.one, 2, function(x){
     !all(is.na(x))
   })

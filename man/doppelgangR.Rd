@@ -20,8 +20,8 @@ doppelgangR(
   within.datasets.only = FALSE,
   intermediate.pruning = FALSE,
   cache.dir = "cache",
-  BPPARAM = bpparam(),
-  verbose = TRUE
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
@@ -71,10 +71,9 @@ missing values for the expression and smoking gun similarity).}
 \item{cache.dir}{The name of a directory in which to cache or look up
 results to save re-calculating correlations.  Set to NULL for no caching.}
 
-\item{BPPARAM}{Argument for BiocParallel::bplapply(), by default will use
-all cores of a multi-core machine}
-
 \item{verbose}{Print progress information}
+
+\item{...}{Deprecated. Any arguments passed via \code{...} (e.g., \code{BPPARAM}) are ignored and will trigger a deprecation warning.}
 }
 \value{
 Returns an object of S4-class "DoppelGang"
@@ -131,7 +130,6 @@ summary(results2)
 }
 \seealso{
 \link{DoppelGang-class}
-\link[BiocParallel]{BiocParallelParam-class}
 }
 \author{
 Levi Waldron, Markus Riester, Marcel Ramos

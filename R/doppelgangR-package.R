@@ -8,7 +8,8 @@
 #' in pData(eset).
 #'
 #' @importFrom Biobase exprs featureNames sampleNames pData "sampleNames<-" "exprs<-" "pData<-"
-#' @importFrom BiocParallel bplapply bpparam
+#' @importFrom future plan
+#' @importFrom future.apply future_lapply
 #' @importFrom sva ComBat
 #' @importFrom digest digest
 #' @importFrom impute impute.knn

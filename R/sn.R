@@ -343,9 +343,9 @@ mst.mle <-
       alpha <- rep(0, d)
       df <- ifelse(is.na(fixed.df), 10, fixed.df)
       if (trace) {
-        cat("mst.mle: dp=", "\n")
-        print(c(beta, Omega, alpha))
-        cat("df:", df, "\n")
+        message("mst.mle: dp=")
+        message(paste(c(beta, Omega, alpha), collapse = " "))
+        message("df: ", df)
       }
     }
     else {

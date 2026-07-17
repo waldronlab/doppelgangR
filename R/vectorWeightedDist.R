@@ -47,12 +47,14 @@ vectorWeightedDist <-
   x <- x[, idx, drop = FALSE]
   y <- y[, idx, drop = FALSE]
   
-  p.x <- sapply(1:ncol(x), function(i)
+  p.x <- vapply(seq_len(ncol(x)), function(i)
     sum(x[k, i] == x[, i],
-        na.rm = TRUE) / sum(!is.na(x[, i])))
-  p.y <- sapply(1:ncol(y), function(i)
+        na.rm = TRUE) / sum(!is.na(x[, i])),
+    FUN.VALUE = numeric(1))
+  p.y <- vapply(seq_len(ncol(y)), function(i)
     sum(y[l, i] == y[, i],
-        na.rm = TRUE) / sum(!is.na(y[, i])))
+        na.rm = TRUE) / sum(!is.na(y[, i])),
+    FUN.VALUE = numeric(1))
   
   idx <- x[k, ] != y[l, ]
   w <- 1 - p.x * p.y

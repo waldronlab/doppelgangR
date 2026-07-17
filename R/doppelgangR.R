@@ -37,17 +37,14 @@
 #' missing values for the expression and smoking gun similarity).
 #' @param cache.dir The name of a directory in which to cache or look up
 #' results to save re-calculating correlations.  Set to NULL for no caching.
-#' @param BPPARAM Argument for BiocParallel::bplapply(), by default will use
-#' all cores of a multi-core machine
 #' @param verbose Print progress information
+#' @param ... Deprecated. Any arguments passed via \code{...} (e.g., \code{BPPARAM}) are ignored and will trigger a deprecation warning.
 #'
 #' @return Returns an object of S4-class "DoppelGang"
 #'
 #' @author Levi Waldron, Markus Riester, Marcel Ramos
 #'
 #' @seealso \link{DoppelGang-class}
-#' \link[BiocParallel]{BiocParallelParam-class}
-#'
 #' @examples
 #'
 #' example("phenoFinder")
@@ -155,17 +152,22 @@ doppelgangR <- function
     cache.dir = "cache",
     ### The name of a directory in which to cache or look up results to save
     ### re-calculating correlations.  Set to NULL for no caching.
-    BPPARAM = bpparam(),
-    ### Argument for BiocParallel::bplapply(), by default what is returned by BiocParallel::bpparam(), 
-    ### see ?BiocParallel::bpparam to change options.
-    verbose = TRUE
+    verbose = TRUE,
     ### Print progress information
+    ...
   ) {
-    ##Save input args except for esets:
-    input.argnames <- ls()[-match("esets", ls())]
-    input.args <- lapply(input.argnames, function(x)
-      get(x))
-    names(input.args) <- input.argnames
+    ##Save input args except for esets and ...:
+    input.argnames <- setdiff(ls(), c("esets", "..."))
+    input.args <- mget(input.argnames)
+    
+    dots <- list(...)
+    if ("BPPARAM" %in% names(dots)) {
+      warning("The 'BPPARAM' argument is deprecated and ignored. 'doppelgangR' now uses the 'future' framework for parallelization. Please configure your parallel backend using 'future::plan()' instead.")
+      dots$BPPARAM <- NULL
+    }
+    if (length(dots) > 0) {
+      stop("Unknown arguments passed via '...': ", paste(names(dots), collapse = ", "))
+    }
     if (is(esets, "ExpressionSet")) {
       esets <- list(ExpressionSet1 = esets, ExpressionSet2 = esets)
       eset.method <- TRUE
@@ -189,10 +191,10 @@ doppelgangR <- function
         paste(names(esets)[i], sampleNames(esets[[i]]), sep = separator)
       if (min(exprs(esets[[i]]), na.rm = TRUE) == -Inf |
           max(exprs(esets[[i]]), na.rm = TRUE) == Inf) {
-        warning(paste(
-          "Replacing -+Inf with min/max expression values for dataset",
+        warning(
+          "Replacing -+Inf with min/max expression values for dataset ",
           names(esets)[i]
-        ))
+        )
         exprs(esets[[i]])[exprs(esets[[i]]) == -Inf] <-
           min(exprs(esets[[i]])[is.finite(exprs(esets[[i]]))], na.rm = TRUE)
         exprs(esets[[i]])[exprs(esets[[i]]) == Inf] <-
@@ -201,7 +203,7 @@ doppelgangR <- function
       if (!is.null(impute.knn.args) &
           any(!complete.cases(exprs(esets[[i]])))) {
         ##KNN imputation
-        message(paste("KNN imputation for", names(esets)[i]))
+        message("KNN imputation for ", names(esets)[i])
         impute.knn.args$data <- exprs(esets[[i]])
         impute.knn.output  <-
           do.call(impute::impute.knn, args = impute.knn.args)
@@ -217,7 +219,7 @@ doppelgangR <- function
     if (!within.datasets.only)
       ds.combns <-
       c(ds.combns, combn(1:length(esets), 2, simplify = FALSE))
-    output.full <- bplapply(ds.combns, function(ij) {
+    output.full <- future_lapply(ds.combns, function(ij) {
       i <- ij[1]
       j <- ij[2]
       if (verbose)
@@ -300,19 +302,17 @@ doppelgangR <- function
       ## If column names don't match, do not search for phenotype doppelgangers:
       if (!identical(colnames(pData(esets[[i]])), colnames(pData(esets[[j]])))) {
         warning(
-          paste(
-            names(esets)[i],
-            "and",
-            names(esets)[j],
-            "have different column names in phenoData.  Skipping phenotype checking for this pair.  Set phenoFinger.args=NULL to disable phenotype checking altogether."
-          )
+          names(esets)[i],
+          " and ",
+          names(esets)[j],
+          " have different column names in phenoData. Skipping phenotype checking for this pair. Set phenoFinger.args=NULL to disable phenotype checking altogether."
         )
         phenoFinder.args <- NULL
       }
       ## automatically find potential "smoking gun" phenotypes
       if (automatic.smokingguns & !is.null(phenoFinder.args)) {
         new.smokinggun.phenotypes <-
-          unlist(sapply(colnames(pData(esets[[i]])), function(cname) {
+          vapply(colnames(pData(esets[[i]])), function(cname) {
             if (cname %in% colnames(pData(esets[[j]]))) {
               if ((sum(!is.na(pData(esets[[i]])[, cname])) > 2 &
                    sum(!is.na(pData(esets[[j]])[, cname])) > 2) &
@@ -324,7 +324,9 @@ doppelgangR <- function
                   )))))
                 return(cname)
             }
-          }))
+            return(NA_character_)
+          }, FUN.VALUE = character(1))
+        new.smokinggun.phenotypes <- new.smokinggun.phenotypes[!is.na(new.smokinggun.phenotypes)]
         manual.smokingguns <-
           unique(c(manual.smokingguns, new.smokinggun.phenotypes))
       }
@@ -392,34 +394,50 @@ doppelgangR <- function
       ##then keep that sample for all methods, so we don't lose the
       ##data when wrapping up:
       if (intermediate.pruning) {
-        keep.rows <- output3[["pheno.doppels"]]$outlierFinder.res$doppel |
-          output3[["expr.doppels"]]$outlierFinder.res$doppel |
-          output3[["smokinggun.doppels"]]$outlierFinder.res$doppel
-        output3[["smokinggun.doppels"]]$outlierFinder.res <-
-          output3[["smokinggun.doppels"]]$outlierFinder.res[keep.rows,]
-        output3[["pheno.doppels"]]$outlierFinder.res <-
-          output3[["pheno.doppels"]]$outlierFinder.res[keep.rows,]
+        key_expr <- paste(output3[["expr.doppels"]]$outlierFinder.res$sample1,
+                          output3[["expr.doppels"]]$outlierFinder.res$sample2, sep = " <-> ")
+        key_pheno <- paste(output3[["pheno.doppels"]]$outlierFinder.res$sample1,
+                           output3[["pheno.doppels"]]$outlierFinder.res$sample2, sep = " <-> ")
+        key_sg <- paste(output3[["smokinggun.doppels"]]$outlierFinder.res$sample1,
+                        output3[["smokinggun.doppels"]]$outlierFinder.res$sample2, sep = " <-> ")
+
+        doppel_expr <- key_expr[which(output3[["expr.doppels"]]$outlierFinder.res$doppel)]
+        doppel_pheno <- key_pheno[which(output3[["pheno.doppels"]]$outlierFinder.res$doppel)]
+        doppel_sg <- key_sg[which(output3[["smokinggun.doppels"]]$outlierFinder.res$doppel)]
+
+        all_doppel_keys <- unique(c(doppel_expr, doppel_pheno, doppel_sg))
+
+        keep_expr <- key_expr %in% all_doppel_keys
+        keep_pheno <- key_pheno %in% all_doppel_keys
+        keep_sg <- key_sg %in% all_doppel_keys
+
         output3[["expr.doppels"]]$outlierFinder.res <-
-          output3[["expr.doppels"]]$outlierFinder.res[keep.rows,]
+          output3[["expr.doppels"]]$outlierFinder.res[keep_expr, , drop = FALSE]
+        output3[["pheno.doppels"]]$outlierFinder.res <-
+          output3[["pheno.doppels"]]$outlierFinder.res[keep_pheno, , drop = FALSE]
+        output3[["smokinggun.doppels"]]$outlierFinder.res <-
+          output3[["smokinggun.doppels"]]$outlierFinder.res[keep_sg, , drop = FALSE]
       }
       return(output3)
-    }, BPPARAM = BPPARAM)
+    }, future.seed = TRUE)
     has.errors <-
-      sapply(output.full, function(x)
-        any(grep("error", class(x))))
+      vapply(output.full, function(x)
+        any(grep("error", class(x))),
+        FUN.VALUE = logical(1))
     if (any(has.errors)) {
       ds.errors <- ds.combns[has.errors]
-      warning(paste0(
-        "The following dataset combinations resulted in errors: ",
-        paste(lapply(ds.errors, function(idx)
-          paste(names(esets)[idx], collapse = "/")),
+      warning(
+        "The following dataset combinations resulted in failures: ",
+        paste(vapply(ds.errors, function(idx)
+          paste(names(esets)[idx], collapse = "/"),
+          FUN.VALUE = character(1)),
           collapse = ", ")
-      ))
+      )
       warning(output.full[has.errors])
     }
-    names(output.full) <- sapply(ds.combns, function(ij) {
+    names(output.full) <- vapply(ds.combns, function(ij) {
       paste(names(esets)[c(ij[1], ij[2])], collapse = separator)
-    })
+    }, FUN.VALUE = character(1))
     if (verbose)
       message("Finalizing...")
     wrapUp <- function(object, element) {

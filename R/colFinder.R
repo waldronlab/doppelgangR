@@ -29,8 +29,8 @@
 #'
 #' @examples
 #' library(SummarizedExperiment)
-#' summex1 <- SummarizedExperiment(matrix(1:4, ncol=2), colData=DataFrame(a=1:2))
-#' summex2 <- SummarizedExperiment(matrix(5:8, ncol=2), colData=DataFrame(a=1:2))
+#' summex1 <- SummarizedExperiment(matrix(1:4, ncol=2), colData=S4Vectors::DataFrame(a=1:2))
+#' summex2 <- SummarizedExperiment(matrix(5:8, ncol=2), colData=S4Vectors::DataFrame(a=1:2))
 #' colFinder(list(summex1, summex2))
 #'
 #' @export colFinder

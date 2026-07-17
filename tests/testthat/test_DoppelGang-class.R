@@ -45,9 +45,10 @@ test_that("DoppelGang class methods work (Normal Use)", {
   
   # Normal Use: Test plot method
   # Save plot to pdf to avoid opening window
-  pdf(file = NULL)
+  tmp <- tempfile()
+  pdf(tmp)
+  on.exit({ dev.off(); unlink(tmp) }, add = TRUE)
   expect_no_error(plot(res))
-  dev.off()
 })
 
 test_that("DoppelGang plot method skip.no.doppels and plot.pair arguments work (Edge Cases)", {
@@ -55,7 +56,9 @@ test_that("DoppelGang plot method skip.no.doppels and plot.pair arguments work (
     res <- doppelgangR(esets, BPPARAM = BiocParallel::SerialParam())
   ))
   
-  pdf(file = NULL)
+  tmp <- tempfile()
+  pdf(tmp)
+  on.exit({ dev.off(); unlink(tmp) }, add = TRUE)
   # Test skip.no.doppels
   expect_no_error(plot(res, skip.no.doppels = TRUE))
   
@@ -67,6 +70,4 @@ test_that("DoppelGang plot method skip.no.doppels and plot.pair arguments work (
   
   # Error handling: plot.pair with wrong length
   expect_error(plot(res, plot.pair = c("m")), "plot.pair must be a character vector of length two")
-  
-  dev.off()
 })

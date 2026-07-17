@@ -67,6 +67,9 @@ test_that("doppelgangR handles edge cases and error states correctly", {
   # Let's just create an eset with non-numeric matrix to throw an error
   eset_fail <- ExpressionSet(assayData = matrix("A", ncol=2, nrow=2), phenoData = AnnotatedDataFrame(data.frame(age=1:2)))
   expect_error(
-    doppelgangR(list(eset1_sg, eset_fail))
+    expect_warning(
+      doppelgangR(list(eset1_sg, eset_fail)),
+      "Caught simpleError"
+    )
   )
 })

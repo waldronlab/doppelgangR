@@ -12,6 +12,8 @@
 #' @param y a matrix with the same number of columns as x
 #' @param k row in x to test for differences
 #' @param l row in y to test for differences
+#' @param col_freqs_x optional precomputed list of column value proportions for x (named numeric tables per column)
+#' @param col_freqs_y optional precomputed list of column value proportions for y (named numeric tables per column)
 #' @return Returns a numeric value, the log of the probability of observing the
 #' matches in x and y
 #' @author Levi Waldron, Markus Riester, Marcel Ramos

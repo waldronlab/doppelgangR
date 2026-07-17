@@ -58,6 +58,15 @@ phenoDist <- function(x, y = NULL, bins = 10,
     if (is.vector(x) && is.vector(y)) {
         z <- vectorDistFun(matrix(x, nrow = 1), matrix(y, nrow = 1), 1, 1, ...)
     } else {
+        # Check if vectorDistFun supports col_freqs_x / col_freqs_y
+        fun_formals <- formals(vectorDistFun)
+        if (is.null(fun_formals)) {
+            supports_freqs <- FALSE
+        } else {
+            has_dots <- "..." %in% names(fun_formals)
+            supports_freqs <- "col_freqs_x" %in% names(fun_formals) || has_dots
+        }
+
         x <- .discretizeDataFrame(x, bins)
         col_freqs_x <- lapply(seq_len(ncol(x)), function(i) {
             tab <- table(x[, i], useNA = "no")
@@ -65,10 +74,16 @@ phenoDist <- function(x, y = NULL, bins = 10,
         })
         if (is.null(y)) {
             z <- matrix(0, nrow = nrow(x), ncol = nrow(x))
-            for (k in 1:(nrow(x) - 1)) {
-                for (l in (k + 1):nrow(x)) {
-                    z[k, l] <- vectorDistFun(x, x, k, l, col_freqs_x = col_freqs_x, col_freqs_y = col_freqs_x, ...)
-                    z[l, k] <- z[k, l]
+            if (nrow(x) >= 2) {
+                for (k in seq_len(nrow(x) - 1)) {
+                    for (l in (k + 1):nrow(x)) {
+                        if (supports_freqs) {
+                            z[k, l] <- vectorDistFun(x, x, k, l, col_freqs_x = col_freqs_x, col_freqs_y = col_freqs_x, ...)
+                        } else {
+                            z[k, l] <- vectorDistFun(x, x, k, l, ...)
+                        }
+                        z[l, k] <- z[k, l]
+                    }
                 }
             }
             dimnames(z) <- list(rownames(x), rownames(x))
@@ -79,9 +94,15 @@ phenoDist <- function(x, y = NULL, bins = 10,
                 tab / sum(tab)
             })
             z <- matrix(0, nrow = nrow(x), ncol = nrow(y))
-            for (k in 1:(nrow(x))) {
-                for (l in 1:nrow(y)) {
-                    z[k, l] <- vectorDistFun(x, y, k, l, col_freqs_x = col_freqs_x, col_freqs_y = col_freqs_y, ...)
+            if (nrow(x) > 0 && nrow(y) > 0) {
+                for (k in seq_len(nrow(x))) {
+                    for (l in seq_len(nrow(y))) {
+                        if (supports_freqs) {
+                            z[k, l] <- vectorDistFun(x, y, k, l, col_freqs_x = col_freqs_x, col_freqs_y = col_freqs_y, ...)
+                        } else {
+                            z[k, l] <- vectorDistFun(x, y, k, l, ...)
+                        }
+                    }
                 }
             }
             dimnames(z) <- list(rownames(x), rownames(y))

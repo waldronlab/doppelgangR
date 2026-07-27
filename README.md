@@ -1,6 +1,33 @@
 
 # doppelgängR
 
+**GitHub Actions:**
+
+[![R CMD check](https://github.com/waldronlab/doppelgangR/actions/workflows/ci.yml/badge.svg)](https://github.com/waldronlab/doppelgangR/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/waldronlab/doppelgangR/graph/badge.svg)](https://codecov.io/gh/waldronlab/doppelgangR)
+[![pkgdown](https://img.shields.io/badge/pkgdown-site-blue.svg)](https://waldronlab.github.io/doppelgangR/)
+
+**Bioconductor Release:**
+
+[![Bioconductor Release Build Status](https://www.bioconductor.org/shields/build/release/bioc/doppelgangR.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/doppelgangR/)
+[![Bioconductor Release Availability](https://www.bioconductor.org/shields/availability/release/doppelgangR.svg)](https://bioconductor.org/packages/release/bioc/html/doppelgangR.html#archives)
+[![Bioconductor Release Downloads](https://www.bioconductor.org/shields/downloads/release/doppelgangR.svg)](https://bioconductor.org/packages/stats/bioc/doppelgangR/)
+[![Bioconductor Support Activity](https://www.bioconductor.org/shields/posts/doppelgangR.svg)](https://support.bioconductor.org/tag/doppelgangR)
+[![Bioconductor Years in BioC](https://www.bioconductor.org/shields/years-in-bioc/doppelgangR.svg)](https://bioconductor.org/packages/release/bioc/html/doppelgangR.html#since)
+[![Bioconductor Release Last Commit](https://www.bioconductor.org/shields/lastcommit/release/bioc/doppelgangR.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/doppelgangR/)
+[![Bioconductor Release Dependencies](https://www.bioconductor.org/shields/dependencies/release/doppelgangR.svg)](https://bioconductor.org/packages/release/bioc/html/doppelgangR.html#since)
+
+**Bioconductor Devel:** 
+
+[![Bioconductor Devel Build Status](https://www.bioconductor.org/shields/build/devel/bioc/doppelgangR.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/doppelgangR/)
+[![Bioconductor Devel Availability](https://www.bioconductor.org/shields/availability/devel/doppelgangR.svg)](https://bioconductor.org/packages/devel/bioc/html/doppelgangR.html#archives)
+[![Bioconductor Devel Downloads](https://www.bioconductor.org/shields/downloads/devel/doppelgangR.svg)](https://bioconductor.org/packages/stats/bioc/doppelgangR/)
+[![Bioconductor Support Activity](https://www.bioconductor.org/shields/posts/doppelgangR.svg)](https://support.bioconductor.org/tag/doppelgangR)
+[![Bioconductor Years in BioC](https://www.bioconductor.org/shields/years-in-bioc/doppelgangR.svg)](https://bioconductor.org/packages/devel/bioc/html/doppelgangR.html#since)
+[![Bioconductor Devel Last Commit](https://www.bioconductor.org/shields/lastcommit/devel/bioc/doppelgangR.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/doppelgangR/)
+[![Bioconductor Devel Dependencies](https://www.bioconductor.org/shields/dependencies/devel/doppelgangR.svg)](https://bioconductor.org/packages/devel/bioc/html/doppelgangR.html#since)
+
+
 ## Introduction
 
 *[doppelgangR](https://bioconductor.org/packages/3.23/doppelgangR)* is a
@@ -16,7 +43,7 @@ Results from running `doppelgangR` on CRC, bladder, and ovarian [on
 Dropbox](httpss://www.dropbox.com/sh/or3l7oo96x1ilm8/AAD1MVQVnoS6H7OExoYwOovSa?dl=0).
 
 For the manuscript vignette, visit
-<https://github.com/waldronlab/doppelgangR_paper>.
+<https://github.com/doppelgangr/doppelgangR_paper>.
 
 The `doppelgangR()` function identifies duplicates in three different
 ways:
@@ -101,7 +128,7 @@ plot(results1)
 
 <div class="figure">
 
-<img src="https://raw.githubusercontent.com/waldronlab/figures/refs/heads/devel/plotdop-1.png?token=GHSAT0AAAAAADOAOGYE6J2QRP54HL4XFORY2I3VLIA" alt="Doppelgängers identified on the basis of similar expression profiles. The vertical red lines indicate samples that were flagged." width="100%" />
+<img src="https://raw.githubusercontent.com/doppelgangr/figures/refs/heads/devel/plotdop-1.png?token=GHSAT0AAAAAADOAOGYE6J2QRP54HL4XFORY2I3VLIA" alt="Doppelgängers identified on the basis of similar expression profiles. The vertical red lines indicate samples that were flagged." width="100%" />
 <p class="caption">
 
 Doppelgängers identified on the basis of similar expression profiles.
@@ -118,7 +145,7 @@ plot(results1, plot.pair=c("JapaneseA", "JapaneseA"))
 
 <div class="figure">
 
-<img src="https://raw.githubusercontent.com/waldronlab/figures/refs/heads/devel/plotdop2-1.png?token=GHSAT0AAAAAADOAOGYFTY77UUIBHH744C7A2I3VNFA" alt="Pair plot of JapaneseA:JapaneseA Doppelgängers identified. The vertical red lines indicate samples that were flagged." width="100%" />
+<img src="https://raw.githubusercontent.com/doppelgangr/figures/refs/heads/devel/plotdop2-1.png?token=GHSAT0AAAAAADOAOGYFTY77UUIBHH744C7A2I3VNFA" alt="Pair plot of JapaneseA:JapaneseA Doppelgängers identified. The vertical red lines indicate samples that were flagged." width="100%" />
 <p class="caption">
 
 Pair plot of JapaneseA:JapaneseA Doppelgängers identified. The vertical

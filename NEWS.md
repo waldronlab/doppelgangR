@@ -1,25 +1,24 @@
-## Changes in version 1.41.1
+## Changes in version 1.42.0
 
-### New Features
-* **SummarizedExperiment Support**: Added native, seamless support for `SummarizedExperiment` inputs (and lists containing them) in the main `doppelgangR()` function. The objects are automatically coerced to `ExpressionSet` internally using robust S4 coercion (`as(x, "ExpressionSet")`), enabling direct compatibility without manual type conversions.
+### Significant user-visible changes
 
-### Migration to future Parallel Framework
-* Replaced `BiocParallel` package usage with the CRAN `future` and `future.apply` framework for parallel computing.
-* Removed `BPPARAM` parameter from `doppelgangR()` to align with `future` package best practices (enabling global backend configuration via `future::plan()`).
-* Added a dummy parameter catcher in `doppelgangR(...)` that throws a helpful deprecation warning if legacy `BPPARAM` is used.
+* Parallel computation now uses the CRAN `future` framework instead of
+  `BiocParallel`. The `BPPARAM` argument of `doppelgangR()` is removed;
+  choose a backend with `future::plan()`. Supplying `BPPARAM` gives a
+  deprecation warning (#29, @lwaldron).
 
-### Performance and Memory Optimizations
-* **Cartesian Product Vector Optimization**: Added a vector fast path in `.outer2df` to construct coordinates directly using vector replication (`rep`), yielding a **46x speedup** on 2,000 samples and eliminating massive memory spikes from legacy string splits.
-* **Phenotype Distance Lookups**: Precalculated value frequencies once per column in `phenoDist()`, allowing `vectorWeightedDist()` to perform $O(1)$ lookups instead of scanning columns dynamically. This reduced complexity from cubic to quadratic and achieved a **2.3x speedup** on 500 samples.
-* **Hamming Distance Helper Optimization**: Replaced `length(na.omit(z))` with `sum(!is.na(z))` inside `vectorHammingDist()` for an **8x speedup** per call.
+### New features
 
-### Bug Fixes & Compliance
-* **Recycling Warning Fixed**: Resolved a vector length mismatch recycling warning in `doppelgangR()` intermediate pruning when smoking guns are enabled. Replaced the element-wise logical OR on vectors of unequal sizes with a robust, key-based merging and subsetting strategy.
-* **BiocCheck & Code Style Compliance**:
-  * Migrated unsafe `sapply()` calls to type-safe `vapply()`.
-  * Replaced manual integer ranges (`1:...`) with `seq_len()`.
-  * Removed `paste()` and `paste0()` from inside error and warning condition signals.
-  * Replaced raw `cat` and `print` calls in trace logging blocks with `message()`.
+* `doppelgangR()` accepts `SummarizedExperiment` objects, and lists of
+  them, converting them to `ExpressionSet` internally (#30, @lwaldron).
+
+### Bug fixes and minor improvements
+
+* `doppelgangR()` is faster and uses less memory on large datasets
+  (#30, @lwaldron).
+* Fix a recycling warning when smoking guns are enabled (#29, @lwaldron).
+* Fix examples, build the vignette when suggested packages are missing,
+  and expand test coverage (#26, #27, #28, @lwaldron).
 
 ## Changes in version 0.5.0
 
